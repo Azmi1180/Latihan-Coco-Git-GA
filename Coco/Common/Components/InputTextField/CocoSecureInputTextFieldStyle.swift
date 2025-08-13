@@ -10,11 +10,9 @@ import SwiftUI
 
 struct CocoSecureInputTextFieldStyle: TextFieldStyle {
     @Binding private var isSecure: Bool
-    
     let leadingIcon: UIImage?
     let placeHolder: String?
     let onFocusedAction: ((Bool) -> Void)?
-    
     init(
         leadingIcon: UIImage?,
         isSecure: Binding<Bool>,
@@ -26,7 +24,7 @@ struct CocoSecureInputTextFieldStyle: TextFieldStyle {
         self.placeHolder = placeHolder
         self.onFocusedAction = onFocusedAction
     }
-    
+    // swiftlint:disable identifier_name
     func _body(configuration: TextField<Self._Label>) -> some View {
         HStack(alignment: .center, spacing: 8.0) {
             if let leadingIcon: UIImage {
@@ -35,9 +33,7 @@ struct CocoSecureInputTextFieldStyle: TextFieldStyle {
                     .scaledToFit()
                     .frame(width: 18.0, height: 18.0)
             }
-                
             configuration
-            
             Button(action: {
                 isSecure.toggle()
             }) {

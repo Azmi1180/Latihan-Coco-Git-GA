@@ -31,6 +31,7 @@ struct CocoInputTextFieldStyle: TextFieldStyle {
         self.onFocusedAction = onFocusedAction
     }
     
+    // swiftlint:disable identifier_name
     func _body(configuration: TextField<Self._Label>) -> some View {
         HStack(alignment: .center, spacing: 8.0) {
             if let leadingIcon: UIImage {

@@ -21,6 +21,7 @@ struct HomeSearchFilterPriceRangeView: View {
                     .foregroundStyle(Token.additionalColorsBlack.toColor())
                 Spacer()
                 Text("Rp\(Int(model.minPrice)) - Rp\(Int(model.maxPrice))")
+                    .monospaced()
                     .font(.jakartaSans(forTextStyle: .body, weight: .semibold))
                     .foregroundStyle(Token.mainColorPrimary.toColor())
             }
