@@ -11,6 +11,7 @@ import SwiftUI
 struct HomeSearchSearchLocationData {
     let id: Int
     let name: String
+    let queryName: String
 }
 
 final class HomeSearchSearchTrayViewModel: ObservableObject {
@@ -28,7 +29,10 @@ final class HomeSearchSearchTrayViewModel: ObservableObject {
             guard let self else { return }
             switch result {
             case .success(let response):
-                self.popularLocations = response.values.map { HomeSearchSearchLocationData(id: $0.id, name: $0.name) }
+                self.popularLocations = response.values.map {
+                    let queryName = $0.name.components(separatedBy: ",").first ?? $0.name
+                    return HomeSearchSearchLocationData(id: $0.id, name: $0.name, queryName: queryName)
+                }
             case .failure(let failure):
                 break
             }

@@ -79,9 +79,9 @@ extension HomeViewModel: HomeSearchBarViewModelDelegate {
         actionDelegate?.openSearchTray(
             selectedQuery: searchBarViewModel.currentTypedText,
             latestSearches: [
-                .init(id: 1, name: "Kepulauan Seribu"),
-                .init(id: 2, name: "Nusa Penida"),
-                .init(id: 3, name: "Gili Island, Indonesia"),
+                .init(id: 1, name: "Kepulauan Seribu", queryName: "Kepulauan Seribu"),
+                .init(id: 2, name: "Nusa Penida", queryName: "Nusa Penida"),
+                .init(id: 3, name: "Gili Island, Indonesia", queryName: "Gili Island"),
             ]
         )
     }
