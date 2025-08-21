@@ -68,7 +68,7 @@ extension HomeViewModel: HomeViewModelProtocol {
     func onSearchDidApply(_ queryText: String) {
         searchBarViewModel.currentTypedText = queryText
         loadingState.percentage = 0
-        actionDelegate?.toggleLoadingView(isShown: true, after: 0)
+        actionDelegate?.toggleLoadingView(isShown: false, after: 0)
         
         if queryText.isEmpty {
             isSearching = false
@@ -76,21 +76,28 @@ extension HomeViewModel: HomeViewModelProtocol {
             fetch()
         } else {
             isSearching = true
-            let generalData = Array(responseData.dropFirst(10)) // Assuming otherDestination is always the last section
-            let filteredData = generalData.filter { $0.title.lowercased().contains(queryText.lowercased()) }
-            
-            filteredOtherDestinationData = filteredData.map { HomeActivityCellDataModel(activity: $0) }
-            
-            let searchResultSectionDataModel = HomeActivityCellSectionDataModel(
-                title: HomeViewModel.searchResultSectionTitle,
-                dataModel: filteredOtherDestinationData
-            )
-            let searchResultHomeSectionData = HomeSectionData(
-                sectionType: .activity,
-                sectionDataModel: searchResultSectionDataModel
-            )
-            collectionViewModel.updateActivity(sections: [searchResultHomeSectionData])
-            actionDelegate?.toggleLoadingView(isShown: false, after: 1.0)
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                guard let self else { return }
+                let generalData = Array(self.responseData.dropFirst(10))
+                let filteredData = generalData.filter { $0.title.lowercased().contains(queryText.lowercased()) }
+                
+                self.filteredOtherDestinationData = filteredData.map { HomeActivityCellDataModel(activity: $0) }
+                
+                let searchResultSectionDataModel = HomeActivityCellSectionDataModel(
+                    title: HomeViewModel.searchResultSectionTitle,
+                    dataModel: self.filteredOtherDestinationData
+                )
+                let searchResultHomeSectionData = HomeSectionData(
+                    sectionType: .activity,
+                    sectionDataModel: searchResultSectionDataModel
+                )
+                
+                DispatchQueue.main.async { [weak self] in
+                    guard let self else { return }
+                    self.collectionViewModel.updateActivity(sections: [searchResultHomeSectionData])
+                    self.actionDelegate?.toggleLoadingView(isShown: false, after: 0)
+                }
+            }
         }
     }
 }
@@ -121,6 +128,7 @@ extension HomeViewModel: HomeSearchBarViewModelDelegate {
 
 private extension HomeViewModel {
     func fetch() {
+        loadingState.percentage = 0
         isSearching = false
         filteredOtherDestinationData = []
         if !searchBarViewModel.currentTypedText.isEmpty {
@@ -136,7 +144,7 @@ private extension HomeViewModel {
             case .success(let response):
                 var sections: [HomeSectionData] = []
                 self.loadingState.percentage = 100
-                self.actionDelegate?.toggleLoadingView(isShown: false, after: 1.0)
+                self.actionDelegate?.toggleLoadingView(isShown: false, after: 0.0)
                 print("✅ Fetch Success")
                 print("Jumlah response: \(response.values.count)")
 
@@ -199,7 +207,9 @@ private extension HomeViewModel {
                 
                 self.collectionViewModel.updateActivity(sections: sections)
                 
-                self.contructFilterData()
+                DispatchQueue.global(qos: .background).async { [weak self] in
+                    self?.contructFilterData()
+                }
             case .failure(let failure):
                 break
             }

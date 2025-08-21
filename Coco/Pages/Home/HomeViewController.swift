@@ -106,7 +106,7 @@ private extension HomeViewController {
             sheet.prefersGrabberVisible = true
             sheet.prefersScrollingExpandsWhenScrolledToEdge = false
             sheet.prefersEdgeAttachedInCompactHeight = true
-            sheet.preferredCornerRadius = 32.0
+            sheet.preferredCornerRadius = 0
         }
         present(trayVC, animated: true)
     }
