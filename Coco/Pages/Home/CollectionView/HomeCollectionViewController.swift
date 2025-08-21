@@ -18,6 +18,7 @@ final class HomeCollectionViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.delegate = self
+        collectionView.backgroundColor = .systemBackground // Tambahkan background color
         viewModel.onViewDidLoad()
     }
     
@@ -40,10 +41,26 @@ extension HomeCollectionViewController: HomeCollectionViewModelAction {
         let activityCellRegistration: ActivityCellRegistration = createActivityCellRegistration()
         let headerRegistration: HeaderRegistration = createHeaderRegistration()
         
-        dataSource = HomeCollectionViewDataSource(collectionView: collectionView, cellProvider: { (collectionView, indexPath, item: AnyHashable) -> UICollectionViewCell? in
+        let otherDestinationCellRegistration: OtherDestinationCellRegistration = createOtherDestinationCellRegistration()
+        
+                dataSource = HomeCollectionViewDataSource(collectionView: collectionView, cellProvider: { [weak self] (collectionView, indexPath, item: AnyHashable) -> UICollectionViewCell? in
+            guard let self = self,
+                  let sectionIdentifier = self.dataSource?.sectionIdentifier(for: indexPath.section) else {
+                return nil
+            }
+            
             switch item {
             case let item as HomeActivityCellDataModel:
-                return collectionView.dequeueConfiguredReusableCell(using: activityCellRegistration, for: indexPath, item: item)
+                let isFamilyFriendly = (sectionIdentifier.type == .familyTopPick)
+                
+                switch sectionIdentifier.type {
+                case .popularDestination, .familyTopPick:
+                    let cell = collectionView.dequeueConfiguredReusableCell(using: activityCellRegistration, for: indexPath, item: item)
+                    cell.configureCell(item, isFamilyFriendly: isFamilyFriendly)
+                    return cell
+                case .activity:
+                    return collectionView.dequeueConfiguredReusableCell(using: otherDestinationCellRegistration, for: indexPath, item: item)
+                }
             default:
                 return nil
             }
@@ -81,9 +98,9 @@ extension HomeCollectionViewController: UICollectionViewDelegate {
 private extension HomeCollectionViewController {
     func createCollectionView() -> UICollectionView {
         let collectionView: UICollectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.showsVerticalScrollIndicator = false
         collectionView.contentInset = .init(top: 0, left: 0, bottom: 8.0, right: 0)
-        
+        collectionView.backgroundColor = .systemBackground // Tambahkan background color
         return collectionView
     }
     
@@ -92,46 +109,130 @@ private extension HomeCollectionViewController {
             guard let sectionIdentifier = self?.dataSource?.sectionIdentifier(for: sectionIndex) else { return nil }
             
             switch sectionIdentifier.type {
-            case .activity:
-                var sectionConfiguration: UICollectionLayoutListConfiguration = UICollectionLayoutListConfiguration(appearance: .grouped)
-                sectionConfiguration.headerMode = .supplementary
-                sectionConfiguration.showsSeparators = false
-                sectionConfiguration.backgroundColor = .clear
-                let section: NSCollectionLayoutSection = NSCollectionLayoutSection.list(using: sectionConfiguration, layoutEnvironment: layoutEnvironment)
+            case .popularDestination, .familyTopPick:
+                // Item
+                let itemSize = NSCollectionLayoutSize(
+                    widthDimension: .absolute(200),
+                    heightDimension: .absolute(217)
+                )
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
-                let sectionHeader: NSCollectionLayoutBoundarySupplementaryItem = NSCollectionLayoutBoundarySupplementaryItem(
-                    layoutSize: NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .estimated(1)),
+                // Group (horizontal container)
+                let groupSize = NSCollectionLayoutSize(
+                    widthDimension: .absolute(200), // Ubah dari fractionalWidth(1.0) ke absolute(200)
+                    heightDimension: .absolute(217)
+                )
+                let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+                
+                // Section
+                let section = NSCollectionLayoutSection(group: group)
+                section.orthogonalScrollingBehavior = .continuous
+                section.interGroupSpacing = 10 // Adjust spacing for vertical layout
+                section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 20.0, bottom: 8.0, trailing: 20.0) // Adjust insets
+
+                // Header
+                let headerHeight: NSCollectionLayoutDimension
+                if sectionIdentifier.title == HomeViewModel.searchResultSectionTitle {
+                    headerHeight = .absolute(0)
+                } else {
+                    headerHeight = .estimated(44)
+                }
+                let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: NSCollectionLayoutSize(
+                        widthDimension: .fractionalWidth(1.0),
+                        heightDimension: headerHeight
+                    ),
                     elementKind: UICollectionView.elementKindSectionHeader,
                     alignment: .top
                 )
                 section.boundarySupplementaryItems = [sectionHeader]
-                section.interGroupSpacing = CGFloat(20)
-                section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 24.0, bottom: 8.0, trailing: 24.0)
+
                 return section
+                
+            case .activity:
+                // Item
+                let itemSize = NSCollectionLayoutSize(
+                    widthDimension: .absolute(390), // Set to absolute width
+                    heightDimension: .absolute(356) // Set to absolute height
+                )
+                let item = NSCollectionLayoutItem(layoutSize: itemSize)
+
+                // Group (vertical container)
+                let groupSize = NSCollectionLayoutSize(
+                    widthDimension: .absolute(390), // Set to absolute width
+                    heightDimension: .absolute(356) // Set to absolute height
+                )
+                let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
+                
+                // Section
+                let section = NSCollectionLayoutSection(group: group)
+                section.orthogonalScrollingBehavior = .none // Change to vertical scrolling
+                section.interGroupSpacing = 10 // Adjust spacing for vertical layout
+                section.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 20.0, bottom: 8.0, trailing: 20.0) // Adjust insets // Adjust insets
+
+                // Header
+                let headerHeight: NSCollectionLayoutDimension
+                if sectionIdentifier.title == HomeViewModel.searchResultSectionTitle {
+                    headerHeight = .absolute(0)
+                } else {
+                    headerHeight = .estimated(44)
+                }
+                let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+                    layoutSize: NSCollectionLayoutSize(
+                        widthDimension: .fractionalWidth(1.0),
+                        heightDimension: headerHeight
+                    ),
+                    elementKind: UICollectionView.elementKindSectionHeader,
+                    alignment: .top
+                )
+                section.boundarySupplementaryItems = [sectionHeader]
+
+                return section
+            }
             }
         }
     }
-}
 
+
+// MARK: Cell Registration
 // MARK: Cell Registration
 private extension HomeCollectionViewController {
     typealias ActivityCellRegistration = UICollectionView.CellRegistration<HomeActivityCell, HomeActivityCellDataModel>
     func createActivityCellRegistration() -> ActivityCellRegistration {
-        .init { [weak self] cell, _, itemIdentifier in
-            guard let self else { return }
+        .init { cell, _, itemIdentifier in
+            cell.configureCell(itemIdentifier, isFamilyFriendly: false)
+        }
+    }
+    
+    typealias OtherDestinationCellRegistration = UICollectionView.CellRegistration<HomeOtherDestinationCell, HomeActivityCellDataModel>
+    func createOtherDestinationCellRegistration() -> OtherDestinationCellRegistration {
+        .init { cell, _, itemIdentifier in
             cell.configureCell(itemIdentifier)
         }
     }
     
     typealias HeaderRegistration = UICollectionView.SupplementaryRegistration<HomeReusableHeader>
     func createHeaderRegistration() -> HeaderRegistration {
-        .init(elementKind: UICollectionView.elementKindSectionHeader) { [weak self] supplementaryView, _, indexPath in
-            guard let section: HomeCollectionContent.Section = self?.dataSource?.sectionIdentifier(for: indexPath.section),
+        .init(elementKind: UICollectionView.elementKindSectionHeader) { supplementaryView, _, indexPath in
+            guard let section: HomeCollectionContent.Section = self.dataSource?.sectionIdentifier(for: indexPath.section),
                   let sectionTitle: String = section.title
             else {
                 return
             }
-            supplementaryView.configureView(title: sectionTitle)
+            
+            let isHidden = (sectionTitle == HomeViewModel.searchResultSectionTitle)
+            
+            var iconName: String? = nil
+            switch section.type {
+            case .popularDestination:
+                iconName = "star.fill"
+            case .familyTopPick:
+                iconName = "heart.fill"
+            case .activity:
+                iconName = "mappin.circle.fill"
+            }
+            
+            supplementaryView.configureView(title: sectionTitle, isHidden: isHidden, iconName: iconName)
         }
     }
 }

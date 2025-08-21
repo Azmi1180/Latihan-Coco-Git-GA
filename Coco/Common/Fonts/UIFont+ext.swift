@@ -47,4 +47,34 @@ extension UIFont {
     func toFont() -> Font {
         Font(self)
     }
+    
+    static func jakartaSans(size: CGFloat, weight: UIFont.Weight = .regular) -> UIFont {
+        let fontName: String = {
+            switch weight {
+            case .ultraLight:
+                return "PlusJakartaSans-ExtraLight"
+            case .thin, .light:
+                return "PlusJakartaSans-Light"
+            case .regular:
+                return "PlusJakartaSans-Regular"
+            case .medium:
+                return "PlusJakartaSans-Medium"
+            case .semibold:
+                return "PlusJakartaSans-SemiBold"
+            case .bold:
+                return "PlusJakartaSans-Bold"
+            case .heavy, .black:
+                return "PlusJakartaSans-ExtraBold"
+            default:
+                return "PlusJakartaSans-Regular"
+            }
+        }()
+
+        guard let customFont = UIFont(name: fontName, size: size) else {
+            assertionFailure("❌ Failed to load custom font: \(fontName) check your .ttf file or info.plist registration")
+            return UIFont.systemFont(ofSize: size, weight: weight)
+        }
+
+        return customFont
+    }
 }

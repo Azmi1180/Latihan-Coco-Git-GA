@@ -1,5 +1,5 @@
 import UIKit
-final class HomeActivityCell: UICollectionViewCell {
+final class HomeOtherDestinationCell: UICollectionViewCell {
     
     // MARK: - Views
     private let cardView: UIView = {
@@ -12,20 +12,20 @@ final class HomeActivityCell: UICollectionViewCell {
     
     private let imageView = UIImageView()
     private let nameLabel = UILabel(
-        font: .jakartaSans(forTextStyle: .footnote, weight: .bold),
+        font: .jakartaSans(size: 16, weight: .bold),
         textColor: Token.additionalColorsBlack,
         numberOfLines: 2
     )
 
     private let areaLabel = UILabel(
-        font: .jakartaSans(forTextStyle: .footnote, weight: .medium),
+        font: .jakartaSans(size: 14, weight: .medium),
         textColor: Token.additionalColorsBlack,
         numberOfLines: 2
         
     )
 
     private let priceLabel = UILabel(
-        font: .jakartaSans(forTextStyle: .footnote, weight: .bold),
+        font: .jakartaSans(size: 16, weight: .bold),
         textColor: Token.additionalColorsBlack,
         numberOfLines: 1
     )
@@ -35,12 +35,13 @@ final class HomeActivityCell: UICollectionViewCell {
         let imageView = UIImageView(image: image)
         return imageView
     }()
-    
-    private let familyFriendlyBadgeView = FamilyFriendlyBadgeView() // New badge view
 
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupViews()
+        nameLabel.setContentHuggingPriority(.required, for: .vertical)
+        areaLabel.setContentHuggingPriority(.required, for: .vertical)
+        priceLabel.setContentHuggingPriority(.required, for: .vertical)
     }
     
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
@@ -51,7 +52,6 @@ final class HomeActivityCell: UICollectionViewCell {
         nameLabel.text = nil
         areaLabel.attributedText = nil
         priceLabel.attributedText = nil
-        familyFriendlyBadgeView.isHidden = true // Hide badge on reuse
     }
     
     override func layoutSubviews() {
@@ -60,7 +60,7 @@ final class HomeActivityCell: UICollectionViewCell {
     }
     
     // MARK: - Configure
-    func configureCell(_ dataModel: HomeActivityCellDataModel, isFamilyFriendly: Bool) {
+    func configureCell(_ dataModel: HomeActivityCellDataModel) {
         // Cross-fade animation for image loading
         imageView.alpha = 0.0
         imageView.loadImage(from: dataModel.imageUrl) { [weak self] image in
@@ -71,35 +71,60 @@ final class HomeActivityCell: UICollectionViewCell {
             }
         }
         
-        nameLabel.text = dataModel.name
-        
         // Configure areaLabel with line height adjustment
         let areaLabelText = dataModel.area
         let areaLabelParagraphStyle = NSMutableParagraphStyle()
         areaLabelParagraphStyle.lineHeightMultiple = 1.1 // Adjust as needed
         let areaLabelAttributes: [NSAttributedString.Key: Any] = [
-            .font: UIFont.jakartaSans(forTextStyle: .footnote, weight: .medium),
-            .foregroundColor: Token.additionalColorsBlack,
+            .font: UIFont.jakartaSans(size: 12, weight: .medium), // Current font for areaLabel
+            .foregroundColor: Token.additionalColorsBlack, // Current color for areaLabel
             .paragraphStyle: areaLabelParagraphStyle
         ]
         areaLabel.attributedText = NSAttributedString(string: areaLabelText, attributes: areaLabelAttributes)
         
-        let formattedPrice = formatToIndonesianCurrency(price: dataModel.priceText)
-        let attributedString = NSMutableAttributedString(
-            string: formattedPrice,
-            attributes: [
-                .font : UIFont.jakartaSans(forTextStyle: .footnote, weight: .bold),
-                .foregroundColor : Token.additionalColorsBlack
-            ]
-        )
-        priceLabel.attributedText = attributedString
+        // Configure nameLabel with line height adjustment
+        let nameLabelText = dataModel.name
+        let nameLabelParagraphStyle = NSMutableParagraphStyle()
+        nameLabelParagraphStyle.lineHeightMultiple = 1.0 // Adjust as needed, 1.0 for no extra space
+        let nameLabelAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.jakartaSans(size: 16, weight: .bold),
+            .foregroundColor: Token.additionalColorsBlack,
+            .paragraphStyle: nameLabelParagraphStyle
+        ]
+        nameLabel.attributedText = NSAttributedString(string: nameLabelText, attributes: nameLabelAttributes)
         
-        familyFriendlyBadgeView.isHidden = !isFamilyFriendly
+        let formattedPrice = formatToIndonesianCurrency(price: dataModel.priceText)
+        
+        // Configure priceLabel with line height adjustment
+        let startFromText = "start from "
+        let startFromParagraphStyle = NSMutableParagraphStyle()
+        startFromParagraphStyle.lineHeightMultiple = 1.1 // Slightly increase line height
+        let startFromAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.jakartaSans(size: 12, weight: .medium),
+            .foregroundColor: UIColor.gray,
+            .paragraphStyle: startFromParagraphStyle
+        ]
+        let startFromAttributedString = NSAttributedString(string: startFromText, attributes: startFromAttributes)
+        
+        let priceParagraphStyle = NSMutableParagraphStyle()
+        priceParagraphStyle.lineHeightMultiple = 1.1 // Slightly increase line height
+        let priceAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.jakartaSans(size: 14, weight: .bold),
+            .foregroundColor: Token.additionalColorsBlack,
+            .paragraphStyle: priceParagraphStyle
+        ]
+        let priceAttributedString = NSAttributedString(string: formattedPrice, attributes: priceAttributes)
+        
+        let combinedAttributedString = NSMutableAttributedString()
+        combinedAttributedString.append(startFromAttributedString)
+        combinedAttributedString.append(priceAttributedString)
+        
+        priceLabel.attributedText = combinedAttributedString
     }
 }
 
 // MARK: - Private Helpers
-private extension HomeActivityCell {
+private extension HomeOtherDestinationCell {
     
     func setupViews() {
         contentView.addSubview(cardView)
@@ -130,10 +155,6 @@ private extension HomeActivityCell {
         stack.translatesAutoresizingMaskIntoConstraints = false
         cardView.addSubview(stack)
         
-        // Add FamilyFriendlyBadgeView
-        cardView.addSubview(familyFriendlyBadgeView)
-        familyFriendlyBadgeView.translatesAutoresizingMaskIntoConstraints = false
-        
         // Activate all constraints at once for clarity
         NSLayoutConstraint.activate([
             cardView.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -144,7 +165,7 @@ private extension HomeActivityCell {
             imageView.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 0),
             imageView.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 0),
             imageView.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: 0),
-            imageView.heightAnchor.constraint(equalToConstant: 136),
+            imageView.heightAnchor.constraint(equalToConstant: 214),
             
             stack.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 0),
             stack.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 8),
@@ -152,11 +173,7 @@ private extension HomeActivityCell {
             stack.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -8),
             
             areaIcon.widthAnchor.constraint(equalToConstant: 18),
-            areaIcon.heightAnchor.constraint(equalToConstant: 18),
-            
-            // FamilyFriendlyBadgeView constraints
-            familyFriendlyBadgeView.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 4),
-            familyFriendlyBadgeView.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -4)
+            areaIcon.heightAnchor.constraint(equalToConstant: 18)
         ])
     }
     

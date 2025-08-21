@@ -18,20 +18,56 @@ final class HomeReusableHeader: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func configureView(title: String) {
+    func configureView(title: String, isHidden: Bool = false, iconName: String? = nil) {
         titleLabel.text = title
+        titleLabel.isHidden = isHidden
+        
+        if let iconName = iconName, !isHidden {
+            iconImageView.image = UIImage(systemName: iconName)
+            iconImageView.isHidden = false
+        } else {
+            iconImageView.image = nil
+            iconImageView.isHidden = true
+        }
     }
     
+    private lazy var iconImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = Token.additionalColorsBlack // Assuming default tint color
+        return imageView
+    }()
+    
     private lazy var titleLabel: UILabel = UILabel(
-        font: .jakartaSans(forTextStyle: .title3, weight: .semibold),
+        font: .jakartaSans(size: 20, weight: .bold),
         textColor: Token.additionalColorsBlack,
         numberOfLines: 2
     )
+    
+    private lazy var stackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .horizontal
+        stackView.spacing = 4
+        stackView.alignment = .center
+        return stackView
+    }()
 }
 
 private extension HomeReusableHeader {
     func setupView() {
-        addSubviewAndLayout(titleLabel, insets: .init(top: 0, left: 0, bottom: 16.0,
-                                                      right: 0))
+        stackView.addArrangedSubview(iconImageView)
+        stackView.addArrangedSubview(titleLabel)
+        addSubview(stackView)
+        
+        NSLayoutConstraint.activate([
+            iconImageView.widthAnchor.constraint(equalToConstant: 18),
+            iconImageView.heightAnchor.constraint(equalToConstant: 18),
+            
+            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0),
+            stackView.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor, constant: -16),
+            stackView.centerYAnchor.constraint(equalTo: centerYAnchor)
+        ])
     }
 }

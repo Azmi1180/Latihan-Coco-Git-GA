@@ -78,5 +78,9 @@ struct CocoInputTextFieldStyle: TextFieldStyle {
         .padding(.horizontal, 16.0)
         .background(Token.mainColorSecondary.toColor())
         .clipShape(Capsule(style: .continuous))
+        .overlay(
+            Capsule(style: .circular)
+                .stroke(Token.mainColorPrimary.toColor(), lineWidth: 1) // ubah warna dan ketebalan sesuai kebutuhan
+         )
     }
 }

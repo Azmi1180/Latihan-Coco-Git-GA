@@ -6,20 +6,14 @@
 //
 
 import Foundation
+import UIKit
 
-final class HomeCollectionViewModel {
-    weak var actionDelegate: HomeCollectionViewModelAction?
+final class HomeCollectionViewModel: NSObject, HomeCollectionViewModelProtocol {
     weak var delegate: HomeCollectionViewModelDelegate?
+    weak var actionDelegate: HomeCollectionViewModelAction? // Add this
     
-    func updateActivity(activity: HomeActivityCellSectionDataModel) {
-        activityData = activity
-        reloadCollection()
-    }
+    private(set) var activityData: [HomeSectionData] = [] // Updated type
     
-    private(set) var activityData: HomeActivityCellSectionDataModel = (nil, [])
-}
-
-extension HomeCollectionViewModel: HomeCollectionViewModelProtocol {
     func onViewDidLoad() {
         // Only Called Once
         actionDelegate?.configureDataSource()
@@ -28,6 +22,12 @@ extension HomeCollectionViewModel: HomeCollectionViewModelProtocol {
     
     func onActivityDidTap(_ dataModel: HomeActivityCellDataModel) {
         delegate?.notifyCollectionViewActivityDidTap(dataModel)
+    }
+    
+    func updateActivity(sections: [HomeSectionData]) { // Updated parameter name and type
+        self.activityData = sections
+        // Replace collectionView.reloadData() with applySnapshot
+        actionDelegate?.applySnapshot(createSnapshot(), completion: nil)
     }
 }
 
@@ -39,30 +39,19 @@ private extension HomeCollectionViewModel {
     }
     
     func createSnapshot() -> HomeCollectionViewSnapShot {
-        var contents: [HomeCollectionContent] = []
+        var snapshot = HomeCollectionViewSnapShot()
         
-        let activitySectionDataModel: HomeCollectionContent? = {
-            guard !activityData.dataModel.isEmpty else {
-                return nil
+        for sectionData in activityData {
+            guard !sectionData.sectionDataModel.dataModel.isEmpty else {
+                continue
             }
             
-            return .init(
-                section: .init(
-                    type: .activity,
-                    title: activityData.title
-                ),
-                items: activityData.dataModel
+            let section = HomeCollectionContent.Section(
+                type: sectionData.sectionType,
+                title: sectionData.sectionDataModel.title
             )
-        }()
-        
-        if let activitySectionDataModel: HomeCollectionContent {
-            contents.append(activitySectionDataModel)
-        }
-        
-        var snapshot: HomeCollectionViewSnapShot = HomeCollectionViewSnapShot()
-        contents.forEach { content in
-            snapshot.appendSections([content.section])
-            snapshot.appendItems(content.items)
+            snapshot.appendSections([section])
+            snapshot.appendItems(sectionData.sectionDataModel.dataModel, toSection: section)
         }
         
         return snapshot

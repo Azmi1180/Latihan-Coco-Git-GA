@@ -58,5 +58,6 @@ struct CocoInputTextField: View {
         }
         .font(.jakartaSans(forTextStyle: .body, weight: .medium))
         .frame(height: kInputHeight)
+
     }
 }

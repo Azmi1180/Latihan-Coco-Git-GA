@@ -73,6 +73,8 @@ struct HomeViewModelTest {
         )
         
         // --- THEN ---
+                
+        // --- THEN ---
         context.actionDelegate.invokedOpenFilterTrayParameters?.viewModel
             .filterDidApplyPublisher.send(filterModel)
         
@@ -250,7 +252,7 @@ struct HomeViewModelTest {
 
 private extension HomeViewModelTest {
     private func assertViewDidLoadSetup(_ context: TestContext) {
-        #expect(context.actionDelegate.invokedConstructCollectionViewCount == 1)
+        #expect(context.actionDelegate.invokedConstructRecommendationViewCount == 1)
         #expect(context.actionDelegate.invokedConstructLoadingStateCount == 1)
         #expect(context.actionDelegate.invokedConstructNavBarCount == 1)
         #expect(context.viewModel.loadingState.percentage == 100)
@@ -263,12 +265,12 @@ private extension HomeViewModelTest {
 
 private final class MockHomeViewModelAction: HomeViewModelAction {
 
-    var invokedConstructCollectionView = false
-    var invokedConstructCollectionViewCount = 0
+    var invokedConstructRecommendationView = false
+    var invokedConstructRecommendationViewCount = 0
 
-    func constructCollectionView(viewModel: some HomeCollectionViewModelProtocol) {
-        invokedConstructCollectionView = true
-        invokedConstructCollectionViewCount += 1
+    func constructRecommendationView(viewModel: some HomeCollectionViewModelProtocol) {
+        invokedConstructRecommendationView = true
+        invokedConstructRecommendationViewCount += 1
     }
 
     var invokedConstructLoadingState = false

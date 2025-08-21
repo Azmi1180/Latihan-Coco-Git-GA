@@ -16,6 +16,8 @@ struct HomeCollectionContent {
     let items: [AnyHashable]
     
     enum SectionType: Hashable {
+        case popularDestination
+        case familyTopPick
         case activity
     }
     

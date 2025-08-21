@@ -34,11 +34,11 @@ final class HomeViewController: UIViewController {
 }
 
 extension HomeViewController: HomeViewModelAction {
-    func constructCollectionView(viewModel: some HomeCollectionViewModelProtocol) {
-        let collectionViewController: HomeCollectionViewController = HomeCollectionViewController(viewModel: viewModel)
-        addChild(collectionViewController)
-        thisView.addSearchResultView(from: collectionViewController.view)
-        collectionViewController.didMove(toParent: self)
+    func constructRecommendationView(viewModel: some HomeCollectionViewModelProtocol) {
+        let recommendationViewController: HomeCollectionViewController = HomeCollectionViewController(viewModel: viewModel)
+        addChild(recommendationViewController)
+        thisView.addSearchResultView(from: recommendationViewController.view)
+        recommendationViewController.didMove(toParent: self)
     }
     
     func constructLoadingState(state: HomeLoadingState) {
