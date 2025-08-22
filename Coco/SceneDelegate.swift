@@ -67,7 +67,7 @@ private extension SceneDelegate {
     func showSplashScreen(over window: UIWindow) {
         let logo: UIImageView = UIImageView(image: CocoIcon.splashLogo.image)
         logo.translatesAutoresizingMaskIntoConstraints = false
-
+        
         window.addSubview(logo)
         
         NSLayoutConstraint.activate([
@@ -83,6 +83,7 @@ private extension SceneDelegate {
             self.dismissSplash()
         }
     }
+
 
     func dismissSplash() {
         UIView.animate(withDuration: 0.5, animations: {

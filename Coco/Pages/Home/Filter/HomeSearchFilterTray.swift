@@ -53,6 +53,7 @@ struct HomeSearchFilterTray: View {
                     .stretch()
                 }
             }
+            .scrollIndicators(.hidden)
         }
         .frame(maxWidth: .infinity)
         .padding(24.0)

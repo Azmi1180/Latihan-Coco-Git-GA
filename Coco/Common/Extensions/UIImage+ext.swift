@@ -9,14 +9,18 @@ import Foundation
 import UIKit
 
 extension UIImageView {
-    func loadImage(from url: URL?, cacheKey: String? = nil) {
-        guard let url: URL else { return }
+    func loadImage(from url: URL?, cacheKey: String? = nil, completion: ((UIImage?) -> Void)? = nil) {
+        guard let url: URL else {
+            completion?(nil)
+            return
+        }
         
         let key: String = cacheKey ?? url.absoluteString
         
         if let cachedImage: UIImage = ImageCacheManager.shared.image(forKey: key) {
             DispatchQueue.main.async {
                 self.image = cachedImage
+                completion?(cachedImage)
             }
             return
         }
@@ -26,6 +30,9 @@ extension UIImageView {
                 let data = data,
                 let image = UIImage(data: data)
             else {
+                DispatchQueue.main.async {
+                    completion?(nil)
+                }
                 return
             }
             
@@ -33,6 +40,7 @@ extension UIImageView {
             
             DispatchQueue.main.async {
                 self.image = image
+                completion?(image)
             }
         }.resume()
     }

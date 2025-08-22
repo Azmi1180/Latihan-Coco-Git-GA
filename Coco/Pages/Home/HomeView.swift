@@ -43,7 +43,7 @@ final class HomeView: UIView {
     
     func addSearchBarView(from view: UIView) {
         searchBarView.subviews.forEach { $0.removeFromSuperview() }
-        searchBarView.addSubviewAndLayout(view, insets: .init(vertical: 0, horizontal: 24.0))
+        searchBarView.addSubviewAndLayout(view, insets: .init(top: 20, left: 20, bottom: 12, right: 20))
     }
     
     private lazy var errorView: UIView = UIView()

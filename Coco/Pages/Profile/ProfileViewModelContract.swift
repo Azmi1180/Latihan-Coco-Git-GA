@@ -15,6 +15,5 @@ protocol ProfileViewModelAction: AnyObject {
 
 protocol ProfileViewModelProtocol: AnyObject {
     var actionDelegate: ProfileViewModelAction? { get set }
-    
     func onViewDidLoad()
 }

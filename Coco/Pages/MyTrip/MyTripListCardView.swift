@@ -77,164 +77,191 @@ final class MyTripListCardView: UIView {
         type: .primary,
         isStretch: true
     )
-    
     private var index: Int = 0
 }
 
 private extension MyTripListCardView {
+
     func setupView() {
-        let dateContentView: UIView = UIView()
-        dateContentView.addSubviews([
-            statusLabelView.view,
-            dateLabel
-        ])
-        
-        statusLabelView.view
-            .layout {
-                $0.leading(to: dateContentView.leadingAnchor)
-                    .top(to: dateContentView.topAnchor)
-                    .bottom(to: dateContentView.bottomAnchor)
-            }
-        
-        dateLabel.layout {
-            $0.leading(to: statusLabelView.view.trailingAnchor, relation: .greaterThanOrEqual, constant: 4.0)
-                .top(to: dateContentView.topAnchor)
-                .bottom(to: dateContentView.bottomAnchor)
-                .trailing(to: dateContentView.trailingAnchor)
-        }
-        
-        let locationContentView: UIView = UIView()
-        let locationIconImageView: UIImageView = UIImageView(image: CocoIcon.icPinPointBlue.getImageWithTintColor(Token.additionalColorsBlack))
-        locationIconImageView.contentMode = .scaleAspectFill
-        locationIconImageView.layout {
-            $0.size(12)
-        }
-        locationContentView.addSubviews([
-            locationIconImageView,
-            locationLabel
-        ])
-        
-        locationIconImageView
-            .layout {
-                $0.leading(to: locationContentView.leadingAnchor)
-                    .top(to: locationContentView.topAnchor)
-                    .bottom(to: locationContentView.bottomAnchor)
-            }
-        
-        locationLabel.layout {
-            $0.leading(to: locationIconImageView.trailingAnchor, constant: 4.0)
-                .centerY(to: locationContentView.centerYAnchor)
-                .trailing(to: locationContentView.trailingAnchor)
-        }
-        
-        let paxContentView: UIView = UIView()
-        paxContentView.addSubviews([
-            totalPaxLabel,
-            totalPriceLabel
-        ])
-        
-        totalPaxLabel
-            .layout {
-                $0.leading(to: paxContentView.leadingAnchor)
-                    .top(to: paxContentView.topAnchor)
-                    .bottom(to: paxContentView.bottomAnchor)
-            }
-        
-        totalPriceLabel.layout {
-            $0.leading(to: totalPaxLabel.trailingAnchor, relation: .greaterThanOrEqual, constant: 4.0)
-                .top(to: paxContentView.topAnchor)
-                .bottom(to: paxContentView.bottomAnchor)
-                .trailing(to: paxContentView.trailingAnchor)
-        }
-        
-        let leftSideContentView: UIView = UIView()
-        leftSideContentView.addSubviews([
-            dateContentView,
-            tripLabel,
-            locationContentView,
-            paxContentView
-        ])
-        dateContentView
-            .layout {
-                $0.leading(to: leftSideContentView.leadingAnchor)
-                    .top(to: leftSideContentView.topAnchor)
-                    .trailing(to: leftSideContentView.trailingAnchor)
-            }
-        
-        tripLabel.layout {
-            $0.top(to: dateContentView.bottomAnchor, constant: 6.0)
-                .leading(to: leftSideContentView.leadingAnchor)
-                .trailing(to: leftSideContentView.trailingAnchor)
-        }
-        
-        locationContentView.layout {
-            $0.top(to: tripLabel.bottomAnchor, constant: 4.0)
-                .leading(to: leftSideContentView.leadingAnchor)
-                .trailing(to: leftSideContentView.trailingAnchor)
-        }
-        
-        paxContentView.layout {
-            $0.top(to: locationContentView.bottomAnchor, constant: 8.0)
-                .leading(to: leftSideContentView.leadingAnchor)
-                .trailing(to: leftSideContentView.trailingAnchor)
-                .bottom(to: leftSideContentView.bottomAnchor)
-        }
-        
-        let headerView: UIView = UIView()
-        headerView.addSubviews([
-            imageView,
-            leftSideContentView
-        ])
-        imageView.layout {
-            $0.leading(to: headerView.leadingAnchor)
-                .top(to: headerView.topAnchor)
-                .bottom(to: headerView.bottomAnchor, relation: .lessThanOrEqual)
-        }
-        
-        leftSideContentView.layout {
-            $0.leading(to: imageView.trailingAnchor, constant: 12.0)
-                .top(to: headerView.topAnchor)
-                .trailing(to: headerView.trailingAnchor)
-                .bottom(to: headerView.bottomAnchor)
-        }
-        
-        let contentView: UIView = UIView()
-        contentView.addSubviews([
-            headerView,
-            detailButtonContainer.view
-        ])
+        let dateContentView = makeDateContentView()
+        let locationContentView = makeLocationContentView()
+        let paxContentView = makePaxContentView()
+
+        let leftSideContentView = makeLeftSideContentView(
+            dateContentView: dateContentView,
+            locationContentView: locationContentView,
+            paxContentView: paxContentView
+        )
+
+        let headerView = makeHeaderView(leftSideContentView: leftSideContentView)
+
+        let contentView = UIView()
+        contentView.addSubviews([headerView, detailButtonContainer.view])
+
         headerView.layout {
             $0.leading(to: contentView.leadingAnchor)
                 .top(to: contentView.topAnchor)
                 .trailing(to: contentView.trailingAnchor)
         }
-        
+
         detailButtonContainer.view.layout {
             $0.top(to: headerView.bottomAnchor, constant: 12.0)
                 .leading(to: contentView.leadingAnchor)
                 .trailing(to: contentView.trailingAnchor)
                 .bottom(to: contentView.bottomAnchor)
         }
-        
-        
+
         addSubviewAndLayout(contentView, insets: UIEdgeInsets(edges: 12.0))
-        
+
         backgroundColor = Token.additionalColorsWhite
         layer.cornerRadius = 16.0
         layer.borderWidth = 1.0
         layer.borderColor = Token.additionalColorsLine.cgColor
     }
-    
+
+    func makeDateContentView() -> UIView {
+        let dateContentView = UIView()
+        dateContentView.addSubviews([statusLabelView.view, dateLabel])
+
+        statusLabelView.view.layout {
+            $0.leading(to: dateContentView.leadingAnchor)
+                .top(to: dateContentView.topAnchor)
+                .bottom(to: dateContentView.bottomAnchor)
+        }
+
+        dateLabel.layout {
+            $0.leading(
+                to: statusLabelView.view.trailingAnchor,
+                relation: .greaterThanOrEqual,
+                constant: 4.0
+            )
+            .top(to: dateContentView.topAnchor)
+            .bottom(to: dateContentView.bottomAnchor)
+            .trailing(to: dateContentView.trailingAnchor)
+        }
+
+        return dateContentView
+    }
+
+    func makeLocationContentView() -> UIView {
+        let locationContentView = UIView()
+
+        let iconView = UIImageView(
+            image: CocoIcon.icPinPointBlue.getImageWithTintColor(Token.additionalColorsBlack)
+        )
+        iconView.contentMode = .scaleAspectFill
+        iconView.layout { $0.size(12) }
+
+        locationContentView.addSubviews([iconView, locationLabel])
+
+        iconView.layout {
+            $0.leading(to: locationContentView.leadingAnchor)
+                .top(to: locationContentView.topAnchor)
+                .bottom(to: locationContentView.bottomAnchor)
+        }
+
+        locationLabel.layout {
+            $0.leading(to: iconView.trailingAnchor, constant: 4.0)
+                .centerY(to: locationContentView.centerYAnchor)
+                .trailing(to: locationContentView.trailingAnchor)
+        }
+
+        return locationContentView
+    }
+
+    func makePaxContentView() -> UIView {
+        let paxContentView = UIView()
+        paxContentView.addSubviews([totalPaxLabel, totalPriceLabel])
+
+        totalPaxLabel.layout {
+            $0.leading(to: paxContentView.leadingAnchor)
+                .top(to: paxContentView.topAnchor)
+                .bottom(to: paxContentView.bottomAnchor)
+        }
+
+        totalPriceLabel.layout {
+            $0.leading(
+                to: totalPaxLabel.trailingAnchor,
+                relation: .greaterThanOrEqual,
+                constant: 4.0
+            )
+            .top(to: paxContentView.topAnchor)
+            .bottom(to: paxContentView.bottomAnchor)
+            .trailing(to: paxContentView.trailingAnchor)
+        }
+
+        return paxContentView
+    }
+
+    func makeLeftSideContentView(
+        dateContentView: UIView,
+        locationContentView: UIView,
+        paxContentView: UIView
+    ) -> UIView {
+        let leftSideContentView = UIView()
+        leftSideContentView.addSubviews([
+            dateContentView,
+            tripLabel,
+            locationContentView,
+            paxContentView
+        ])
+
+        dateContentView.layout {
+            $0.leading(to: leftSideContentView.leadingAnchor)
+                .top(to: leftSideContentView.topAnchor)
+                .trailing(to: leftSideContentView.trailingAnchor)
+        }
+
+        tripLabel.layout {
+            $0.top(to: dateContentView.bottomAnchor, constant: 6.0)
+                .leading(to: leftSideContentView.leadingAnchor)
+                .trailing(to: leftSideContentView.trailingAnchor)
+        }
+
+        locationContentView.layout {
+            $0.top(to: tripLabel.bottomAnchor, constant: 4.0)
+                .leading(to: leftSideContentView.leadingAnchor)
+                .trailing(to: leftSideContentView.trailingAnchor)
+        }
+
+        paxContentView.layout {
+            $0.top(to: locationContentView.bottomAnchor, constant: 8.0)
+                .leading(to: leftSideContentView.leadingAnchor)
+                .trailing(to: leftSideContentView.trailingAnchor)
+                .bottom(to: leftSideContentView.bottomAnchor)
+        }
+
+        return leftSideContentView
+    }
+
+    func makeHeaderView(leftSideContentView: UIView) -> UIView {
+        let headerView = UIView()
+        headerView.addSubviews([imageView, leftSideContentView])
+
+        imageView.layout {
+            $0.leading(to: headerView.leadingAnchor)
+                .top(to: headerView.topAnchor)
+                .bottom(to: headerView.bottomAnchor, relation: .lessThanOrEqual)
+        }
+
+        leftSideContentView.layout {
+            $0.leading(to: imageView.trailingAnchor, constant: 12.0)
+                .top(to: headerView.topAnchor)
+                .trailing(to: headerView.trailingAnchor)
+                .bottom(to: headerView.bottomAnchor)
+        }
+
+        return headerView
+    }
+
     func createImageView() -> UIImageView {
-        let imageView: UIImageView = UIImageView()
+        let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 14.0
         imageView.layout {
-            $0.width(89)
-                .height(106)
+            $0.width(89).height(106)
         }
-        
         return imageView
     }
 }

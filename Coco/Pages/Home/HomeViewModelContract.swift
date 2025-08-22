@@ -12,7 +12,8 @@ protocol HomeViewModelNavigationDelegate: AnyObject {
 }
 
 protocol HomeViewModelAction: AnyObject {
-    func constructCollectionView(viewModel: some HomeCollectionViewModelProtocol)
+    func constructRecommendationView(viewModel: some HomeCollectionViewModelProtocol)
+
     func constructLoadingState(state: HomeLoadingState)
     func constructNavBar(viewModel: HomeSearchBarViewModel)
     
@@ -30,7 +31,9 @@ protocol HomeViewModelAction: AnyObject {
 protocol HomeViewModelProtocol: AnyObject {
     var actionDelegate: HomeViewModelAction? { get set }
     var navigationDelegate: HomeViewModelNavigationDelegate? { get set }
-    
+    var isSearching: Bool { get }
+    var otherDestinationData: [HomeActivityCellDataModel] { get }
+    var filteredOtherDestinationData: [HomeActivityCellDataModel] { get }
     func onViewDidLoad()
     func onSearchDidApply(_ queryText: String)
 }
