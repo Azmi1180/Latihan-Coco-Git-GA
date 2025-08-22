@@ -152,14 +152,14 @@ private extension HomeCollectionViewController {
             case .activity:
                 // Item
                 let itemSize = NSCollectionLayoutSize(
-                    widthDimension: .absolute(390), // Set to absolute width
+                    widthDimension: .absolute(335), // Set to absolute width
                     heightDimension: .absolute(356) // Set to absolute height
                 )
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
                 // Group (vertical container)
                 let groupSize = NSCollectionLayoutSize(
-                    widthDimension: .absolute(390), // Set to absolute width
+                    widthDimension: .absolute(335), // Set to absolute width
                     heightDimension: .absolute(356) // Set to absolute height
                 )
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])

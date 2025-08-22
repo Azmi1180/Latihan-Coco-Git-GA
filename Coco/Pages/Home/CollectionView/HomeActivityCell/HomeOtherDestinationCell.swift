@@ -160,17 +160,16 @@ private extension HomeOtherDestinationCell {
             cardView.topAnchor.constraint(equalTo: contentView.topAnchor),
             cardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             cardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            cardView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             
-            imageView.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 0),
-            imageView.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 0),
-            imageView.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: 0),
+            imageView.topAnchor.constraint(equalTo: cardView.topAnchor),
+            imageView.leadingAnchor.constraint(equalTo: cardView.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: cardView.trailingAnchor),
             imageView.heightAnchor.constraint(equalToConstant: 214),
             
             stack.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 0),
             stack.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 8),
             stack.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -8),
-            stack.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -8),
+            stack.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: 0),
             
             areaIcon.widthAnchor.constraint(equalToConstant: 18),
             areaIcon.heightAnchor.constraint(equalToConstant: 18)
