@@ -108,7 +108,8 @@ private extension HomeSearchSearchTray {
                 .foregroundStyle(Token.additionalColorsBlack.toColor())
         }
         .onTapGesture {
-            viewModel.searchBarViewModel.currentTypedText = location.queryName
+            searchDidApply(location.name)
+//            viewModel.searchBarViewModel.currentTypedText = location.name
         }
     }
     

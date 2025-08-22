@@ -57,9 +57,24 @@ extension HomeViewModel: HomeViewModelProtocol {
     
     func onSearchDidApply(_ queryText: String) {
         searchBarViewModel.currentTypedText = queryText
-        loadingState.percentage = 0
-        actionDelegate?.toggleLoadingView(isShown: true, after: 0)
-        fetch()
+
+        if queryText.isEmpty {
+            collectionViewModel.updateActivity(activity: (title: "", dataModel: responseData.map { HomeActivityCellDataModel(activity: $0) }))
+            return
+        }
+
+        let searchKeywords = queryText.lowercased().components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
+
+        let filteredActivities = responseData.filter { activity in
+            let title = activity.title.lowercased()
+            let destinationName = activity.destination.name.lowercased()
+
+            return searchKeywords.allSatisfy { keyword in
+                title.contains(keyword) || destinationName.contains(keyword)
+            }
+        }
+
+        collectionViewModel.updateActivity(activity: (title: "", dataModel: filteredActivities.map { HomeActivityCellDataModel(activity: $0) }))
     }
 }
 
@@ -79,9 +94,9 @@ extension HomeViewModel: HomeSearchBarViewModelDelegate {
         actionDelegate?.openSearchTray(
             selectedQuery: searchBarViewModel.currentTypedText,
             latestSearches: [
-                .init(id: 1, name: "Kepulauan Seribu", queryName: "Kepulauan Seribu"),
-                .init(id: 2, name: "Nusa Penida", queryName: "Nusa Penida"),
-                .init(id: 3, name: "Gili Island, Indonesia", queryName: "Gili Island"),
+                .init(id: 1, name: "Kepulauan Seribu"),
+                .init(id: 2, name: "Nusa Penida"),
+                .init(id: 3, name: "Gili Island, Indonesia"),
             ]
         )
     }
