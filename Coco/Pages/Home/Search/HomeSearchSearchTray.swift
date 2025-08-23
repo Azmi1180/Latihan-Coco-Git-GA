@@ -96,18 +96,20 @@ private extension HomeSearchSearchTray {
         }
     }
     
-    func createLocationView(name: String) -> some View {
+    // MARK: Popular Destination
+    func createLocationView(location: HomeSearchSearchLocationData) -> some View {
         HStack(alignment: .center, spacing: 14.0) {
             Image(uiImage: CocoIcon.icPinPointBlue.image)
                 .resizable()
                 .frame(width: 24.0, height: 24.0)
             
-            Text(name)
+            Text(location.name)
                 .font(.jakartaSans(forTextStyle: .callout, weight: .medium))
                 .foregroundStyle(Token.additionalColorsBlack.toColor())
         }
         .onTapGesture {
-            viewModel.searchBarViewModel.currentTypedText = name
+            searchDidApply(location.name)
+//            viewModel.searchBarViewModel.currentTypedText = location.name
         }
     }
     
@@ -150,7 +152,7 @@ private extension HomeSearchSearchTray {
     func popularLocationSectionView() -> some View {
         VStack(alignment: .leading, spacing: 15.0) {
             ForEach(Array(viewModel.popularLocations.enumerated()), id: \.0) { (index, location) in
-                createLocationView(name: location.name)
+                createLocationView(location: location)
                 
                 if index < viewModel.popularLocations.count {
                     Rectangle()

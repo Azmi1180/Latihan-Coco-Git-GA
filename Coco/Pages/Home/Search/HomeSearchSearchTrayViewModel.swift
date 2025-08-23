@@ -28,7 +28,9 @@ final class HomeSearchSearchTrayViewModel: ObservableObject {
             guard let self else { return }
             switch result {
             case .success(let response):
-                self.popularLocations = response.values.map { HomeSearchSearchLocationData(id: $0.id, name: $0.name) }
+                self.popularLocations = response.values.map {
+                    return HomeSearchSearchLocationData(id: $0.id, name: $0.name)
+                }
             case .failure(let failure):
                 break
             }
