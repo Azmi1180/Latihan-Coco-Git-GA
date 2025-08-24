@@ -10,7 +10,7 @@ import SwiftUI
 
 struct HomeSearchBarView: View {
     @ObservedObject var viewModel: HomeSearchBarViewModel
-    
+
     var body: some View {
         CocoInputTextField(
             leadingIcon: viewModel.leadingIcon,

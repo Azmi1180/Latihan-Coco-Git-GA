@@ -11,7 +11,7 @@ import SwiftUI
 struct HomeSearchFilterPillView: View {
     @ObservedObject var state: HomeSearchFilterPillState
     let didTap: () -> Void
-    
+
     var body: some View {
         Text(state.title)
             .lineLimit(1)

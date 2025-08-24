@@ -17,11 +17,11 @@ struct HomeTabItem: TabItemRepresentable {
     func makeRootViewController() -> UIViewController {
         let viewModel: HomeViewModel = HomeViewModel()
         let viewController: HomeViewController = HomeViewController(viewModel: viewModel)
-        
+
         return viewController
     }
-    
+
     private let viewModel = HomeCollectionViewModel()
-    
+
     private let vm = HomeLoadingState()
 }

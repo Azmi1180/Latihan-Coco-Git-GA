@@ -17,7 +17,7 @@ final class UserFetcher: UserFetcherProtocol {
     init(networkService: NetworkServiceProtocol = NetworkService.shared) {
         self.networkService = networkService
     }
-    
+
     func fetchUser(
         completion: @escaping (Result<UserModelArray, NetworkServiceError>) -> Void
     ) {
@@ -30,6 +30,6 @@ final class UserFetcher: UserFetcherProtocol {
             completion: completion
         )
     }
-    
+
     private let networkService: NetworkServiceProtocol
 }

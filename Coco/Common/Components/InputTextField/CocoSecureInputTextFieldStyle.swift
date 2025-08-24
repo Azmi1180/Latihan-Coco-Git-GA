@@ -47,8 +47,12 @@ struct CocoSecureInputTextFieldStyle: TextFieldStyle {
         }
         .padding(.vertical, 14.0)
         .padding(.horizontal, 16.0)
-        .background(Token.mainColorSecondary.toColor())
         .clipShape(Capsule(style: .continuous))
+        .overlay(
+            Capsule(style: .circular)
+                .inset(by: 0.5) // Inset the capsule slightly to prevent clipping
+                .stroke(Token.mainColorPrimary.toColor(), lineWidth: 1) // ubah warna dan ketebalan sesuai kebutuhan
+         )
     }
 }
 

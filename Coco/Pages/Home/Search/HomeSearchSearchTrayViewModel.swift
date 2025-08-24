@@ -16,12 +16,12 @@ struct HomeSearchSearchLocationData {
 final class HomeSearchSearchTrayViewModel: ObservableObject {
     @Published var searchBarViewModel: HomeSearchBarViewModel
     @Published var popularLocations: [HomeSearchSearchLocationData] = []
-    
+
     init(searchBarViewModel: HomeSearchBarViewModel, activityFetcher: ActivityFetcherProtocol = ActivityFetcher()) {
         self.searchBarViewModel = searchBarViewModel
         self.activityFetcher = activityFetcher
     }
-    
+
     @MainActor
     func onAppear() {
         activityFetcher.fetchTopDestination() { [weak self] result in
@@ -34,6 +34,6 @@ final class HomeSearchSearchTrayViewModel: ObservableObject {
             }
         }
     }
-    
+
     private let activityFetcher: ActivityFetcherProtocol
 }

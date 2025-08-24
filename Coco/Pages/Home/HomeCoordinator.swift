@@ -12,20 +12,20 @@ final class HomeCoordinator: BaseCoordinator {
     struct Input {
         let navigationController: UINavigationController
         let flow: Flow
-        
+
         enum Flow {
             case activityDetail(data: ActivityDetailDataModel)
         }
     }
-    
+
     init(input: Input) {
         self.input = input
         super.init(navigationController: input.navigationController)
     }
-    
+
     override func start() {
         super.start()
-        
+
         switch input.flow {
         case .activityDetail(let data):
             let detailViewModel: ActivityDetailViewModel = ActivityDetailViewModel(
@@ -36,13 +36,13 @@ final class HomeCoordinator: BaseCoordinator {
             start(viewController: detailViewController)
         }
     }
-    
+
     private let input: Input
 }
 
 extension HomeCoordinator: HomeViewModelNavigationDelegate {
     func notifyHomeDidSelectActivity() {
-        
+
     }
 }
 
@@ -53,7 +53,7 @@ extension HomeCoordinator: HomeFormScheduleViewModelDelegate {
         )
         viewModel.delegate = self
         let viewController = CheckoutViewController(viewModel: viewModel)
-        
+
         DispatchQueue.main.async { [weak self] in
             self?.start(viewController: viewController)
         }

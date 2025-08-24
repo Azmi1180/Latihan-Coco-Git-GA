@@ -10,7 +10,7 @@ import Foundation
 final class SignInViewModel {
     weak var delegate: (any SignInViewModelDelegate)?
     weak var actionDelegate: (any SignInViewModelAction)?
-    
+
     init(fetcher: SignInFetcherProtocol = SignInFetcher()) {
         self.fetcher = fetcher
     }
@@ -23,13 +23,13 @@ final class SignInViewModel {
         isTypeAble: true,
         delegate: nil
     )
-    
+
     private lazy var passwordInputVM: CocoSecureInputTextFieldViewModel = CocoSecureInputTextFieldViewModel(
         leadingIcon: nil,
         placeholderText: "Enter your password",
         currentTypedText: ""
     )
-    
+
     private let fetcher: SignInFetcherProtocol
 }
 
@@ -40,7 +40,7 @@ extension SignInViewModel: SignInViewModelProtocol {
             passwordInputVM: passwordInputVM
         )
     }
-    
+
     func onSignInDidTap() {
         fetcher.signIn(
             spec: SignInSpec(

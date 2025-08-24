@@ -21,7 +21,7 @@ final class ActivityFetcher: ActivityFetcherProtocol {
     init(networkService: NetworkServiceProtocol = NetworkService.shared) {
         self.networkService = networkService
     }
-    
+
     func fetchActivity(
         request: ActivitySearchRequest,
         completion: @escaping (Result<ActivityModelArray, NetworkServiceError>) -> Void
@@ -35,7 +35,7 @@ final class ActivityFetcher: ActivityFetcherProtocol {
             completion: completion
         )
     }
-    
+
     func fetchTopDestination(
         completion: @escaping (Result<ActivityTopDestinationModelArray, NetworkServiceError>) -> Void
     ) {
@@ -48,6 +48,6 @@ final class ActivityFetcher: ActivityFetcherProtocol {
             completion: completion
         )
     }
-    
+
     private let networkService: NetworkServiceProtocol
 }

@@ -10,7 +10,7 @@ import Foundation
 enum CreateBookingEndpoint: EndpointProtocol {
     case create
     case getBookings
-    
+
     var path: String {
         switch self {
         case .create:

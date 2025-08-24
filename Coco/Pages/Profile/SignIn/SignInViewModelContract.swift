@@ -21,7 +21,7 @@ protocol SignInViewModelAction: AnyObject {
 protocol SignInViewModelProtocol: AnyObject {
     var delegate: SignInViewModelDelegate? { get set }
     var actionDelegate: SignInViewModelAction? { get set }
-    
+
     func onViewDidLoad()
     func onSignInDidTap()
 }

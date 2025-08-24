@@ -18,7 +18,7 @@ protocol UserProfileViewModelAction: AnyObject {
 protocol UserProfileViewModelProtocol: AnyObject {
     var delegate: UserProfileViewModelDelegate? { get set }
     var actionDelegate: UserProfileViewModelAction? { get set }
-    
+
     func onViewDidLoad()
     func onLogoutDidTap()
 }

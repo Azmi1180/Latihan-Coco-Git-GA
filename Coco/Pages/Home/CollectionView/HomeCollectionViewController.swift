@@ -14,24 +14,24 @@ final class HomeCollectionViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         self.viewModel.actionDelegate = self
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         collectionView.delegate = self
         collectionView.backgroundColor = .systemBackground // Tambahkan background color
         viewModel.onViewDidLoad()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func loadView() {
         view = collectionView
     }
-    
+
     var dataSource: HomeCollectionViewDataSource?
-    
+
     private let viewModel: HomeCollectionViewModelProtocol
     private lazy var collectionView: UICollectionView = createCollectionView()
 }
@@ -40,41 +40,39 @@ extension HomeCollectionViewController: HomeCollectionViewModelAction {
     func configureDataSource() {
         let activityCellRegistration: ActivityCellRegistration = createActivityCellRegistration()
         let headerRegistration: HeaderRegistration = createHeaderRegistration()
-        
+
         let otherDestinationCellRegistration: OtherDestinationCellRegistration = createOtherDestinationCellRegistration()
-        
+
                 dataSource = HomeCollectionViewDataSource(collectionView: collectionView, cellProvider: { [weak self] (collectionView, indexPath, item: AnyHashable) -> UICollectionViewCell? in
             guard let self = self,
                   let sectionIdentifier = self.dataSource?.sectionIdentifier(for: indexPath.section) else {
                 return nil
             }
-            
+
             switch item {
             case let item as HomeActivityCellDataModel:
-                let isFamilyFriendly = (sectionIdentifier.type == .familyTopPick)
-                
                 switch sectionIdentifier.type {
                 case .popularDestination, .familyTopPick:
                     let cell = collectionView.dequeueConfiguredReusableCell(using: activityCellRegistration, for: indexPath, item: item)
-                    cell.configureCell(item, isFamilyFriendly: isFamilyFriendly)
                     return cell
                 case .activity:
-                    return collectionView.dequeueConfiguredReusableCell(using: otherDestinationCellRegistration, for: indexPath, item: item)
+                    let cell = collectionView.dequeueConfiguredReusableCell(using: otherDestinationCellRegistration, for: indexPath, item: item)
+                    return cell
                 }
             default:
                 return nil
             }
         })
-        
+
         dataSource?.supplementaryViewProvider = { collectionView, kind, indexPath in
             if kind == UICollectionView.elementKindSectionHeader {
                 return collectionView.dequeueConfiguredReusableSupplementary(using: headerRegistration, for: indexPath)
             }
-            
+
             return nil
         }
     }
-    
+
     func applySnapshot(_ snapshot: HomeCollectionViewSnapShot, completion: (() -> Void)?) {
         dataSource?.apply(snapshot, completion: completion)
     }
@@ -85,7 +83,7 @@ extension HomeCollectionViewController: UICollectionViewDelegate {
         guard let item: AnyHashable = dataSource?.itemIdentifier(for: indexPath) else {
              return
         }
-        
+
         switch item {
         case let item as HomeActivityCellDataModel:
             viewModel.onActivityDidTap(item)
@@ -103,11 +101,11 @@ private extension HomeCollectionViewController {
         collectionView.backgroundColor = .systemBackground // Tambahkan background color
         return collectionView
     }
-    
+
     func createLayout() -> UICollectionViewLayout {
         UICollectionViewCompositionalLayout { [weak self] (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
             guard let sectionIdentifier = self?.dataSource?.sectionIdentifier(for: sectionIndex) else { return nil }
-            
+
             switch sectionIdentifier.type {
             case .popularDestination, .familyTopPick:
                 // Item
@@ -123,7 +121,7 @@ private extension HomeCollectionViewController {
                     heightDimension: .absolute(217)
                 )
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
-                
+
                 // Section
                 let section = NSCollectionLayoutSection(group: group)
                 section.orthogonalScrollingBehavior = .continuous
@@ -148,7 +146,7 @@ private extension HomeCollectionViewController {
                 section.boundarySupplementaryItems = [sectionHeader]
 
                 return section
-                
+
             case .activity:
                 // Item
                 let itemSize = NSCollectionLayoutSize(
@@ -163,7 +161,7 @@ private extension HomeCollectionViewController {
                     heightDimension: .absolute(356) // Set to absolute height
                 )
                 let group = NSCollectionLayoutGroup.vertical(layoutSize: groupSize, subitems: [item])
-                
+
                 // Section
                 let section = NSCollectionLayoutSection(group: group)
                 section.orthogonalScrollingBehavior = .none // Change to vertical scrolling
@@ -200,17 +198,17 @@ private extension HomeCollectionViewController {
     typealias ActivityCellRegistration = UICollectionView.CellRegistration<HomeActivityCell, HomeActivityCellDataModel>
     func createActivityCellRegistration() -> ActivityCellRegistration {
         .init { cell, _, itemIdentifier in
-            cell.configureCell(itemIdentifier, isFamilyFriendly: false)
-        }
-    }
-    
-    typealias OtherDestinationCellRegistration = UICollectionView.CellRegistration<HomeOtherDestinationCell, HomeActivityCellDataModel>
-    func createOtherDestinationCellRegistration() -> OtherDestinationCellRegistration {
-        .init { cell, _, itemIdentifier in
             cell.configureCell(itemIdentifier)
         }
     }
-    
+
+    typealias OtherDestinationCellRegistration = UICollectionView.CellRegistration<HomeOtherDestinationCell, HomeActivityCellDataModel>
+    func createOtherDestinationCellRegistration() -> OtherDestinationCellRegistration {
+        .init { cell, _, itemIdentifier in
+            cell.configureCell(itemIdentifier, isFamilyFriendly: itemIdentifier.isFamilyFriendly)
+        }
+    }
+
     typealias HeaderRegistration = UICollectionView.SupplementaryRegistration<HomeReusableHeader>
     func createHeaderRegistration() -> HeaderRegistration {
         .init(elementKind: UICollectionView.elementKindSectionHeader) { supplementaryView, _, indexPath in
@@ -219,9 +217,9 @@ private extension HomeCollectionViewController {
             else {
                 return
             }
-            
+
             let isHidden = (sectionTitle == HomeViewModel.searchResultSectionTitle)
-            
+
             var iconName: String? = nil
             switch section.type {
             case .popularDestination:
@@ -231,7 +229,7 @@ private extension HomeCollectionViewController {
             case .activity:
                 iconName = "mappin.circle.fill"
             }
-            
+
             supplementaryView.configureView(title: sectionTitle, isHidden: isHidden, iconName: iconName)
         }
     }

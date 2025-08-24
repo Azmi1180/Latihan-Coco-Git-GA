@@ -22,7 +22,7 @@ final class ConstraintBuilder {
         self.view = view
         self.view.translatesAutoresizingMaskIntoConstraints = false
     }
-    
+
     @discardableResult
     func top(
         to anchor: NSLayoutYAxisAnchor,
@@ -32,7 +32,7 @@ final class ConstraintBuilder {
         applyConstraint(from: view.topAnchor, to: anchor, relation: relation, constant: constant)
         return self
     }
-    
+
     @discardableResult
     func edges(
         to view: UIView,
@@ -75,7 +75,7 @@ final class ConstraintBuilder {
         applyConstraint(from: view.trailingAnchor, to: anchor, relation: relation, constant: constant)
         return self
     }
-    
+
     @discardableResult
     func widthAnchor(
         to anchor: NSLayoutDimension,
@@ -85,7 +85,7 @@ final class ConstraintBuilder {
         applyConstraint(from: view.widthAnchor, to: anchor, relation: relation, constant: constant)
         return self
     }
-    
+
     @discardableResult
     func width(_ constant: CGFloat) -> Self {
         constraints.append(view.widthAnchor.constraint(equalToConstant: constant))
@@ -97,7 +97,7 @@ final class ConstraintBuilder {
         constraints.append(view.heightAnchor.constraint(equalToConstant: constant))
         return self
     }
-    
+
     @discardableResult
     func size(_ constant: CGFloat) -> Self {
         constraints.append(view.heightAnchor.constraint(equalToConstant: constant))

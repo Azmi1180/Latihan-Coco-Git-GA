@@ -29,7 +29,7 @@ final class HomeViewModel {
     private(set) lazy var collectionViewModel: any HomeCollectionViewModelProtocol = {
         let viewModel: HomeCollectionViewModel = HomeCollectionViewModel()
         viewModel.delegate = self
-        viewModel.actionDelegate = self // Add this
+        
         return viewModel
     }()
     private(set) lazy var loadingState: HomeLoadingState = HomeLoadingState()
@@ -47,6 +47,7 @@ final class HomeViewModel {
     
     private var responseMap: [Int: Activity] = [:]
     private var responseData: [Activity] = []
+    private var allActivities: [Activity] = []
     private var cancellables: Set<AnyCancellable> = Set()
     
     private(set) var filterDataModel: HomeSearchFilterTrayDataModel?
@@ -54,6 +55,9 @@ final class HomeViewModel {
     var isSearching: Bool = false
     var filteredOtherDestinationData: [HomeActivityCellDataModel] = []
     var otherDestinationData: [HomeActivityCellDataModel] = []
+    var searchedTopDestinationData: [HomeActivityCellDataModel] = []
+    var searchedTopFamilyPickData: [HomeActivityCellDataModel] = []
+    var searchedAllData: [HomeActivityCellDataModel] = []
 }
 
 extension HomeViewModel: HomeViewModelProtocol {
@@ -73,34 +77,42 @@ extension HomeViewModel: HomeViewModelProtocol {
         if queryText.isEmpty {
             isSearching = false
             filteredOtherDestinationData = []
+            actionDelegate?.showEmptyState(false)
             fetch()
         } else {
             isSearching = true
             DispatchQueue.global(qos: .userInitiated).async { [weak self] in
                 guard let self else { return }
-                let generalData = Array(self.responseData.dropFirst(10))
-                let filteredData = generalData.filter { $0.title.lowercased().contains(queryText.lowercased()) }
-                
-                self.filteredOtherDestinationData = filteredData.map { HomeActivityCellDataModel(activity: $0) }
-                
-                let searchResultSectionDataModel = HomeActivityCellSectionDataModel(
-                    title: HomeViewModel.searchResultSectionTitle,
-                    dataModel: self.filteredOtherDestinationData
-                )
-                let searchResultHomeSectionData = HomeSectionData(
-                    sectionType: .activity,
-                    sectionDataModel: searchResultSectionDataModel
-                )
-                
-                DispatchQueue.main.async { [weak self] in
+                self.filteredOtherDestinationData = self.otherDestinationData.filter { $0.name.lowercased().contains(queryText.lowercased()) }
+            }
+        DispatchQueue.main.async { [weak self] in
                     guard let self else { return }
-                    self.collectionViewModel.updateActivity(sections: [searchResultHomeSectionData])
+                    var sections: [HomeSectionData] = []
+
+                    if !self.filteredOtherDestinationData.isEmpty {
+                        let otherDestinationSectionDataModel = HomeActivityCellSectionDataModel(
+                            title: self.isSearching ? HomeViewModel.searchResultSectionTitle : HomeViewModel.otherDestinationTitle,
+                            dataModel: self.filteredOtherDestinationData
+                        )
+                        let otherDestinationSection = HomeSectionData(
+                            sectionType: .activity,
+                            sectionDataModel: otherDestinationSectionDataModel
+                        )
+                        sections.append(otherDestinationSection)
+                    }
+
+                    self.collectionViewModel.updateActivity(sections: sections)
                     self.actionDelegate?.toggleLoadingView(isShown: false, after: 0)
+                    self.actionDelegate?.showEmptyState(sections.isEmpty)
                 }
             }
         }
     }
-}
+
+
+
+
+
 
 extension HomeViewModel: HomeCollectionViewModelDelegate {
     func notifyCollectionViewActivityDidTap(_ dataModel: HomeActivityCellDataModel) {
@@ -147,14 +159,25 @@ private extension HomeViewModel {
                 self.actionDelegate?.toggleLoadingView(isShown: false, after: 0.0)
                 print("✅ Fetch Success")
                 print("Jumlah response: \(response.values.count)")
-
-                let activities = response.values
+                
+                var activities = response.values
+                for index in 0..<activities.count {
+                    if index < 5 {
+                        activities[index].isTopDestination = true
+                    } else if index < 10 {
+                        activities[index].isFamilyTopPick = true
+                    }
+                }
+                
+                self.allActivities = activities
+                self.searchedAllData = activities.map { HomeActivityCellDataModel(activity: $0) }
                 activities.forEach { activity in
                     print("""
                            --- Activity ---
                            ID: \(activity.id)
                            Nama: \(activity.title)
                            Harga: \(activity.pricing)
+                           description: \(activity.description)
                            Accessories: \(activity.accessories.map { $0.name })
                            Cancelable: \(activity.cancelable)
                            ---------------
@@ -167,7 +190,9 @@ private extension HomeViewModel {
                 let topDestinationData = Array(activities.prefix(5))
                 let topFamilyPickData = Array(activities.dropFirst(5).prefix(5))
                 let generalData = Array(activities.dropFirst(10))
-                self.otherDestinationData = generalData.map { HomeActivityCellDataModel(activity: $0) }
+                self.otherDestinationData = generalData.map { HomeActivityCellDataModel(activity: $0) } +
+                                            topDestinationData.map { HomeActivityCellDataModel(activity: $0) } +
+                                            topFamilyPickData.map { HomeActivityCellDataModel(activity: $0) }
                 
                 if !topDestinationData.isEmpty {
                     let topDestinationSectionDataModel = HomeActivityCellSectionDataModel(
@@ -277,52 +302,10 @@ private extension HomeViewModel {
                 guard let self else { return }
                 self.filterDataModel = newFilterData
                 actionDelegate?.dismissTray()
-                filterDidApply()
+                self.onSearchDidApply(self.searchBarViewModel.currentTypedText)
             }
             .store(in: &cancellables)
         
         actionDelegate?.openFilterTray(viewModel)
-    }
-    
-    func filterDidApply() {
-        guard let filterDataModel: HomeSearchFilterTrayDataModel else { return }
-        let tempResponseData: [Activity] = HomeFilterUtil.doFilter(
-            responseData,
-            filterDataModel: filterDataModel
-        )
-        
-        let searchResultSectionDataModel = HomeActivityCellSectionDataModel(
-            title: "Search Result",
-            dataModel: tempResponseData.map { HomeActivityCellDataModel(activity: $0) }
-        )
-        
-        let searchResultSection = HomeSectionData(
-            sectionType: .activity, // Assuming search results use the activity layout
-            sectionDataModel: searchResultSectionDataModel
-        )
-        
-        collectionViewModel.updateActivity(sections: [searchResultSection])
-    }
-}
-
-extension HomeViewModel: HomeCollectionViewModelAction {
-    func configureDataSource() {
-        // This method is called by HomeCollectionViewModel to configure its data source.
-        // HomeViewModel doesn't directly configure the data source, HomeCollectionViewController does.
-        // So, we can leave this empty or log a message.
-    }
-    
-    func applySnapshot(_ snapshot: HomeCollectionViewSnapShot, completion: (() -> Void)?) {
-        // This method is called by HomeCollectionViewModel to apply a snapshot.
-        // HomeViewModel doesn't directly apply the snapshot, HomeCollectionViewController does.
-        // We need to forward this call to the HomeCollectionViewController's data source.
-        // This implies HomeViewModel needs a reference to HomeCollectionViewController's data source.
-        // This is a design flaw. HomeCollectionViewModel should not be calling applySnapshot directly.
-        // Instead, HomeCollectionViewModel should update its activityData, and HomeCollectionViewController
-        // should observe changes to activityData and apply the snapshot.
-        
-        // For now, to fix the compilation error, I will leave this empty.
-        // A proper fix would involve refactoring the data flow.
-        completion?()
     }
 }

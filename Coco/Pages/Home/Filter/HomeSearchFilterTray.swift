@@ -10,14 +10,14 @@ import SwiftUI
 
 struct HomeSearchFilterTray: View {
     @ObservedObject var viewModel: HomeSearchFilterTrayViewModel
-    
+
     var body: some View {
         VStack(alignment: .center) {
             Text("Search")
                 .multilineTextAlignment(.center)
                 .font(.jakartaSans(forTextStyle: .body, weight: .semibold))
                 .foregroundStyle(Token.additionalColorsBlack.toColor())
-            
+
             ScrollView {
                 VStack(alignment: .leading, spacing: 24.0) {
                     if !viewModel.dataModel.filterPillDataState.isEmpty {
@@ -25,7 +25,7 @@ struct HomeSearchFilterTray: View {
                             Text("Popular Filters")
                                 .foregroundStyle(Token.additionalColorsBlack.toColor())
                                 .font(.jakartaSans(forTextStyle: .body, weight: .semibold))
-                             
+
                             ScrollView(.horizontal) {
                                 HStack(spacing: 12.0) {
                                     ForEach(viewModel.dataModel.filterPillDataState, id: \.id) { state in
@@ -37,7 +37,7 @@ struct HomeSearchFilterTray: View {
                             }
                         }
                     }
-                    
+
                     HomeSearchFilterPriceRangeView(model: viewModel.dataModel.priceRangeModel, rangeDidChange: {
                         viewModel.updateApplyButtonTitle()
                     })

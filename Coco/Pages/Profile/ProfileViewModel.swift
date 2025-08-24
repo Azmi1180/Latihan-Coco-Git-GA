@@ -42,7 +42,7 @@ private extension ProfileViewModel {
         actionDelegate?.showSignInView(viewModel: viewModel)
         actionDelegate?.updateTitle(with: "Sign In")
     }
-    
+
     func showUserProfileView() {
         let viewModel: UserProfileViewModel = UserProfileViewModel()
         viewModel.delegate = self

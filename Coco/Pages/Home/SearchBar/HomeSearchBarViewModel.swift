@@ -15,17 +15,17 @@ protocol HomeSearchBarViewModelDelegate: AnyObject {
 
 final class HomeSearchBarViewModel: ObservableObject {
     weak var delegate: HomeSearchBarViewModelDelegate?
-    
+
     @Published var currentTypedText: String = ""
     @Published var trailingIcon: ImageHandler?
-    
+
     let leadingIcon: UIImage?
     let isTypeAble: Bool
     let placeholderText: String
-    
+
     private let defaultTrailingIcon: ImageHandler?
     private var cancellables = Set<AnyCancellable>()
-    
+
     init(
         leadingIcon: UIImage?,
         placeholderText: String,
@@ -41,15 +41,15 @@ final class HomeSearchBarViewModel: ObservableObject {
         self.isTypeAble = isTypeAble
         self.delegate = delegate
         self.defaultTrailingIcon = trailingIcon
-        
+
         observeSearchText()
     }
-    
+
     func onTextFieldFocusDidChange(to newFocus: Bool) {
         guard newFocus else { return }
         delegate?.notifyHomeSearchBarDidTap(isTypeAble: isTypeAble, viewModel: self)
     }
-    
+
     private func observeSearchText() {
         $currentTypedText
             .sink { [weak self] newText in

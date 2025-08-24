@@ -14,21 +14,21 @@ final class ActivityDetailViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         self.viewModel.actionDelegate = self
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func loadView() {
         view = thisView
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         thisView.delegate = self
         viewModel.onViewDidLoad()
     }
-    
+
     private let viewModel: ActivityDetailViewModelProtocol
     private let thisView: ActivityDetailView = ActivityDetailView()
 }
@@ -36,7 +36,7 @@ final class ActivityDetailViewController: UIViewController {
 extension ActivityDetailViewController: ActivityDetailViewModelAction {
     func configureView(data: ActivityDetailDataModel) {
         thisView.configureView(data)
-        
+
         if data.imageUrlsString.isEmpty {
             thisView.toggleImageSliderView(isShown: false)
         }
@@ -48,7 +48,7 @@ extension ActivityDetailViewController: ActivityDetailViewModelAction {
             sliderVCs.didMove(toParent: self)
         }
     }
-    
+
     func updatePackageData(data: [ActivityDetailDataModel.Package]) {
         thisView.updatePackageData(data)
     }
@@ -58,7 +58,7 @@ extension ActivityDetailViewController: ActivityDetailViewDelegate {
     func notifyPackagesButtonDidTap(shouldShowAll: Bool) {
         viewModel.onPackageDetailStateDidChange(shouldShowAll: shouldShowAll)
     }
-    
+
     func notifyPackagesDetailDidTap(with packageId: Int) {
         viewModel.onPackagesDetailDidTap(with: packageId)
     }

@@ -14,9 +14,9 @@ extension UIImageView {
             completion?(nil)
             return
         }
-        
+
         let key: String = cacheKey ?? url.absoluteString
-        
+
         if let cachedImage: UIImage = ImageCacheManager.shared.image(forKey: key) {
             DispatchQueue.main.async {
                 self.image = cachedImage
@@ -24,7 +24,7 @@ extension UIImageView {
             }
             return
         }
-        
+
         URLSession.shared.dataTask(with: url) { data, response, error in
             guard
                 let data = data,
@@ -35,9 +35,9 @@ extension UIImageView {
                 }
                 return
             }
-            
+
             ImageCacheManager.shared.set(image, forKey: key)
-            
+
             DispatchQueue.main.async {
                 self.image = image
                 completion?(image)

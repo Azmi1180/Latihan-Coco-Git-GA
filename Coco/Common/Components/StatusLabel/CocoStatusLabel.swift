@@ -11,7 +11,7 @@ import SwiftUI
 struct CocoStatusLabel: View {
     var title: String
     var style: CocoStatusLabelStyle
-    
+
     var body: some View {
         Text(title)
             .lineLimit(1)
@@ -39,18 +39,18 @@ final class CocoStatusLabelHostingController: UIHostingController<CocoStatusLabe
     ) {
         self.titleData = title
         self.style = style
-        
+
         super.init(rootView: CocoStatusLabel(title: titleData, style: style))
     }
 
     @MainActor @preconcurrency required dynamic init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func updateTitle(_ newTitle: String) {
         self.rootView.title = newTitle
     }
-    
+
     func updateStyle(_ newStyle: CocoStatusLabelStyle) {
         self.rootView.style = newStyle
     }

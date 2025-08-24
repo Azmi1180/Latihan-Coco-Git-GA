@@ -15,16 +15,16 @@ protocol MyTripListCardViewDelegate: AnyObject {
 
 final class MyTripListCardView: UIView {
     weak var delegate: MyTripListCardViewDelegate?
-    
+
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupView()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func configureView(dataModel: MyTripListCardDataModel, index: Int) {
         self.index = index
         statusLabelView.updateTitle(dataModel.statusLabel.text)
@@ -36,7 +36,7 @@ final class MyTripListCardView: UIView {
         totalPriceLabel.text = dataModel.price
         imageView.loadImage(from: URL(string: dataModel.imageUrl))
     }
-    
+
     private lazy var imageView: UIImageView = createImageView()
     private lazy var statusLabelView: CocoStatusLabelHostingController = CocoStatusLabelHostingController(
         title: "",

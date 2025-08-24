@@ -12,7 +12,7 @@ extension UIEdgeInsets {
     init(vertical: CGFloat, horizontal: CGFloat) {
         self.init(top: vertical, left: horizontal, bottom: vertical, right: horizontal)
     }
-    
+
     init(edges: CGFloat) {
         self.init(top: edges, left: edges, bottom: edges, right: edges)
     }

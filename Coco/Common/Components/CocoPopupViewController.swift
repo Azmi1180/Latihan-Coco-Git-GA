@@ -56,7 +56,7 @@ final class CocoPopupViewController: UIViewController {
             container.trailingAnchor.constraint(lessThanOrEqualTo: view.trailingAnchor, constant: -24)
         ])
     }
-    
+
     private let child: UIViewController
     private let transitionDelegate: PopupTransitioningDelegate = PopupTransitioningDelegate()
 }

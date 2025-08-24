@@ -13,7 +13,7 @@ final class ProfileView: UIView {
         super.init(frame: frame)
         setupView()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
@@ -21,6 +21,6 @@ final class ProfileView: UIView {
 
 private extension ProfileView {
     func setupView() {
-        
+
     }
 }

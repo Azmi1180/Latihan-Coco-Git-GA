@@ -14,13 +14,13 @@ typealias HomeCollectionViewSnapShot = NSDiffableDataSourceSnapshot<HomeCollecti
 struct HomeCollectionContent {
     let section: Section
     let items: [AnyHashable]
-    
+
     enum SectionType: Hashable {
         case popularDestination
         case familyTopPick
         case activity
     }
-    
+
     struct Section: Hashable {
         let type: SectionType
         let title: String?

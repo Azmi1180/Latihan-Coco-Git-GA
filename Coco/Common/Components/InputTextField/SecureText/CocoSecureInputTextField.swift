@@ -13,10 +13,10 @@ private let kInputHeight: CGFloat = 52.0
 struct CocoSecureInputTextField: View {
     @ObservedObject var viewModel: CocoSecureInputTextFieldViewModel
     @State private var isSecure: Bool = true
-    
+
     @FocusState private var isFocused: Bool
     private let onFocusedAction: ((Bool) -> Void)?
-    
+
     init(
         viewModel: CocoSecureInputTextFieldViewModel,
         onFocusedAction: ((Bool) -> Void)? = nil
@@ -24,7 +24,7 @@ struct CocoSecureInputTextField: View {
         self.viewModel = viewModel
         self.onFocusedAction = onFocusedAction
     }
-    
+
     var body: some View {
         Group {
             if isSecure {
@@ -56,6 +56,7 @@ struct CocoSecureInputTextField: View {
         }
         .font(.jakartaSans(forTextStyle: .body, weight: .medium))
         .frame(height: kInputHeight)
+        
     }
 }
 

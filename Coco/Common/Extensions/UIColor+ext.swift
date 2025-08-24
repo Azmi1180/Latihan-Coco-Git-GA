@@ -12,7 +12,7 @@ import SwiftUI
 extension UIColor {
     static func from(_ hex: String) -> UIColor {
         let red, green, blue, alpha: CGFloat
-        
+
         // Trim and switch offset
         let trimmedHexColor: String = {
             if hex.hasPrefix("#") {
@@ -21,14 +21,14 @@ extension UIColor {
             }
             return hex
         }()
-        
+
         let scanner: Scanner = Scanner(string: trimmedHexColor)
         var hexNumber: UInt64 = 0
         guard scanner.scanHexInt64(&hexNumber) else {
             assertionFailure("\(hex) is not a valid format")
             return .black
         }
-        
+
         switch trimmedHexColor.count {
         case 6: // RRGGBB
             red   = CGFloat((hexNumber & 0xFF0000) >> 16) / 255
@@ -49,7 +49,7 @@ extension UIColor {
 
         return UIColor(red: red, green: green, blue: blue, alpha: alpha)
     }
-    
+
     func toColor() -> Color {
         Color(self)
     }

@@ -24,9 +24,9 @@ struct HomeSectionData {
 protocol HomeCollectionViewModelProtocol: AnyObject {
     var actionDelegate: HomeCollectionViewModelAction? { get set }
     var delegate: HomeCollectionViewModelDelegate? { get set }
-    
+
     var activityData: [HomeSectionData] { get } // Updated type
-    
+
     func onViewDidLoad()
     func updateActivity(sections: [HomeSectionData]) // Updated parameter name and type
     func onActivityDidTap(_ dataModel: HomeActivityCellDataModel)

@@ -10,11 +10,11 @@ import SwiftUI
 
 struct HomeSearchSearchTray: View {
     @StateObject var viewModel: HomeSearchSearchTrayViewModel
-    
+
     @State var latestSearches: [HomeSearchSearchLocationData]
-    
+
     let searchDidApply: ((_ query: String) -> Void)
-    
+
     init(
         selectedQuery: String,
         latestSearches: [HomeSearchSearchLocationData],
@@ -32,34 +32,34 @@ struct HomeSearchSearchTray: View {
                 )
             )
         )
-        
+
         self.latestSearches = latestSearches
         self.searchDidApply = searchDidApply
     }
-    
+
     var body: some View {
         VStack(alignment: .center) {
             Text("Filter Service")
                 .multilineTextAlignment(.center)
                 .font(.jakartaSans(forTextStyle: .body, weight: .semibold))
                 .foregroundStyle(Token.additionalColorsBlack.toColor())
-            
+
             ScrollView {
                 VStack(alignment: .leading, spacing: 24.0) {
                     HomeSearchBarView(viewModel: viewModel.searchBarViewModel)
-                    
+
                     if !latestSearches.isEmpty {
                         createSectionView(title: "Last Search") {
                             lastSearchSectionView()
                         }
                     }
-                    
+
                     if !viewModel.popularLocations.isEmpty {
                         createSectionView(title: "Popular Location") {
                             popularLocationSectionView()
                         }
                     }
-                    
+
                     Spacer()
                     CocoButton(
                         action: {
@@ -95,13 +95,13 @@ private extension HomeSearchSearchTray {
             view()
         }
     }
-    
+
     func createLocationView(name: String) -> some View {
         HStack(alignment: .center, spacing: 14.0) {
             Image(uiImage: CocoIcon.icPinPointBlue.image)
                 .resizable()
                 .frame(width: 24.0, height: 24.0)
-            
+
             Text(name)
                 .font(.jakartaSans(forTextStyle: .callout, weight: .medium))
                 .foregroundStyle(Token.additionalColorsBlack.toColor())
@@ -110,14 +110,14 @@ private extension HomeSearchSearchTray {
             viewModel.searchBarViewModel.currentTypedText = name
         }
     }
-    
+
     func createLastSearchView(name: String) -> some View {
         HStack(alignment: .center, spacing: 6.0) {
             Text(name)
                 .lineLimit(1)
                 .font(.jakartaSans(forTextStyle: .body, weight: .light))
                 .foregroundStyle(Token.grayscale60.toColor())
-            
+
             Image(uiImage: CocoIcon.icCross.image)
                 .resizable()
                 .frame(width: 15.0, height: 15.0)
@@ -131,7 +131,7 @@ private extension HomeSearchSearchTray {
         )
         .cornerRadius(14.0)
     }
-    
+
     func lastSearchSectionView() -> some View {
         ScrollView(.horizontal) {
             HStack(alignment: .center, spacing: 16.0) {
@@ -146,12 +146,12 @@ private extension HomeSearchSearchTray {
             }
         }
     }
-    
+
     func popularLocationSectionView() -> some View {
         VStack(alignment: .leading, spacing: 15.0) {
             ForEach(Array(viewModel.popularLocations.enumerated()), id: \.0) { (index, location) in
                 createLocationView(name: location.name)
-                
+
                 if index < viewModel.popularLocations.count {
                     Rectangle()
                         .frame(maxWidth: .infinity)

@@ -11,25 +11,25 @@ import SwiftUI
 
 final class HomeSearchFilterTrayViewModel: ObservableObject {
     let filterDidApplyPublisher: PassthroughSubject<HomeSearchFilterTrayDataModel, Never> = PassthroughSubject()
-    
+
     @Published var dataModel: HomeSearchFilterTrayDataModel
     @Published var applyButtonTitle: String
-    
+
     private let activities: [Activity]
     private var cancellables: Set<AnyCancellable> = Set()
-    
+
     init(dataModel: HomeSearchFilterTrayDataModel, activities: [Activity]) {
         self.dataModel = dataModel
         self.activities = activities
-        
+
         let tempActivity: [Activity] = HomeFilterUtil.doFilter(activities, filterDataModel: dataModel)
         applyButtonTitle = Self.getTitle(tempActivity)
     }
-    
+
     func filterDidApply() {
         filterDidApplyPublisher.send(dataModel)
     }
-    
+
     func updateApplyButtonTitle() {
         let tempActivity: [Activity] = HomeFilterUtil.doFilter(activities, filterDataModel: dataModel)
         applyButtonTitle = Self.getTitle(tempActivity)

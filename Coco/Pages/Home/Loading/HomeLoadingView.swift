@@ -11,7 +11,7 @@ import SwiftUI
 struct HomeLoadingView: View {
     @ObservedObject var state: HomeLoadingState
     @State var currentTypedText: String = ""
-    
+
     var body: some View {
         VStack(alignment: .center, spacing: 32.0) {
             Text("Loading...")
@@ -21,7 +21,7 @@ struct HomeLoadingView: View {
                         weight: .bold
                     )
                 )
-            
+
             CocoLoadingBar(percentage: state.percentageV)
         }
         .padding(16.0)
