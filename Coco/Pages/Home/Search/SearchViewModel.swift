@@ -55,5 +55,9 @@ final class SearchViewModel: ObservableObject {
     func applySearch(query: String) {
         delegate?.searchViewModel(didApplySearch: query)
     }
+
+    func removeLatestSearch(at index: Int) {
+        latestSearches.remove(at: index)
+    }
 }
 

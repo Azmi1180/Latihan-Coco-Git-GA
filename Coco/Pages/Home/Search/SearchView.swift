@@ -81,16 +81,23 @@ private extension SearchView {
         }
     }
     
-    func createLastSearchView(name: String) -> some View {
+    func createLastSearchView(name: String, index: Int) -> some View {
         HStack(alignment: .center, spacing: 6.0) {
             Text(name)
                 .lineLimit(1)
                 .font(.jakartaSans(forTextStyle: .body, weight: .light))
                 .foregroundStyle(Token.grayscale60.toColor())
             
-            Image(uiImage: CocoIcon.icCross.image)
-                .resizable()
-                .frame(width: 15.0, height: 15.0)
+            // MARK: Delete button
+            Button(action: {
+                withAnimation {
+                    viewModel.removeLatestSearch(at: index)
+                }
+            }) {
+                Image(uiImage: CocoIcon.icCross.image)
+                    .resizable()
+                    .frame(width: 15.0, height: 15.0)
+            }
         }
         .padding(.vertical, 12.0)
         .padding(.horizontal, 20.0)
@@ -106,12 +113,11 @@ private extension SearchView {
         ScrollView(.horizontal) {
             HStack(alignment: .center, spacing: 16.0) {
                 ForEach(Array(viewModel.latestSearches.enumerated()), id: \.0) { (index, location) in
-                    createLastSearchView(name: location.name)
-                        .onTapGesture {
-                            withAnimation {
-                                _ = viewModel.latestSearches.remove(at: index)
-                            }
-                        }
+                    Button(action: {
+                        viewModel.applySearch(query: location.name)
+                    }){
+                        createLastSearchView(name: location.name, index: index)
+                    }
                 }
             }
         }
