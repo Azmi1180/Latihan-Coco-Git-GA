@@ -71,8 +71,9 @@ extension HomeViewModel: HomeViewModelProtocol {
     
     func onSearchDidApply(_ queryText: String) {
         searchBarViewModel.currentTypedText = queryText
-        loadingState.percentage = 0
-        actionDelegate?.toggleLoadingView(isShown: false, after: 0)
+        // Show loading view at the start of the search
+        loadingState.percentage = 0 // Reset percentage for new search
+        actionDelegate?.toggleLoadingView(isShown: false, after: 0) // Show loading view
         
         if queryText.isEmpty {
             isSearching = false
@@ -84,8 +85,8 @@ extension HomeViewModel: HomeViewModelProtocol {
             DispatchQueue.global(qos: .userInitiated).async { [weak self] in
                 guard let self else { return }
                 self.filteredOtherDestinationData = self.otherDestinationData.filter { $0.name.lowercased().contains(queryText.lowercased()) }
-            }
-        DispatchQueue.main.async { [weak self] in
+
+                DispatchQueue.main.async { [weak self] in // Move this block inside the async block
                     guard let self else { return }
                     var sections: [HomeSectionData] = []
 
@@ -102,9 +103,12 @@ extension HomeViewModel: HomeViewModelProtocol {
                     }
 
                     self.collectionViewModel.updateActivity(sections: sections)
-                    self.actionDelegate?.toggleLoadingView(isShown: false, after: 0)
-                    self.actionDelegate?.showEmptyState(sections.isEmpty)
+                    // Hide loading view and show empty state AFTER search results are processed
+                    self.loadingState.percentage = 100 // Set to 100 after processing
+                    self.actionDelegate?.toggleLoadingView(isShown: false, after: 0) // Hide loading view
+                    self.actionDelegate?.showEmptyState(sections.isEmpty) // Show empty state if no results
                 }
+            }
             }
         }
     }
@@ -156,7 +160,7 @@ private extension HomeViewModel {
             case .success(let response):
                 var sections: [HomeSectionData] = []
                 self.loadingState.percentage = 100
-                self.actionDelegate?.toggleLoadingView(isShown: false, after: 0.0)
+                self.actionDelegate?.toggleLoadingView(isShown: false, after: 0)
                 print("✅ Fetch Success")
                 print("Jumlah response: \(response.values.count)")
                 
@@ -271,9 +275,7 @@ private extension HomeViewModel {
                 )
             )
         }
-        
         let sortedData = responseMapActivity.sorted { $0.pricing < $1.pricing }
-        
         let minPrice: Double = sortedData.first?.pricing ?? 0
         let maxPrice: Double = sortedData.last?.pricing ?? 0
         let filterDataModel: HomeSearchFilterTrayDataModel = HomeSearchFilterTrayDataModel(

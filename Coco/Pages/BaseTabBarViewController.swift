@@ -26,7 +26,7 @@ final class BaseTabBarViewController: UITabBarController {
     private let tabBarItemDatas: [TabItemRepresentable] = [
         HomeTabItem(),
         MyTripTabItem(),
-        ProfileTabItem(),
+        ProfileTabItem()
     ]
 
     private lazy var navigationControllers: [UINavigationController] = []

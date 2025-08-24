@@ -13,15 +13,22 @@ struct HomeLoadingView: View {
     @State var currentTypedText: String = ""
 
     var body: some View {
-        VStack(alignment: .center, spacing: 32.0) {
-            Text("Loading...")
+        Text("Just a moment, we’re preparing")
+            .font(
+                .jakartaSans(
+                    forTextStyle: .title2,
+                    weight: .bold
+                )
+            )
+
+        VStack(alignment: .center, spacing: 32) {
+            Text("the best trip for you 🤿")
                 .font(
                     .jakartaSans(
                         forTextStyle: .title2,
                         weight: .bold
                     )
                 )
-
             CocoLoadingBar(percentage: state.percentageV)
         }
         .padding(16.0)

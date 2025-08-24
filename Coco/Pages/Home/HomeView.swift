@@ -56,8 +56,8 @@ final class HomeView: UIView {
 private extension HomeView {
     func setupView() {
         addSubviewAndLayout(contentStackView)
-        addSubviewAndLayout(loadingView)
         addSubviewAndLayout(errorView)
+        addSubviewAndLayout(loadingView) // Ensure loadingView is added last
 
         errorView.isHidden = true
         loadingView.isHidden = true

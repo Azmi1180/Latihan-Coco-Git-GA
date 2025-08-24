@@ -144,7 +144,7 @@ private extension HomeOtherDestinationCell {
             cardView.topAnchor.constraint(equalTo: contentView.topAnchor),
             cardView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             cardView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            cardView.widthAnchor.constraint(equalToConstant: 335),
+            cardView.widthAnchor.constraint(equalToConstant: 390),
             cardView.heightAnchor.constraint(equalToConstant: 356),
 
             imageView.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 0),
