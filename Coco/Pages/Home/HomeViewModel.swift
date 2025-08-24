@@ -130,7 +130,8 @@ extension HomeViewModel: HomeSearchBarViewModelDelegate {
                 .init(id: 1, name: "Kepulauan Seribu"),
                 .init(id: 2, name: "Nusa Penida"),
                 .init(id: 3, name: "Gili Island, Indonesia"),
-            ]
+            ],
+            currentQuery: searchBarViewModel.currentTypedText
         )
     }
 }

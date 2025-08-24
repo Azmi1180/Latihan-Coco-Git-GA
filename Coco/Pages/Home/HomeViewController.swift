@@ -76,12 +76,12 @@ extension HomeViewController: HomeViewModelAction {
         coordinator.start()
     }
     
-    func searchDidTap(latestSearches: [HomeSearchSearchLocationData]) {
+    func searchDidTap(latestSearches: [HomeSearchSearchLocationData], currentQuery: String) {
         guard let navigationController else { return }
         let coordinator: HomeCoordinator = HomeCoordinator(
             input: .init(
                 navigationController: navigationController,
-                flow: .search(viewModel: viewModel, latestSearches: latestSearches)
+                flow: .search(viewModel: viewModel, latestSearches: latestSearches, currentQuery: currentQuery)
             )
         )
         coordinator.parentCoordinator = AppCoordinator.shared
