@@ -16,13 +16,13 @@ final class HomeCoordinator: BaseCoordinator {
 
         enum Flow {
             case activityDetail(data: ActivityDetailDataModel)
-            case search(viewModel: HomeViewModelProtocol)
+            case search(viewModel: HomeViewModelProtocol, latestSearches: [HomeSearchSearchLocationData])
         }
     }
 
     init(input: Input) {
         self.input = input
-        if case .search(let viewModel) = input.flow {
+        if case .search(let viewModel, _) = input.flow {
             self.homeViewModel = viewModel
         } else {
             self.homeViewModel = nil
@@ -42,7 +42,7 @@ final class HomeCoordinator: BaseCoordinator {
             let detailViewController: ActivityDetailViewController = ActivityDetailViewController(viewModel: detailViewModel)
             start(viewController: detailViewController)
 
-        case .search:
+        case .search(let viewModel, let latestSearches):
             let searchViewModel: SearchViewModel = SearchViewModel(
                 searchBarViewModel: HomeSearchBarViewModel(
                     leadingIcon: CocoIcon.icSearchLoop.image,
@@ -51,7 +51,8 @@ final class HomeCoordinator: BaseCoordinator {
                     trailingIcon: nil,
                     isTypeAble: true,
                     delegate: nil
-                )
+                ),
+                latestSearches: latestSearches
             )
             searchViewModel.delegate = self
             let searchViewController: SearchViewController = SearchViewController(viewModel: searchViewModel)

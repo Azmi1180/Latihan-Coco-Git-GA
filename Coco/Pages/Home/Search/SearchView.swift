@@ -12,24 +12,18 @@ struct SearchView: View {
     @StateObject var viewModel: SearchViewModel
     
     var body: some View {
-        VStack(alignment: .center) {
-            Text("Filter Service")
-                .multilineTextAlignment(.center)
-                .font(.jakartaSans(forTextStyle: .body, weight: .semibold))
-                .foregroundStyle(Token.additionalColorsBlack.toColor())
-            
-            ScrollView {
-                VStack(alignment: .leading, spacing: 24.0) {
+        VStack {
+                VStack(spacing: 24.0) {
                     HomeSearchBarView(viewModel: viewModel.searchBarViewModel)
                     
                     if !viewModel.latestSearches.isEmpty {
-                        createSectionView(title: "Last Search") {
+                        createSectionView(title: "Last Searched") {
                             lastSearchSectionView()
                         }
                     }
                     
                     if !viewModel.popularLocations.isEmpty {
-                        createSectionView(title: "Popular Location") {
+                        createSectionView(title: "Popular Searches") {
                             popularLocationSectionView()
                         }
                     }
@@ -45,12 +39,11 @@ struct SearchView: View {
                     )
                     .stretch()
                 }
-            }
         }
         .frame(maxWidth: .infinity)
-        .padding(24.0)
+        .padding(.horizontal, 24)
         .background(Color.white)
-        .cornerRadius(16)
+//        .cornerRadius(16)
         .onAppear {
             viewModel.onAppear()
         }
@@ -64,8 +57,9 @@ private extension SearchView {
     ) -> some View {
         VStack(alignment: .leading, spacing: 12.0) {
             Text(title)
-                .font(.jakartaSans(forTextStyle: .body, weight: .semibold))
+                .font(.jakartaSans(forTextStyle: .body, weight: .bold))
                 .foregroundStyle(Token.additionalColorsBlack.toColor())
+                .padding(.bottom)
             view()
         }
     }
