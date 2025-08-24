@@ -20,10 +20,11 @@ protocol HomeViewModelAction: AnyObject {
     func toggleLoadingView(isShown: Bool, after: CGFloat)
     func activityDidSelect(data: ActivityDetailDataModel)
     
-    func openSearchTray(
-        selectedQuery: String,
-        latestSearches: [HomeSearchSearchLocationData]
-    )
+//    func openSearchTray(
+//        selectedQuery: String,
+//        latestSearches: [HomeSearchSearchLocationData]
+//    )
+    func searchDidTap()
     func openFilterTray(_ viewModel: HomeSearchFilterTrayViewModel)
     func dismissTray()
 }

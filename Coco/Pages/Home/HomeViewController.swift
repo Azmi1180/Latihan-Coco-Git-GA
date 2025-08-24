@@ -76,18 +76,31 @@ extension HomeViewController: HomeViewModelAction {
         coordinator.start()
     }
     
-    func openSearchTray(
-        selectedQuery: String,
-        latestSearches: [HomeSearchSearchLocationData]
-    ) {
-        presentTray(view: HomeSearchSearchTray(
-            selectedQuery: selectedQuery,
-            latestSearches: latestSearches
-        ) { [weak self] queryText in
-            self?.dismiss(animated: true)
-            self?.viewModel.onSearchDidApply(queryText)
-        })
+    func searchDidTap() {
+        guard let navigationController else { return }
+        let coordinator: HomeCoordinator = HomeCoordinator(
+            input: .init(
+                navigationController: navigationController,
+                flow: .search(viewModel: viewModel)
+            )
+        )
+        coordinator.parentCoordinator = AppCoordinator.shared
+        coordinator.start()
     }
+
+//    Previous implementation
+//    func openSearchTray(
+//        selectedQuery: String,
+//        latestSearches: [HomeSearchSearchLocationData]
+//    ) {
+//        presentTray(view: HomeSearchSearchTray(
+//            selectedQuery: selectedQuery,
+//            latestSearches: latestSearches
+//        ) { [weak self] queryText in
+//            self?.dismiss(animated: true)
+//            self?.viewModel.onSearchDidApply(queryText)
+//        })
+//    }
     
     func openFilterTray(_ viewModel: HomeSearchFilterTrayViewModel) {
         presentTray(view: HomeSearchFilterTray(viewModel: viewModel))
