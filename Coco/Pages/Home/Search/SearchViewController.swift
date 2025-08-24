@@ -24,6 +24,17 @@ class SearchViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Custom back button
+        self.navigationItem.hidesBackButton = true
+        let backButton = UIButton(type: .custom)
+//        backButton.setImage(CocoIcon.icChevronLeft.image, for: .normal)
+        backButton.setImage(UIImage(systemName: "arrow.backward"), for: .normal)
+        backButton.tintColor = Token.mainColorPrimary
+        backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+
+        let backBarButtonItem = UIBarButtonItem(customView: backButton)
+        navigationItem.leftBarButtonItem = backBarButtonItem
+        
         let searchView = SearchView(viewModel: self.viewModel)
         let hostingController = UIHostingController(rootView: searchView)
         
@@ -39,6 +50,10 @@ class SearchViewController: UIViewController {
             hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+    }
+
+    @objc func backButtonTapped() {
+        navigationController?.popViewController(animated: true)
     }
 }
 
