@@ -74,6 +74,14 @@ extension ResultViewController: ResultViewModelAction {
     func dismissTray() {
         dismiss(animated: true)
     }
+    
+    func constructFilterPills(pills: [FilterPillDataModel], selectedPillId: String?, delegate: FilterPillViewDelegate) {
+        let filterPillView = FilterPillView()
+        filterPillView.configure(with: pills, selectedPillId: selectedPillId)
+        filterPillView.delegate = delegate
+        
+        thisView.addFilterPillsView(from: filterPillView)
+    }
 }
 
 private extension ResultViewController {

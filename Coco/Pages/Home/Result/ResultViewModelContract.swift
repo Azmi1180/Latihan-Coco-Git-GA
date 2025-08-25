@@ -19,4 +19,5 @@ protocol ResultViewModelAction: AnyObject {
     func notifySearchBarTappedForNavigation()
     func openFilterTray(_ viewModel: HomeSearchFilterTrayViewModel)
     func dismissTray()
+    func constructFilterPills(pills: [FilterPillDataModel], selectedPillId: String?, delegate: FilterPillViewDelegate)
 }

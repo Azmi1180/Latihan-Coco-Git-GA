@@ -32,6 +32,11 @@ final class ResultView: UIView {
     }
     
     // Adds the CollectionView/Search Results child view.
+    func addFilterPillsView(from view: UIView) {
+        filterPillsView.subviews.forEach { $0.removeFromSuperview() }
+        filterPillsView.addSubviewAndLayout(view, insets: .init(top: 0, left: 20, bottom: 0, right: 20))
+    }
+
     func addSearchResultView(from view: UIView) {
         // Clear previous views
         searchResultView.subviews.forEach { $0.removeFromSuperview() }
@@ -63,6 +68,7 @@ final class ResultView: UIView {
     private lazy var errorView: UIView = UIView()
     private lazy var loadingView: UIView = UIView()
     private lazy var searchBarView: UIView = UIView()
+    private lazy var filterPillsView: UIView = UIView()
     private lazy var searchResultView: UIView = UIView()
     private lazy var contentStackView: UIStackView = createContentStackView()
 }
@@ -86,6 +92,7 @@ private extension ResultView {
     func createContentStackView() -> UIStackView {
         let stackView = UIStackView(arrangedSubviews: [
             searchBarView,
+            filterPillsView,
             searchResultView,
         ])
         stackView.axis = .vertical
