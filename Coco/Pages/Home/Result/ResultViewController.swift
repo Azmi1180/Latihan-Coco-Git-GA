@@ -31,6 +31,20 @@ class ResultViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel.onViewDidLoad()
+        
+        // Custom back button
+        self.navigationItem.hidesBackButton = true
+        let backButton = UIButton(type: .custom)
+        backButton.setImage(UIImage(systemName: "arrow.backward"), for: .normal)
+        backButton.tintColor = Token.mainColorPrimary
+        backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
+
+        let backBarButtonItem = UIBarButtonItem(customView: backButton)
+        navigationItem.leftBarButtonItem = backBarButtonItem
+    }
+
+    @objc func backButtonTapped() {
+        navigationController?.popViewController(animated: true)
     }
 }
 
