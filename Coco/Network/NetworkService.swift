@@ -50,10 +50,13 @@ final class NetworkService: NetworkServiceProtocol {
         request.httpMethod = method.rawValue
         request.allHTTPHeaderFields = headers
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        if urlString.contains("supabase") {
+            if let apiKey: String = Secrets.shared.apiKey {
+                request.setValue(apiKey, forHTTPHeaderField: "apikey")
+                request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
+            }
 
-        if let apiKey: String = Secrets.shared.apiKey {
-            request.setValue(apiKey, forHTTPHeaderField: "apikey")
-            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
         }
 
         if let body: JSONObject = body?.toDictionary() {

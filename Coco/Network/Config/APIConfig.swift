@@ -7,11 +7,24 @@
 
 import Foundation
 
+enum APISource {
+    case supabase
+    case firebase
+}
+
 enum APIConfig {
-    static let baseURL = "https://guffnieowbgkilwcjkks.supabase.co/rest/v1/"
+    static func baseURL(for source: APISource) -> String {
+        switch source {
+        case .supabase:
+            return "https://guffnieowbgkilwcjkks.supabase.co/rest/v1/"
+        case .firebase:
+            return "https://cococo-d3c4b-default-rtdb.asia-southeast1.firebasedatabase.app/"
+        }
+    }
 }
 
 protocol EndpointProtocol {
+    var source: APISource { get }
     var path: String { get }
     var urlString: String { get }
     var url: URL? { get }
@@ -19,7 +32,7 @@ protocol EndpointProtocol {
 
 extension EndpointProtocol {
     var urlString: String {
-        return APIConfig.baseURL + path
+        return APIConfig.baseURL(for: source) + path
     }
 
     var url: URL? {
