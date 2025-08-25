@@ -66,5 +66,27 @@ extension ResultViewController: ResultViewModelAction {
     func notifySearchBarTappedForNavigation() {
         navigationController?.popViewController(animated: true)
     }
+    
+    func openFilterTray(_ viewModel: HomeSearchFilterTrayViewModel) {
+        presentTray(view: HomeSearchFilterTray(viewModel: viewModel))
+    }
+
+    func dismissTray() {
+        dismiss(animated: true)
+    }
+}
+
+private extension ResultViewController {
+    func presentTray(view: some View) {
+        let trayVC: UIHostingController = UIHostingController(rootView: view)
+        if let sheet: UISheetPresentationController = trayVC.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.prefersGrabberVisible = true
+            sheet.prefersScrollingExpandsWhenScrolledToEdge = false
+            sheet.prefersEdgeAttachedInCompactHeight = true
+            sheet.preferredCornerRadius = 0
+        }
+        present(trayVC, animated: true)
+    }
 }
 
