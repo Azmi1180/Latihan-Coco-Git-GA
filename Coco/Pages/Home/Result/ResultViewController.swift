@@ -62,4 +62,9 @@ extension ResultViewController: ResultViewModelAction {
         thisView.addSearchBarView(from: searchBarViewController.view)
         searchBarViewController.didMove(toParent: self)
     }
+    
+    func notifySearchBarTappedForNavigation() {
+        navigationController?.popViewController(animated: true)
+    }
 }
+

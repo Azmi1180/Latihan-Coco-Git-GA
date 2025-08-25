@@ -21,7 +21,7 @@ protocol HomeViewModelAction: AnyObject {
     func toggleLoadingView(isShown: Bool, after: CGFloat)
     func activityDidSelect(data: ActivityDetailDataModel)
     
-    func searchDidTap(latestSearches: [HomeSearchSearchLocationData], currentQuery: String)
+    func navigateToSearch(latestSearches: [HomeSearchSearchLocationData], currentQuery: String)
     func openFilterTray(_ viewModel: HomeSearchFilterTrayViewModel)
     func dismissTray()
     func showEmptyState(_ show: Bool)

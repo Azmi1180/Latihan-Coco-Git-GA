@@ -32,8 +32,18 @@ class ResultViewModel: ResultViewModelProtocol {
             currentTypedText: query,
             trailingIcon: (image: CocoIcon.icFilterIcon.image, didTap: {}),
             isTypeAble: false,
-            delegate: nil
+            delegate: self
         )
         actionDelegate?.constructNavBar(viewModel: searchBarViewModel)
+    }
+}
+
+extension ResultViewModel: HomeSearchBarViewModelDelegate {
+    func notifyHomeSearchBarDidTap(isTypeAble: Bool, viewModel: HomeSearchBarViewModel) {
+        // Not used for this specific case
+    }
+    
+    func homeSearchBarDidTapForNavigation() {
+        actionDelegate?.notifySearchBarTappedForNavigation()
     }
 }

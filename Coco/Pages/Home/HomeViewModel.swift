@@ -258,12 +258,16 @@ extension HomeViewModel: HomeSearchBarViewModelDelegate {
     func notifyHomeSearchBarDidTap(isTypeAble: Bool, viewModel: HomeSearchBarViewModel) {
         guard !isTypeAble else { return }
         
-        // TODO: Change with real data
-        actionDelegate?.searchDidTap(
+        // This method is now deprecated. Use homeSearchBarDidTapForNavigation instead.
+        // The logic here is moved to homeSearchBarDidTapForNavigation.
+    }
+    
+    func homeSearchBarDidTapForNavigation() {
+        actionDelegate?.navigateToSearch(
             latestSearches: [
-                .init(id: 1, name: "Kepulauan Seribu"),
-                .init(id: 2, name: "Nusa Penida"),
-                .init(id: 3, name: "Gili Island, Indonesia"),
+                HomeSearchSearchLocationData(id: 1, name: "Kepulauan Seribu"),
+                HomeSearchSearchLocationData(id: 2, name: "Nusa Penida"),
+                HomeSearchSearchLocationData(id: 3, name: "Gili Island, Indonesia"),
             ],
             currentQuery: searchBarViewModel.currentTypedText
         )
