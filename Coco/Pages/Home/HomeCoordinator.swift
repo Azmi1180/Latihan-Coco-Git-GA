@@ -52,7 +52,8 @@ final class HomeCoordinator: BaseCoordinator {
                     isTypeAble: true,
                     delegate: nil
                 ),
-                latestSearches: latestSearches
+                latestSearches: latestSearches,
+                lastSearchQuery: self.lastAppliedSearchQuery
             )
             searchViewModel.delegate = self
             let searchViewController: SearchViewController = SearchViewController(viewModel: searchViewModel)
@@ -62,13 +63,14 @@ final class HomeCoordinator: BaseCoordinator {
 
     private let input: Input
     private let homeViewModel: HomeViewModelProtocol?
+    private var lastAppliedSearchQuery: String?
 }
 
-extension HomeCoordinator: HomeViewModelNavigationDelegate {
-    func notifyHomeDidSelectActivity() {
-
-    }
-}
+//extension HomeCoordinator: HomeViewModelNavigationDelegate {
+//    func notifyHomeDidSelectActivity() {
+//
+//    }
+//}
 
 extension HomeCoordinator: HomeFormScheduleViewModelDelegate {
     func notifyFormScheduleDidNavigateToCheckout(with response: CreateBookingResponse) {
@@ -111,6 +113,7 @@ extension HomeCoordinator: ActivityDetailNavigationDelegate {
 
 extension HomeCoordinator: SearchViewModelDelegate {
     func searchViewModel(didApplySearch query: String) {
+        self.lastAppliedSearchQuery = query
         guard let homeViewModel = homeViewModel else { return }
         let activities = homeViewModel.getActivities()
         

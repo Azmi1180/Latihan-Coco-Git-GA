@@ -95,7 +95,7 @@ extension HomeViewController: HomeViewModelAction {
         coordinator.start()
     }
     
-    func searchDidTap(latestSearches: [HomeSearchSearchLocationData], currentQuery: String) {
+    func navigateToSearch(latestSearches: [HomeSearchSearchLocationData], currentQuery: String) {
         guard let navigationController else { return }
         let coordinator: HomeCoordinator = HomeCoordinator(
             input: .init(

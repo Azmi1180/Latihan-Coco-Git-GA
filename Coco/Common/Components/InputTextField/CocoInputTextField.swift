@@ -17,8 +17,9 @@ struct CocoInputTextField: View {
     private let leadingIcon: UIImage?
     private let trailingIcon: ImageHandler?
     private let placeholder: String?
+    
+    let isFocused: FocusState<Bool>.Binding
 
-    @FocusState private var isFocused: Bool
     private let onFocusedAction: ((Bool) -> Void)?
 
     init(
@@ -27,7 +28,8 @@ struct CocoInputTextField: View {
         trailingIcon: ImageHandler? = nil,
         placeholder: String?,
         shouldInterceptFocus: Bool = false,
-        onFocusedAction: ((Bool) -> Void)? = nil
+        onFocusedAction: ((Bool) -> Void)? = nil,
+        isFocused: FocusState<Bool>.Binding
     ) {
         self.leadingIcon = leadingIcon
         _currentTypedText = currentTypedText
@@ -35,6 +37,7 @@ struct CocoInputTextField: View {
         self.placeholder = placeholder
         self.shouldInterceptFocus = shouldInterceptFocus
         self.onFocusedAction = onFocusedAction
+        self.isFocused = isFocused // The binding is now stored directly.
     }
 
     var body: some View {
@@ -52,12 +55,11 @@ struct CocoInputTextField: View {
                 onFocusedAction: onFocusedAction
             )
         )
-        .focused($isFocused)
-        .onChange(of: isFocused) { isFocused in
-            onFocusedAction?(isFocused)
+        .focused(isFocused)
+        .onChange(of: isFocused.wrappedValue) { newValue in
+            onFocusedAction?(newValue)
         }
         .font(.jakartaSans(forTextStyle: .body, weight: .medium))
         .frame(height: kInputHeight)
-
     }
 }

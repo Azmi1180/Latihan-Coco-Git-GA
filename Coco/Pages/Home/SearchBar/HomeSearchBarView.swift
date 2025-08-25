@@ -1,4 +1,3 @@
-//
 //  HomeSearchBarView.swift
 //  Coco
 //
@@ -10,6 +9,8 @@ import SwiftUI
 
 struct HomeSearchBarView: View {
     @ObservedObject var viewModel: HomeSearchBarViewModel
+    
+    @FocusState private var isFocused: Bool
 
     var body: some View {
         CocoInputTextField(
@@ -18,8 +19,15 @@ struct HomeSearchBarView: View {
             trailingIcon: viewModel.trailingIcon,
             placeholder: viewModel.placeholderText,
             shouldInterceptFocus: !viewModel.isTypeAble,
-            onFocusedAction: viewModel.onTextFieldFocusDidChange(to:)
+            onFocusedAction: viewModel.onTextFieldFocusDidChange(to:),
+            isFocused: $isFocused
         )
+        .onChange(of: isFocused) { newValue in
+            viewModel.isSearchBarFocused = newValue
+        }
+        .onChange(of: viewModel.isSearchBarFocused) { newValue in
+            isFocused = newValue
+        }
     }
 }
 

@@ -11,6 +11,7 @@ import Combine
 
 protocol HomeSearchBarViewModelDelegate: AnyObject {
     func notifyHomeSearchBarDidTap(isTypeAble: Bool, viewModel: HomeSearchBarViewModel)
+    func homeSearchBarDidTapForNavigation()
 }
 
 final class HomeSearchBarViewModel: ObservableObject {
@@ -18,6 +19,7 @@ final class HomeSearchBarViewModel: ObservableObject {
 
     @Published var currentTypedText: String = ""
     @Published var trailingIcon: ImageHandler?
+    @Published var isSearchBarFocused: Bool = false
 
     let leadingIcon: UIImage?
     let isTypeAble: Bool
@@ -47,7 +49,11 @@ final class HomeSearchBarViewModel: ObservableObject {
 
     func onTextFieldFocusDidChange(to newFocus: Bool) {
         guard newFocus else { return }
-        delegate?.notifyHomeSearchBarDidTap(isTypeAble: isTypeAble, viewModel: self)
+        if !isTypeAble {
+            delegate?.homeSearchBarDidTapForNavigation()
+        } else {
+            delegate?.notifyHomeSearchBarDidTap(isTypeAble: isTypeAble, viewModel: self)
+        }
     }
 
     private func observeSearchText() {
