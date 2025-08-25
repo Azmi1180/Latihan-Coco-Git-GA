@@ -17,4 +17,6 @@ protocol ResultViewModelAction: AnyObject {
     func constructCollectionView(viewModel: some HomeCollectionViewModelProtocol)
     func constructNavBar(viewModel: HomeSearchBarViewModel)
     func notifySearchBarTappedForNavigation()
+    func openFilterTray(_ viewModel: HomeSearchFilterTrayViewModel)
+    func dismissTray()
 }

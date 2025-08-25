@@ -125,7 +125,7 @@ extension HomeCoordinator: SearchViewModelDelegate {
         
         let searchResults = filteredActivities.map { HomeActivityCellDataModel(activity: $0) }
         
-        let resultCoordinator = ResultCoordinator(navigationController: navigationController!, searchResults: searchResults, query: query)
+        let resultCoordinator = ResultCoordinator(navigationController: navigationController!, searchResults: searchResults, query: query, activities: filteredActivities)
         resultCoordinator.start()
     }
 }
