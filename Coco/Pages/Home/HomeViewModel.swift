@@ -125,13 +125,13 @@ extension HomeViewModel: HomeSearchBarViewModelDelegate {
         guard !isTypeAble else { return }
         
         // TODO: Change with real data
-        actionDelegate?.openSearchTray(
-            selectedQuery: searchBarViewModel.currentTypedText,
+        actionDelegate?.searchDidTap(
             latestSearches: [
                 .init(id: 1, name: "Kepulauan Seribu"),
                 .init(id: 2, name: "Nusa Penida"),
-                .init(id: 3, name: "Gili Island, Indonesia")
-            ]
+                .init(id: 3, name: "Gili Island, Indonesia"),
+            ],
+            currentQuery: searchBarViewModel.currentTypedText
         )
     }
 }
