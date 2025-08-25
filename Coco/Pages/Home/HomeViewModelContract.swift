@@ -35,4 +35,5 @@ protocol HomeViewModelProtocol: AnyObject {
     var filteredOtherDestinationData: [HomeActivityCellDataModel] { get }
     func onViewDidLoad()
     func onSearchDidApply(_ queryText: String)
+    func getActivities() -> [Activity]
 }
