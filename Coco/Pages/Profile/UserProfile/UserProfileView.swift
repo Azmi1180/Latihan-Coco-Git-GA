@@ -13,16 +13,16 @@ final class UserProfileView: UIView {
         super.init(frame: frame)
         setupView()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     func addlogoutButton(with view: UIView) {
         logoutButtonContainer.subviews.forEach { $0.removeFromSuperview() }
         logoutButtonContainer.addSubviewAndLayout(view)
     }
-    
+
     private lazy var logoutButtonContainer: UIView = UIView()
     private lazy var nameLabel: UILabel = UILabel(
         font: .jakartaSans(forTextStyle: .subheadline, weight: .semibold),
@@ -46,7 +46,7 @@ private extension UserProfileView {
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 56.0 / 2
-        
+
         let stackView: UIStackView = UIStackView(arrangedSubviews: [
             imageView,
             nameLabel,
@@ -55,25 +55,25 @@ private extension UserProfileView {
         stackView.spacing = 12.0
         stackView.axis = .vertical
         stackView.alignment = .center
-        
+
         addSubviews([
             stackView,
             logoutButtonContainer
         ])
-        
+
         stackView.layout {
             $0.top(to: self.safeAreaLayoutGuide.topAnchor, relation: .greaterThanOrEqual)
                 .centerX(to: self.centerXAnchor)
                 .centerY(to: self.centerYAnchor)
         }
-        
+
         logoutButtonContainer.layout {
             $0.top(to: stackView.bottomAnchor, relation: .greaterThanOrEqual)
                 .leading(to: self.leadingAnchor, constant: 26.0)
                 .trailing(to: self.trailingAnchor, constant: -26.0)
                 .bottom(to: self.safeAreaLayoutGuide.bottomAnchor, constant: -64.0)
         }
-        
+
         nameLabel.text = UserDefaults.standard.string(forKey: "user-name") ?? ""
         emailLabel.text = UserDefaults.standard.string(forKey: "user-email") ?? ""
     }

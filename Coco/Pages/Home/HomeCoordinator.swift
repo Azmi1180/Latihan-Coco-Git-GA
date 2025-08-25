@@ -66,7 +66,7 @@ final class HomeCoordinator: BaseCoordinator {
 
 extension HomeCoordinator: HomeViewModelNavigationDelegate {
     func notifyHomeDidSelectActivity() {
-        
+
     }
 }
 
@@ -77,7 +77,7 @@ extension HomeCoordinator: HomeFormScheduleViewModelDelegate {
         )
         viewModel.delegate = self
         let viewController = CheckoutViewController(viewModel: viewModel)
-        
+
         DispatchQueue.main.async { [weak self] in
             self?.start(viewController: viewController)
         }

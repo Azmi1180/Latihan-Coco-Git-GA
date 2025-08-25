@@ -12,12 +12,12 @@ final class AppCoordinator {
     // Properties
     weak var parentCoordinator: Coordinator?
     weak var navigationController: UINavigationController?
-    
+
     var children: [BaseCoordinatorProtocol] = []
-    
+
     // Static shared instance
     static let shared: AppCoordinator = AppCoordinator()
-    
+
     // Private initializer to prevent instantiation from outside
     private init() {}
 }
@@ -29,11 +29,11 @@ extension AppCoordinator: Coordinator {
             return
         }
     }
-    
+
     func setNavigationController(_ navigationController: UINavigationController) {
         self.navigationController = navigationController
     }
-    
+
     func childDidFinish(_ coordinator : BaseCoordinatorProtocol){
         // Call this if a coordinator is done.
         for (index, child) in children.enumerated() {

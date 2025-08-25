@@ -11,37 +11,37 @@ struct ActivityDetailDataModel: Equatable {
     let title: String
     let location: String
     let imageUrlsString: [String]
-    
+
     let detailInfomation: ActivitySectionLayout<String>
     let providerDetail: ActivitySectionLayout<ProviderDetail>
     let tripFacilities: ActivitySectionLayout<[String]>
     let tnc: String
-    
+
     let availablePackages: ActivitySectionLayout<[Package]>
     let hiddenPackages: [Package]
-    
+
     struct ProviderDetail: Equatable {
         let name: String
         let description: String
         let imageUrlString: String
     }
-    
+
     struct Package: Equatable {
         let imageUrlString: String
         let name: String
         let description: String
         let price: String
-        
+
         let id: Int
     }
-    
+
     init(_ response: Activity) {
         title = response.title
         location = response.destination.name
         imageUrlsString = response.images
             .filter { $0.imageType != .banner }
             .map { $0.imageUrl }
-        
+
         detailInfomation = ActivitySectionLayout(
             title: "Details",
             content: response.description
@@ -59,7 +59,7 @@ struct ActivityDetailDataModel: Equatable {
             content: response.accessories.map { $0.name }
         )
         tnc = response.cancelable
-        
+
         availablePackages = ActivitySectionLayout(
             title: "Available Packages",
             content: response.packages.map {
@@ -72,7 +72,7 @@ struct ActivityDetailDataModel: Equatable {
                 )
             }
         )
-        
+
         hiddenPackages = Array(availablePackages.content.prefix(2))
     }
 }

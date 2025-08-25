@@ -9,11 +9,11 @@ import Foundation
 
 final class TripDetailViewModel {
     weak var actionDelegate: TripDetailViewModelAction?
-    
+
     init(data: BookingDetails) {
         self.data = data
     }
-    
+
     private let data: BookingDetails
 }
 

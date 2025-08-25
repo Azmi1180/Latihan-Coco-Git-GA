@@ -9,31 +9,33 @@ import Foundation
 
 struct HomeActivityCellDataModel: Hashable {
     let id: Int
-    
+
     let area: String
     let name: String
     let priceText: String
     let imageUrl: URL?
-    
-    init(id: Int, area: String, name: String, priceText: String, imageUrl: URL?) {
+    let isFamilyFriendly: Bool
+
+    init(id: Int, area: String, name: String, priceText: String, imageUrl: URL?, isFamilyFriendly: Bool) {
         self.id = id
         self.area = area
         self.name = name
         self.priceText = priceText
         self.imageUrl = imageUrl
+        self.isFamilyFriendly = isFamilyFriendly
     }
-    
+
     init(activity: Activity) {
         self.id = activity.id
-        self.area = activity.title
-        self.name = activity.description
+        self.name = activity.title
+        self.area = activity.destination.name
         self.priceText = "\(activity.pricing)"
-        self.imageUrl = if let thumbnail = activity.images.first { $0.imageType == .thumbnail }?.imageUrl {
+        self.imageUrl = if let thumbnail = activity.images.first(where: { $0.imageType == .thumbnail })?.imageUrl {
             URL(string: thumbnail)
-        }
-        else {
+        } else {
             nil
         }
+        self.isFamilyFriendly = activity.isFamilyTopPick
     }
 }
 

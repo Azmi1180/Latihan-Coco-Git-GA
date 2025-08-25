@@ -16,7 +16,7 @@ extension UserProfileViewModel: UserProfileViewModelProtocol {
     func onViewDidLoad() {
         actionDelegate?.configureView()
     }
-    
+
     func onLogoutDidTap() {
         delegate?.notifyUserDidLogout()
     }

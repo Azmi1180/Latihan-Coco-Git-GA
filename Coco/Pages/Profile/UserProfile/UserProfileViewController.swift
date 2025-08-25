@@ -14,20 +14,20 @@ final class UserProfileViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         self.viewModel.actionDelegate = self
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel.onViewDidLoad()
     }
-    
+
     override func loadView() {
         view = thisView
     }
-    
+
     private let viewModel: UserProfileViewModelProtocol
     private let thisView: UserProfileView = UserProfileView()
 }
@@ -43,7 +43,7 @@ extension UserProfileViewController: UserProfileViewModelAction {
             type: .secondary,
             isStretch: true
         )
-        
+
         addChild(buttonHosting)
         thisView.addlogoutButton(with: buttonHosting.view)
         buttonHosting.didMove(toParent: self)

@@ -15,21 +15,21 @@ final class CheckoutViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         self.viewModel.actionDelegate = self
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func loadView() {
         view = thisView
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel.onViewDidLoad()
         title = "Checkout"
     }
-    
+
     private let viewModel: CheckoutViewModelProtocol
     private let thisView: CheckoutView = CheckoutView()
 }
@@ -37,7 +37,7 @@ final class CheckoutViewController: UIViewController {
 extension CheckoutViewController: CheckoutViewModelAction {
     func configureView(bookingData: BookingDetails) {
         thisView.configureView(bookingData)
-        
+
         let bookButtonVC: CocoButtonHostingController = CocoButtonHostingController(
             action: viewModel.bookNowDidTap,
             text: "Book Now",
@@ -49,7 +49,7 @@ extension CheckoutViewController: CheckoutViewModelAction {
         thisView.addBooknowButton(from: bookButtonVC.view)
         bookButtonVC.didMove(toParent: self)
     }
-    
+
     func showPopUpSuccess(completion: @escaping () -> Void) {
         let view: CheckoutCompletedPopUpView = CheckoutCompletedPopUpView { [weak self] in
             self?.dismiss(animated: true, completion: completion)

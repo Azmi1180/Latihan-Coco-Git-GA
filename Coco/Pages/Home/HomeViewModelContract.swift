@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 protocol HomeViewModelNavigationDelegate: AnyObject {
    func notifyHomeDidSelectActivity()
@@ -16,17 +17,14 @@ protocol HomeViewModelAction: AnyObject {
 
     func constructLoadingState(state: HomeLoadingState)
     func constructNavBar(viewModel: HomeSearchBarViewModel)
-    
+
     func toggleLoadingView(isShown: Bool, after: CGFloat)
     func activityDidSelect(data: ActivityDetailDataModel)
     
-//    func openSearchTray(
-//        selectedQuery: String,
-//        latestSearches: [HomeSearchSearchLocationData]
-//    )
     func searchDidTap(latestSearches: [HomeSearchSearchLocationData], currentQuery: String)
     func openFilterTray(_ viewModel: HomeSearchFilterTrayViewModel)
     func dismissTray()
+    func showEmptyState(_ show: Bool)
 }
 
 protocol HomeViewModelProtocol: AnyObject {

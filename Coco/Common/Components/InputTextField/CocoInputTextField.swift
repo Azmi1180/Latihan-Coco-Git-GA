@@ -12,15 +12,15 @@ private let kInputHeight: CGFloat = 52.0
 
 struct CocoInputTextField: View {
     @Binding var currentTypedText: String
-    
+
     private let shouldInterceptFocus: Bool
     private let leadingIcon: UIImage?
     private let trailingIcon: ImageHandler?
     private let placeholder: String?
-    
+
     @FocusState private var isFocused: Bool
     private let onFocusedAction: ((Bool) -> Void)?
-    
+
     init(
         leadingIcon: UIImage? = nil,
         currentTypedText: Binding<String>,
@@ -36,7 +36,7 @@ struct CocoInputTextField: View {
         self.shouldInterceptFocus = shouldInterceptFocus
         self.onFocusedAction = onFocusedAction
     }
-    
+
     var body: some View {
         TextField(
             placeholder ?? "",

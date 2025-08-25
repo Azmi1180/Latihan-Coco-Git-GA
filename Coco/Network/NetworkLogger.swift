@@ -14,7 +14,7 @@ struct NetworkLogger {
     static func logResponse(data: Data?, response: URLResponse?, error: Error?) {
         #if DEBUG || STAGING
         print("📡 Network Response:")
-        
+
         if let urlResponse: HTTPURLResponse = response as? HTTPURLResponse {
             print("🔗 URL: \(urlResponse.url?.absoluteString ?? "")")
             print("📥 Status: \(urlResponse.statusCode)")
@@ -29,7 +29,7 @@ struct NetworkLogger {
                 print("📦 Raw Body: \(text)")
             }
         }
-        
+
         if let error: Error = error {
             print("❗️Error: \(error.localizedDescription)")
         }

@@ -19,7 +19,7 @@ protocol ActivityDetailViewModelAction: AnyObject {
 protocol ActivityDetailViewModelProtocol: AnyObject {
     var actionDelegate: ActivityDetailViewModelAction? { get set }
     var navigationDelegate: ActivityDetailNavigationDelegate? { get set }
-    
+
     func onViewDidLoad()
     func onPackageDetailStateDidChange(shouldShowAll: Bool)
     func onPackagesDetailDidTap(with packageId: Int)

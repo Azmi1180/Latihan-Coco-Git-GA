@@ -23,7 +23,7 @@ protocol HomeFormScheduleViewModelAction: AnyObject {
 protocol HomeFormScheduleViewModelProtocol: AnyObject {
     var delegate: HomeFormScheduleViewModelDelegate? { get set }
     var actionDelegate: HomeFormScheduleViewModelAction? { get set }
-    
+
     func onViewDidLoad()
     func onCalendarDidChoose(date: Date)
     func onCheckout()

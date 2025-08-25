@@ -11,7 +11,7 @@ import SwiftUI
 struct ImageSliderView: View {
     let images: [String]
     @State private var currentIndex: Int = 0
-    
+
     @Namespace private var dotAnimation
 
     var body: some View {
@@ -34,7 +34,7 @@ struct ImageSliderView: View {
                 }
             }
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            
+
             HStack(spacing: 8) {
                 ForEach(images.indices, id: \.self) { index in
                     Capsule()

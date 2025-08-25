@@ -19,9 +19,9 @@ protocol CheckoutViewModelAction: AnyObject {
 protocol CheckoutViewModelProtocol: AnyObject {
     var delegate: CheckoutViewModelDelegate? { get set }
     var actionDelegate: CheckoutViewModelAction? { get set }
-    
+
     init(bookingResponse: BookingDetails)
-    
+
     func onViewDidLoad()
     func bookNowDidTap()
 }

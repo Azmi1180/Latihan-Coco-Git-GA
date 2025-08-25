@@ -29,7 +29,7 @@ final class HomeViewModel {
     private(set) lazy var collectionViewModel: any HomeCollectionViewModelProtocol = {
         let viewModel: HomeCollectionViewModel = HomeCollectionViewModel()
         viewModel.delegate = self
-        viewModel.actionDelegate = self // Add this
+        
         return viewModel
     }()
     private(set) lazy var loadingState: HomeLoadingState = HomeLoadingState()
@@ -47,6 +47,7 @@ final class HomeViewModel {
     
     private var responseMap: [Int: Activity] = [:]
     private var responseData: [Activity] = []
+    private var allActivities: [Activity] = []
     private var cancellables: Set<AnyCancellable> = Set()
     
     private(set) var filterDataModel: HomeSearchFilterTrayDataModel?
@@ -54,90 +55,11 @@ final class HomeViewModel {
     var isSearching: Bool = false
     var filteredOtherDestinationData: [HomeActivityCellDataModel] = []
     var otherDestinationData: [HomeActivityCellDataModel] = []
-}
-
-extension HomeViewModel: HomeViewModelProtocol {
-    func onViewDidLoad() {
-        actionDelegate?.constructRecommendationView(viewModel: collectionViewModel)
-        actionDelegate?.constructLoadingState(state: loadingState)
-        actionDelegate?.constructNavBar(viewModel: searchBarViewModel)
-        
-        fetch()
-    }
+    var searchedTopDestinationData: [HomeActivityCellDataModel] = []
+    var searchedTopFamilyPickData: [HomeActivityCellDataModel] = []
+    var searchedAllData: [HomeActivityCellDataModel] = []
     
-    func onSearchDidApply(_ queryText: String) {
-        searchBarViewModel.currentTypedText = queryText
-
-        if queryText.isEmpty {
-            // When search is cleared, fetch the original full list of data.
-            fetch()
-            return
-        }
-
-        isSearching = true
-        // Run search on a background thread to avoid blocking the UI
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            guard let self else { return }
-
-            let searchKeywords = queryText.lowercased().components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
-
-            // Filter activities based on the search keywords.
-            let filteredActivities = self.responseData.filter { activity in
-                let title = activity.title.lowercased()
-                let destinationName = activity.destination.name.lowercased()
-
-                // All keywords must be present in either the title or destination name.
-                return searchKeywords.allSatisfy { keyword in
-                    title.contains(keyword) || destinationName.contains(keyword)
-                }
-            }
-            
-            let searchDataModel = filteredActivities.map { HomeActivityCellDataModel(activity: $0) }
-
-            // Create a section for the search results.
-            let searchResultSectionDataModel = HomeActivityCellSectionDataModel(
-                title: HomeViewModel.searchResultSectionTitle, // Empty title to hide the header
-                dataModel: searchDataModel
-            )
-            let searchResultSection = HomeSectionData(
-                sectionType: .activity,
-                sectionDataModel: searchResultSectionDataModel
-            )
-
-            // Update the collection view on the main thread.
-            DispatchQueue.main.async { [weak self] in
-                self?.collectionViewModel.updateActivity(sections: [searchResultSection])
-            }
-        }
-    }
-}
-
-extension HomeViewModel: HomeCollectionViewModelDelegate {
-    func notifyCollectionViewActivityDidTap(_ dataModel: HomeActivityCellDataModel) {
-        guard let activity: Activity = responseMap[dataModel.id] else { return }
-        let data: ActivityDetailDataModel = ActivityDetailDataModel(activity)
-        actionDelegate?.activityDidSelect(data: data)
-    }
-}
-
-extension HomeViewModel: HomeSearchBarViewModelDelegate {
-    func notifyHomeSearchBarDidTap(isTypeAble: Bool, viewModel: HomeSearchBarViewModel) {
-        guard !isTypeAble else { return }
-        
-        // TODO: Change with real data
-        actionDelegate?.searchDidTap(
-            latestSearches: [
-                .init(id: 1, name: "Kepulauan Seribu"),
-                .init(id: 2, name: "Nusa Penida"),
-                .init(id: 3, name: "Gili Island, Indonesia"),
-            ],
-            currentQuery: searchBarViewModel.currentTypedText
-        )
-    }
-}
-
-private extension HomeViewModel {
-    func fetch() {
+    private func fetch() {
         loadingState.percentage = 0
         isSearching = false
         filteredOtherDestinationData = []
@@ -154,21 +76,32 @@ private extension HomeViewModel {
             case .success(let response):
                 var sections: [HomeSectionData] = []
                 self.loadingState.percentage = 100
-                self.actionDelegate?.toggleLoadingView(isShown: false, after: 0.0)
+                self.actionDelegate?.toggleLoadingView(isShown: false, after: 0)
                 print("✅ Fetch Success")
                 print("Jumlah response: \(response.values.count)")
-
-                let activities = response.values
+                
+                var activities = response.values
+                for index in 0..<activities.count {
+                    if index < 5 {
+                        activities[index].isTopDestination = true
+                    } else if index < 10 {
+                        activities[index].isFamilyTopPick = true
+                    }
+                }
+                
+                self.allActivities = activities
+                self.searchedAllData = activities.map { HomeActivityCellDataModel(activity: $0) }
                 activities.forEach { activity in
                     print("""
-                           --- Activity ---
-                           ID: \(activity.id)
-                           Nama: \(activity.title)
-                           Harga: \(activity.pricing)
-                           Accessories: \(activity.accessories.map { $0.name })
-                           Cancelable: \(activity.cancelable)
-                           ---------------
-                           """)
+                       --- Activity ---
+                       ID: \(activity.id)
+                       Nama: \(activity.title)
+                       Harga: \(activity.pricing)
+                       description: \(activity.description)
+                       Accessories: \(activity.accessories.map { $0.name })
+                       Cancelable: \(activity.cancelable)
+                       ---------------
+                       """)
                     self.responseMap[activity.id] = activity
                 }
                 
@@ -177,7 +110,9 @@ private extension HomeViewModel {
                 let topDestinationData = Array(activities.prefix(5))
                 let topFamilyPickData = Array(activities.dropFirst(5).prefix(5))
                 let generalData = Array(activities.dropFirst(10))
-                self.otherDestinationData = generalData.map { HomeActivityCellDataModel(activity: $0) }
+                self.otherDestinationData = generalData.map { HomeActivityCellDataModel(activity: $0) } +
+                topDestinationData.map { HomeActivityCellDataModel(activity: $0) } +
+                topFamilyPickData.map { HomeActivityCellDataModel(activity: $0) }
                 
                 if !topDestinationData.isEmpty {
                     let topDestinationSectionDataModel = HomeActivityCellSectionDataModel(
@@ -226,7 +161,7 @@ private extension HomeViewModel {
         }
     }
     
-    func contructFilterData() {
+    private func contructFilterData() {
         let responseMapActivity: [Activity] = Array(responseMap.values)
         var seenIDs: Set<Int> = Set()
         var activityValues: [HomeSearchFilterPillState] = responseMap.values
@@ -256,9 +191,7 @@ private extension HomeViewModel {
                 )
             )
         }
-        
         let sortedData = responseMapActivity.sorted { $0.pricing < $1.pricing }
-        
         let minPrice: Double = sortedData.first?.pricing ?? 0
         let maxPrice: Double = sortedData.last?.pricing ?? 0
         let filterDataModel: HomeSearchFilterTrayDataModel = HomeSearchFilterTrayDataModel(
@@ -274,7 +207,7 @@ private extension HomeViewModel {
         self.filterDataModel = filterDataModel
     }
     
-    func openFilterTray() {
+    private func openFilterTray() {
         guard let filterDataModel: HomeSearchFilterTrayDataModel else { return }
         
         let viewModel: HomeSearchFilterTrayViewModel = HomeSearchFilterTrayViewModel(
@@ -287,52 +220,91 @@ private extension HomeViewModel {
                 guard let self else { return }
                 self.filterDataModel = newFilterData
                 actionDelegate?.dismissTray()
-                filterDidApply()
+                self.onSearchDidApply(self.searchBarViewModel.currentTypedText)
             }
             .store(in: &cancellables)
         
         actionDelegate?.openFilterTray(viewModel)
     }
+}
+
+extension HomeViewModel: HomeViewModelProtocol {
+    func onViewDidLoad() {
+        actionDelegate?.constructRecommendationView(viewModel: collectionViewModel)
+        actionDelegate?.constructLoadingState(state: loadingState)
+        actionDelegate?.constructNavBar(viewModel: searchBarViewModel)
+        
+        fetch()
+    }
     
-    func filterDidApply() {
-        guard let filterDataModel: HomeSearchFilterTrayDataModel else { return }
-        let tempResponseData: [Activity] = HomeFilterUtil.doFilter(
-            responseData,
-            filterDataModel: filterDataModel
-        )
+    func onSearchDidApply(_ queryText: String) {
+        searchBarViewModel.currentTypedText = queryText
         
-        let searchResultSectionDataModel = HomeActivityCellSectionDataModel(
-            title: "Search Result",
-            dataModel: tempResponseData.map { HomeActivityCellDataModel(activity: $0) }
-        )
+        if queryText.isEmpty {
+            // When search is cleared, fetch the original full list of data.
+            fetch()
+            return
+        }
         
-        let searchResultSection = HomeSectionData(
-            sectionType: .activity, // Assuming search results use the activity layout
-            sectionDataModel: searchResultSectionDataModel
-        )
-        
-        collectionViewModel.updateActivity(sections: [searchResultSection])
+        isSearching = true
+        // Run search on a background thread to avoid blocking the UI
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self else { return }
+            
+            let searchKeywords = queryText.lowercased().components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
+            
+            // Filter activities based on the search keywords.
+            let filteredActivities = self.responseData.filter { activity in
+                let title = activity.title.lowercased()
+                let destinationName = activity.destination.name.lowercased()
+                
+                // All keywords must be present in either the title or destination name.
+                return searchKeywords.allSatisfy { keyword in
+                    title.contains(keyword) || destinationName.contains(keyword)
+                }
+            }
+            
+            let searchDataModel = filteredActivities.map { HomeActivityCellDataModel(activity: $0) }
+            
+            // Create a section for the search results.
+            let searchResultSectionDataModel = HomeActivityCellSectionDataModel(
+                title: HomeViewModel.searchResultSectionTitle, // Empty title to hide the header
+                dataModel: searchDataModel
+            )
+            let searchResultSection = HomeSectionData(
+                sectionType: .activity,
+                sectionDataModel: searchResultSectionDataModel
+            )
+            
+            // Update the collection view on the main thread.
+            DispatchQueue.main.async { [weak self] in
+                self?.collectionViewModel.updateActivity(sections: [searchResultSection])
+                self?.actionDelegate?.showEmptyState(searchDataModel.isEmpty)
+            }
+        }
     }
 }
 
-extension HomeViewModel: HomeCollectionViewModelAction {
-    func configureDataSource() {
-        // This method is called by HomeCollectionViewModel to configure its data source.
-        // HomeViewModel doesn't directly configure the data source, HomeCollectionViewController does.
-        // So, we can leave this empty or log a message.
+extension HomeViewModel: HomeCollectionViewModelDelegate {
+    func notifyCollectionViewActivityDidTap(_ dataModel: HomeActivityCellDataModel) {
+        guard let activity: Activity = responseMap[dataModel.id] else { return }
+        let data: ActivityDetailDataModel = ActivityDetailDataModel(activity)
+        actionDelegate?.activityDidSelect(data: data)
     }
-    
-    func applySnapshot(_ snapshot: HomeCollectionViewSnapShot, completion: (() -> Void)?) {
-        // This method is called by HomeCollectionViewModel to apply a snapshot.
-        // HomeViewModel doesn't directly apply the snapshot, HomeCollectionViewController does.
-        // We need to forward this call to the HomeCollectionViewController's data source.
-        // This implies HomeViewModel needs a reference to HomeCollectionViewController's data source.
-        // This is a design flaw. HomeCollectionViewModel should not be calling applySnapshot directly.
-        // Instead, HomeCollectionViewModel should update its activityData, and HomeCollectionViewController
-        // should observe changes to activityData and apply the snapshot.
+}
+
+extension HomeViewModel: HomeSearchBarViewModelDelegate {
+    func notifyHomeSearchBarDidTap(isTypeAble: Bool, viewModel: HomeSearchBarViewModel) {
+        guard !isTypeAble else { return }
         
-        // For now, to fix the compilation error, I will leave this empty.
-        // A proper fix would involve refactoring the data flow.
-        completion?()
+        // TODO: Change with real data
+        actionDelegate?.searchDidTap(
+            latestSearches: [
+                .init(id: 1, name: "Kepulauan Seribu"),
+                .init(id: 2, name: "Nusa Penida"),
+                .init(id: 3, name: "Gili Island, Indonesia"),
+            ],
+            currentQuery: searchBarViewModel.currentTypedText
+        )
     }
 }

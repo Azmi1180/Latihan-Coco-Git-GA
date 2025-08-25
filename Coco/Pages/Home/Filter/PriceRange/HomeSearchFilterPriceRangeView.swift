@@ -52,7 +52,7 @@ struct HomeSearchFilterPriceRangeView: View {
                             let percent = min(max(0, value.location.x / width), upperRatio)
                             let newValue = model.range.lowerBound + Double(percent) * (model.range.upperBound - model.range.lowerBound)
                             model.minPrice = min(max(model.range.lowerBound, round(newValue / model.step) * model.step), model.maxPrice - model.step)
-                            
+
                             rangeDidChange()
                         })
 
@@ -63,7 +63,7 @@ struct HomeSearchFilterPriceRangeView: View {
                             let percent = max(min(1, value.location.x / width), lowerRatio)
                             let newValue = model.range.lowerBound + Double(percent) * (model.range.upperBound - model.range.lowerBound)
                             model.maxPrice = max(min(model.range.upperBound, round(newValue / model.step) * model.step), model.minPrice + model.step)
-                            
+
                             rangeDidChange()
                         })
                 }

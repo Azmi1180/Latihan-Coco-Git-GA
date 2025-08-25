@@ -10,7 +10,7 @@ import Foundation
 struct HomeSearchFilterTrayDataModel {
     var filterPillDataState: [HomeSearchFilterPillState] = []
     var priceRangeModel: HomeSearchFilterPriceRangeModel
-    
+
     init(filterPillDataState: [HomeSearchFilterPillState], priceRangeModel: HomeSearchFilterPriceRangeModel) {
         self.filterPillDataState = filterPillDataState
         self.priceRangeModel = priceRangeModel
