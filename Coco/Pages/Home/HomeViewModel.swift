@@ -237,51 +237,12 @@ extension HomeViewModel: HomeViewModelProtocol {
         fetch()
     }
     
+    func getActivities() -> [Activity] {
+        return responseData
+    }
+
     func onSearchDidApply(_ queryText: String) {
         searchBarViewModel.currentTypedText = queryText
-        
-        if queryText.isEmpty {
-            // When search is cleared, fetch the original full list of data.
-            fetch()
-            return
-        }
-        
-        isSearching = true
-        // Run search on a background thread to avoid blocking the UI
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            guard let self else { return }
-            
-            let searchKeywords = queryText.lowercased().components(separatedBy: .whitespacesAndNewlines).filter { !$0.isEmpty }
-            
-            // Filter activities based on the search keywords.
-            let filteredActivities = self.responseData.filter { activity in
-                let title = activity.title.lowercased()
-                let destinationName = activity.destination.name.lowercased()
-                
-                // All keywords must be present in either the title or destination name.
-                return searchKeywords.allSatisfy { keyword in
-                    title.contains(keyword) || destinationName.contains(keyword)
-                }
-            }
-            
-            let searchDataModel = filteredActivities.map { HomeActivityCellDataModel(activity: $0) }
-            
-            // Create a section for the search results.
-            let searchResultSectionDataModel = HomeActivityCellSectionDataModel(
-                title: HomeViewModel.searchResultSectionTitle, // Empty title to hide the header
-                dataModel: searchDataModel
-            )
-            let searchResultSection = HomeSectionData(
-                sectionType: .activity,
-                sectionDataModel: searchResultSectionDataModel
-            )
-            
-            // Update the collection view on the main thread.
-            DispatchQueue.main.async { [weak self] in
-                self?.collectionViewModel.updateActivity(sections: [searchResultSection])
-                self?.actionDelegate?.showEmptyState(searchDataModel.isEmpty)
-            }
-        }
     }
 }
 

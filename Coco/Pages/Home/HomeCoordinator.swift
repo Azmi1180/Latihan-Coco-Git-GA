@@ -111,7 +111,18 @@ extension HomeCoordinator: ActivityDetailNavigationDelegate {
 
 extension HomeCoordinator: SearchViewModelDelegate {
     func searchViewModel(didApplySearch query: String) {
-        homeViewModel?.onSearchDidApply(query)
-        navigationController?.popViewController(animated: true)
+        guard let homeViewModel = homeViewModel else { return }
+        let activities = homeViewModel.getActivities()
+        
+        let filteredActivities = activities.filter { activity in
+            let title = activity.title.lowercased()
+            let destinationName = activity.destination.name.lowercased()
+            return title.contains(query.lowercased()) || destinationName.contains(query.lowercased())
+        }
+        
+        let searchResults = filteredActivities.map { HomeActivityCellDataModel(activity: $0) }
+        
+        let resultCoordinator = ResultCoordinator(navigationController: navigationController!, searchResults: searchResults, query: query)
+        resultCoordinator.start()
     }
 }
