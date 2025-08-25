@@ -11,6 +11,10 @@ enum CreateBookingEndpoint: EndpointProtocol {
     case create
     case getBookings
     
+    var source: APISource {
+        return .supabase
+    }
+    
     var path: String {
         switch self {
         case .create:

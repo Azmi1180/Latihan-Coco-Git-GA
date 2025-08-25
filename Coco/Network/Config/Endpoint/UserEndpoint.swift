@@ -11,6 +11,10 @@ enum UserEndpoint: EndpointProtocol {
     case all
     case signIn
 
+    var source: APISource {
+        return .supabase
+    }
+    
     var path: String {
         switch self {
         case .all:
