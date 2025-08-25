@@ -32,6 +32,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
         rootViewController.baseCoordinator = appCoordinator
         showSplashScreen(over: window)
+//        fetchAllData()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -64,6 +65,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 }
 
 private extension SceneDelegate {
+//    func fetchAllData() {
+//        let viewModel = DataViewModel()
+//        viewModel.fetchData()
+//    }
+
     func showSplashScreen(over window: UIWindow) {
         let logo: UIImageView = UIImageView(image: CocoIcon.splashLogo.image)
         logo.translatesAutoresizingMaskIntoConstraints = false

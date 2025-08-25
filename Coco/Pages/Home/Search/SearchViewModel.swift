@@ -28,7 +28,7 @@ final class SearchViewModel: ObservableObject {
     init(
         searchBarViewModel: HomeSearchBarViewModel,
         latestSearches: [HomeSearchSearchLocationData] = [],
-        activityFetcher: ActivityFetcherProtocol = ActivityFetcher(),
+        activityFetcher: ActivityFetcherProtocol = ActivityFetcher()
     ) {
         self.searchBarViewModel = searchBarViewModel
         self.activityFetcher = activityFetcher
