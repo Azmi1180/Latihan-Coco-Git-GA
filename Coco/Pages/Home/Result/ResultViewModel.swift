@@ -20,6 +20,12 @@ class ResultViewModel: ResultViewModelProtocol {
     private(set) var filterDataModel: HomeSearchFilterTrayDataModel?
     private var cancellables: Set<AnyCancellable> = Set()
     
+    private var filterPills: [FilterPillDataModel] = [
+        FilterPillDataModel(id: "all", title: "All"),
+        FilterPillDataModel(id: "familyFriendly", title: "Family-Friendly")
+    ]
+    private var selectedFilterPillId: String = "all"
+    
     init(searchResults: [HomeActivityCellDataModel], query: String, activities: [Activity]) {
         self.searchResults = searchResults
         self.query = query
@@ -42,6 +48,8 @@ class ResultViewModel: ResultViewModelProtocol {
             delegate: self
         )
         actionDelegate?.constructNavBar(viewModel: searchBarViewModel)
+        
+        actionDelegate?.constructFilterPills(pills: filterPills, selectedPillId: selectedFilterPillId, delegate: self)
         
         DispatchQueue.global(qos: .background).async { [weak self] in
             self?.contructFilterData()
@@ -122,5 +130,27 @@ extension ResultViewModel: HomeSearchBarViewModelDelegate {
     
     func homeSearchBarDidTapForNavigation() {
         actionDelegate?.notifySearchBarTappedForNavigation()
+    }
+}
+
+extension ResultViewModel: FilterPillViewDelegate {
+    func didSelectFilterPill(with id: String) {
+        selectedFilterPillId = id
+        actionDelegate?.constructFilterPills(pills: filterPills, selectedPillId: selectedFilterPillId, delegate: self)
+        
+        let filteredResults: [HomeActivityCellDataModel]
+        if id == "all" {
+            filteredResults = searchResults
+        } else if id == "familyFriendly" {
+            filteredResults = searchResults.filter { $0.isFamilyFriendly }
+        } else {
+            filteredResults = searchResults
+        }
+        
+        let collectionViewModel = HomeCollectionViewModel()
+        collectionViewModel.updateActivity(sections: [
+            HomeSectionData(sectionType: .activity, sectionDataModel: HomeActivityCellSectionDataModel(title: "", dataModel: filteredResults))
+        ])
+        actionDelegate?.constructCollectionView(viewModel: collectionViewModel)
     }
 }
