@@ -15,7 +15,7 @@ final class CreateBookingFetcher: CreateBookingFetcherProtocol {
     init(networkService: NetworkServiceProtocol = NetworkService.shared) {
         self.networkService = networkService
     }
-    
+
     func createBooking(request: CreateBookingSpec) async throws -> CreateBookingResponse {
         try await networkService.request(
             urlString: CreateBookingEndpoint.create.urlString,
@@ -25,6 +25,6 @@ final class CreateBookingFetcher: CreateBookingFetcherProtocol {
             body: request
         )
     }
-    
+
     private let networkService: NetworkServiceProtocol
 }

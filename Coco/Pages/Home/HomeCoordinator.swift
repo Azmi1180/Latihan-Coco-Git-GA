@@ -1,3 +1,4 @@
+
 //
 //  HomeCoordinator.swift
 //  Coco
@@ -12,20 +13,26 @@ final class HomeCoordinator: BaseCoordinator {
     struct Input {
         let navigationController: UINavigationController
         let flow: Flow
-        
+
         enum Flow {
             case activityDetail(data: ActivityDetailDataModel)
+            case search(viewModel: HomeViewModelProtocol, latestSearches: [HomeSearchSearchLocationData], currentQuery: String)
         }
     }
-    
+
     init(input: Input) {
         self.input = input
+        if case .search(let viewModel, _, _) = input.flow {
+            self.homeViewModel = viewModel
+        } else {
+            self.homeViewModel = nil
+        }
         super.init(navigationController: input.navigationController)
     }
-    
+
     override func start() {
         super.start()
-        
+
         switch input.flow {
         case .activityDetail(let data):
             let detailViewModel: ActivityDetailViewModel = ActivityDetailViewModel(
@@ -34,15 +41,32 @@ final class HomeCoordinator: BaseCoordinator {
             detailViewModel.navigationDelegate = self
             let detailViewController: ActivityDetailViewController = ActivityDetailViewController(viewModel: detailViewModel)
             start(viewController: detailViewController)
+
+        case .search(let viewModel, let latestSearches, let currentQuery):
+            let searchViewModel: SearchViewModel = SearchViewModel(
+                searchBarViewModel: HomeSearchBarViewModel(
+                    leadingIcon: CocoIcon.icSearchLoop.image,
+                    placeholderText: "Search...",
+                    currentTypedText: currentQuery,
+                    trailingIcon: nil,
+                    isTypeAble: true,
+                    delegate: nil
+                ),
+                latestSearches: latestSearches
+            )
+            searchViewModel.delegate = self
+            let searchViewController: SearchViewController = SearchViewController(viewModel: searchViewModel)
+            start(viewController: searchViewController)
         }
     }
-    
+
     private let input: Input
+    private let homeViewModel: HomeViewModelProtocol?
 }
 
 extension HomeCoordinator: HomeViewModelNavigationDelegate {
     func notifyHomeDidSelectActivity() {
-        
+
     }
 }
 
@@ -53,7 +77,7 @@ extension HomeCoordinator: HomeFormScheduleViewModelDelegate {
         )
         viewModel.delegate = self
         let viewController = CheckoutViewController(viewModel: viewModel)
-        
+
         DispatchQueue.main.async { [weak self] in
             self?.start(viewController: viewController)
         }
@@ -82,5 +106,12 @@ extension HomeCoordinator: ActivityDetailNavigationDelegate {
         viewModel.delegate = self
         let viewController: HomeFormScheduleViewController = HomeFormScheduleViewController(viewModel: viewModel)
         start(viewController: viewController)
+    }
+}
+
+extension HomeCoordinator: SearchViewModelDelegate {
+    func searchViewModel(didApplySearch query: String) {
+        homeViewModel?.onSearchDidApply(query)
+        navigationController?.popViewController(animated: true)
     }
 }

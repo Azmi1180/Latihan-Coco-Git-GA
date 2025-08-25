@@ -12,7 +12,7 @@ enum CocoButtonStyle {
     case small
     case normal
     case large
-    
+
     var padding: EdgeInsets {
         switch self {
         case .small:
@@ -38,7 +38,7 @@ enum CocoButtonStyle {
             )
         }
     }
-    
+
     var height: Double {
         switch self {
         case .small:
@@ -49,7 +49,7 @@ enum CocoButtonStyle {
             return 56.0
         }
     }
-    
+
     var cornerRadius: Double {
         switch self {
         case .small:
@@ -67,7 +67,7 @@ enum CocoButtonType {
     case secondary
     case tertiary
     case disabled
-    
+
     var textColor: Color {
         switch self {
         case .primary:
@@ -80,7 +80,7 @@ enum CocoButtonType {
             return Token.grayscale60.toColor()
         }
     }
-    
+
     var backgroundColor: Color {
         switch self {
         case .primary:
@@ -93,7 +93,7 @@ enum CocoButtonType {
             return Token.grayscale20.toColor()
         }
     }
-    
+
     var borderColor: Color? {
         switch self {
         case .primary:

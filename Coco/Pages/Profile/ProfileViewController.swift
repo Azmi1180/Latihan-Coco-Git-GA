@@ -14,16 +14,16 @@ final class ProfileViewController: UIViewController {
         super.init(nibName: nil, bundle: nil)
         self.viewModel.actionDelegate = self
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel.onViewDidLoad()
     }
-    
+
     private let viewModel: ProfileViewModelProtocol
     private var currentChild: UIViewController?
 }
@@ -33,12 +33,12 @@ extension ProfileViewController: ProfileViewModelAction {
         let vc: UserProfileViewController = UserProfileViewController(viewModel: viewModel)
         switchToChild(vc)
     }
-    
+
     func showSignInView(viewModel: SignInViewModel) {
         let viewController: SignInViewController = SignInViewController(viewModel: viewModel)
         switchToChild(viewController)
     }
-    
+
     func updateTitle(with text: String) {
         title = text
     }

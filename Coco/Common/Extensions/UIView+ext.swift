@@ -14,7 +14,7 @@ extension UIView {
         builderBlock(builder)
         builder.activate()
     }
-    
+
     func addSubviewAndLayout(
         _ subview: UIView,
         insets: UIEdgeInsets = .zero
@@ -29,7 +29,7 @@ extension UIView {
               .bottom(to: bottomAnchor, relation: .equal, constant: -insets.bottom)
         }
     }
-    
+
     func addSubviews(_ views: [UIView]) {
         views.forEach {
             addSubview($0)

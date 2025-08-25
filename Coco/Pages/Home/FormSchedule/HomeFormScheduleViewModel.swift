@@ -15,12 +15,12 @@ struct HomeFormScheduleViewModelInput {
 final class HomeFormScheduleViewModel {
     weak var delegate: (any HomeFormScheduleViewModelDelegate)?
     weak var actionDelegate: (any HomeFormScheduleViewModelAction)?
-    
+
     init(input: HomeFormScheduleViewModelInput, fetcher: CreateBookingFetcherProtocol = CreateBookingFetcher()) {
         self.input = input
         self.fetcher = fetcher
     }
-    
+
     private let input: HomeFormScheduleViewModelInput
     private lazy var calendarInputViewModel: HomeSearchBarViewModel = HomeSearchBarViewModel(
         leadingIcon: nil,
@@ -58,21 +58,21 @@ extension HomeFormScheduleViewModel: HomeFormScheduleViewModelProtocol {
             calendarViewModel: calendarInputViewModel,
             paxInputViewModel: paxInputViewModel
         )
-        
+
         let data: HomeFormScheduleViewData = HomeFormScheduleViewData(
             imageString: input.package.imageUrlsString.first ?? "",
             activityName: input.package.title,
             packageName: input.package.availablePackages.content.first { $0.id == input.selectedPackageId }?.name ?? "",
             location: input.package.location
         )
-        
+
         actionDelegate?.configureView(data: data)
     }
-    
+
     func onCalendarDidChoose(date: Date) {
         chosenDateInput = date
     }
-    
+
     func onCheckout() {
         Task {
             do {
@@ -87,7 +87,7 @@ extension HomeFormScheduleViewModel: HomeFormScheduleViewModelProtocol {
                 delegate?.notifyFormScheduleDidNavigateToCheckout(with: response)
             }
             catch {
-                
+
             }
         }
     }
@@ -99,13 +99,13 @@ extension HomeFormScheduleViewModel: HomeSearchBarViewModelDelegate {
             actionDelegate?.showCalendarOption()
         }
         else if viewModel === paxInputViewModel {
-            
+
         }
     }
 }
 
 private extension HomeFormScheduleViewModel {
     func openCalendar() {
-        
+
     }
 }

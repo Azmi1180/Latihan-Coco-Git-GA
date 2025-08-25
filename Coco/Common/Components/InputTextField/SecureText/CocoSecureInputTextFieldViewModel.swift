@@ -10,10 +10,10 @@ import UIKit
 
 final class CocoSecureInputTextFieldViewModel: ObservableObject {
     @Published var currentTypedText: String = ""
-    
+
     let leadingIcon: UIImage?
     let placeholderText: String
-    
+
     init(
         leadingIcon: UIImage?,
         placeholderText: String,

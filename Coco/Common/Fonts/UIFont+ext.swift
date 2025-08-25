@@ -43,11 +43,11 @@ extension UIFont {
 
         return UIFontMetrics(forTextStyle: style).scaledFont(for: customFont)
     }
-    
+
     func toFont() -> Font {
         Font(self)
     }
-    
+
     static func jakartaSans(size: CGFloat, weight: UIFont.Weight = .regular) -> UIFont {
         let fontName: String = {
             switch weight {

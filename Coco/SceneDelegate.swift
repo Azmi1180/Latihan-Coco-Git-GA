@@ -14,22 +14,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = scene as? UIWindowScene else { return }
-        
+
         let rootViewController: BaseTabBarViewController = BaseTabBarViewController()
-        
+
         let window = UIWindow(windowScene: windowScene)
         window.rootViewController = rootViewController
         window.makeKeyAndVisible()
-        
+
         self.window = window
-        
+
         guard let currentActiveNavigationController: UINavigationController = rootViewController.currentActiveNavigationController else {
             return
         }
-        
+
         appCoordinator = AppCoordinator.shared
         appCoordinator?.setNavigationController(currentActiveNavigationController)
-        
+
         rootViewController.baseCoordinator = appCoordinator
         showSplashScreen(over: window)
 //        fetchAllData()
@@ -73,18 +73,18 @@ private extension SceneDelegate {
     func showSplashScreen(over window: UIWindow) {
         let logo: UIImageView = UIImageView(image: CocoIcon.splashLogo.image)
         logo.translatesAutoresizingMaskIntoConstraints = false
-        
+
         window.addSubview(logo)
-        
+
         NSLayoutConstraint.activate([
             logo.topAnchor.constraint(equalTo: window.topAnchor),
             logo.bottomAnchor.constraint(equalTo: window.bottomAnchor),
             logo.leadingAnchor.constraint(equalTo: window.leadingAnchor),
             logo.trailingAnchor.constraint(equalTo: window.trailingAnchor)
         ])
-        
+
         self.splashView = logo
-        
+
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             self.dismissSplash()
         }

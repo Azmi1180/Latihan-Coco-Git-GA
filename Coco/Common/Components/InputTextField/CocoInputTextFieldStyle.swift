@@ -16,7 +16,7 @@ struct CocoInputTextFieldStyle: TextFieldStyle {
     let trailingIcon: ImageHandler?
     let shouldInterceptFocus: Bool
     let onFocusedAction: ((Bool) -> Void)?
-    
+
     init(
         leadingIcon: UIImage?,
         placeHolder: String?,
@@ -30,7 +30,7 @@ struct CocoInputTextFieldStyle: TextFieldStyle {
         self.shouldInterceptFocus = shouldInterceptFocus
         self.onFocusedAction = onFocusedAction
     }
-    
+
     // swiftlint:disable identifier_name
     func _body(configuration: TextField<Self._Label>) -> some View {
         HStack(alignment: .center, spacing: 8.0) {
@@ -40,12 +40,12 @@ struct CocoInputTextFieldStyle: TextFieldStyle {
                     .scaledToFit()
                     .frame(width: 18.0, height: 18.0)
             }
-            
+
             ZStack {
                 GeometryReader { proxy in
                     configuration
                         .disabled(shouldInterceptFocus) // Disable interaction if intercepting
-                    
+
                     // Transparent layer to intercept taps
                     if shouldInterceptFocus {
                         Color.clear
@@ -59,12 +59,12 @@ struct CocoInputTextFieldStyle: TextFieldStyle {
             }
 
             Spacer()
-                
+
             if let trailingIcon: ImageHandler {
                 Rectangle()
                     .frame(width: 1.0, height: 18.0)
                     .foregroundStyle(Token.additionalColorsLine.toColor())
-                
+
                 Image(uiImage: trailingIcon.image)
                     .resizable()
                     .scaledToFit()
@@ -76,7 +76,6 @@ struct CocoInputTextFieldStyle: TextFieldStyle {
         }
         .padding(.vertical, 14.0)
         .padding(.horizontal, 16.0)
-        .background(Token.mainColorSecondary.toColor())
         .clipShape(Capsule(style: .continuous))
         .overlay(
             Capsule(style: .circular)

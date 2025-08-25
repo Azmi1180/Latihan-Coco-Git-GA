@@ -15,7 +15,7 @@ final class MyTripBookingListFetcher: MyTripBookingListFetcherProtocol {
     init(networkService: NetworkServiceProtocol = NetworkService.shared) {
         self.networkService = networkService
     }
-    
+
     func fetchTripBookingList(request: TripBookingListSpec) async throws -> JSONArray<BookingDetails> {
         try await networkService.request(
             urlString: CreateBookingEndpoint.getBookings.urlString,
@@ -25,6 +25,6 @@ final class MyTripBookingListFetcher: MyTripBookingListFetcherProtocol {
             body: request
         )
     }
-    
+
     private let networkService: NetworkServiceProtocol
 }

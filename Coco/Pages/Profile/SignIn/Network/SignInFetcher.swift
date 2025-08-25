@@ -15,7 +15,7 @@ final class SignInFetcher: SignInFetcherProtocol {
     init(networkService: NetworkServiceProtocol = NetworkService.shared) {
         self.networkService = networkService
     }
-    
+
     func signIn(spec: SignInSpec, completion: @escaping (Result<SignInResponse, NetworkServiceError>) -> Void) {
         networkService.request(
             urlString: UserEndpoint.signIn.urlString,
@@ -26,6 +26,6 @@ final class SignInFetcher: SignInFetcherProtocol {
             completion: completion
         )
     }
-    
+
     private let networkService: NetworkServiceProtocol
 }

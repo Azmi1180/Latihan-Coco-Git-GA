@@ -13,6 +13,6 @@ protocol TripDetailViewModelAction: AnyObject {
 
 protocol TripDetailViewModelProtocol: AnyObject {
     var actionDelegate: TripDetailViewModelAction? { get set }
-    
+
     func onViewDidLoad()
 }

@@ -10,13 +10,13 @@ import SwiftUI
 
 struct CocoButton: View {
     @Environment(\.isStretch) var isStretch: Bool
-    
+
     private let action: () -> Void
     private let text: String
-    
+
     private let style: CocoButtonStyle
     private let type: CocoButtonType
-    
+
     init(
         action: @escaping () -> Void,
         text: String,
@@ -28,7 +28,7 @@ struct CocoButton: View {
         self.style = style
         self.type = type
     }
-    
+
     var body: some View {
         Button(action: action) {
             Text(text)
@@ -45,10 +45,10 @@ struct CocoButtonStyleConfiguration: ButtonStyle {
         self.style = style
         self.type = type
     }
-    
+
     private let style: CocoButtonStyle
     private let type: CocoButtonType
-    
+
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .padding(style.padding)

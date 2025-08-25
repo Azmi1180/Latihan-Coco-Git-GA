@@ -17,7 +17,7 @@ protocol NetworkServiceProtocol: AnyObject {
         body: JSONEncodable?,
         completion: @escaping (Result<T, NetworkServiceError>) -> Void
     ) -> URLSessionDataTask?
-    
+
     func request<T: JSONDecodable>(
         urlString: String,
         method: HTTPMethod,
@@ -29,9 +29,9 @@ protocol NetworkServiceProtocol: AnyObject {
 
 final class NetworkService: NetworkServiceProtocol {
     static let shared: NetworkService = NetworkService()
-    
+
     private init() { }
-    
+
     @discardableResult
     func request<T: JSONDecodable>(
         urlString: String,
@@ -45,7 +45,7 @@ final class NetworkService: NetworkServiceProtocol {
             completion(.failure(.invalidURL))
             return nil
         }
-        
+
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
         request.allHTTPHeaderFields = headers
@@ -56,8 +56,9 @@ final class NetworkService: NetworkServiceProtocol {
                 request.setValue(apiKey, forHTTPHeaderField: "apikey")
                 request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
             }
+
         }
-        
+
         if let body: JSONObject = body?.toDictionary() {
             do {
                 request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
@@ -70,7 +71,7 @@ final class NetworkService: NetworkServiceProtocol {
         let task: URLSessionDataTask = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let self else { return }
             NetworkLogger.logResponse(data: data, response: response, error: error)
-            
+
             if let error: Error = error {
                 let nsError: NSError = error as NSError
                 if nsError.code == NSURLErrorNotConnectedToInternet {
@@ -134,11 +135,11 @@ final class NetworkService: NetworkServiceProtocol {
                 completeOnMain(.failure(.decodingFailed(error)), completion)
             }
         }
-        
+
         task.resume()
         return task
     }
-    
+
     func request<T: JSONDecodable>(
         urlString: String,
         method: HTTPMethod,
