@@ -22,7 +22,7 @@ class ResultViewModel: ResultViewModelProtocol {
     func onViewDidLoad() {
         let collectionViewModel = HomeCollectionViewModel()
         collectionViewModel.updateActivity(sections: [
-            HomeSectionData(sectionType: .activity, sectionDataModel: HomeActivityCellSectionDataModel(title: "Search Results", dataModel: searchResults))
+            HomeSectionData(sectionType: .activity, sectionDataModel: HomeActivityCellSectionDataModel(title: "", dataModel: searchResults))
         ])
         actionDelegate?.constructCollectionView(viewModel: collectionViewModel)
         

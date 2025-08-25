@@ -59,10 +59,20 @@ final class HomeSearchBarViewModel: ObservableObject {
     private func observeSearchText() {
         $currentTypedText
             .sink { [weak self] newText in
-                if newText.isEmpty {
-                    self?.trailingIcon = nil
+                guard let self else { return }
+                if self.isTypeAble {
+                    if newText.isEmpty {
+                        self.trailingIcon = nil
+                    } else {
+                        self.trailingIcon = ImageHandler(
+                            image: CocoIcon.icCross.image,
+                            didTap: {
+                                self.currentTypedText = ""
+                            }
+                        )
+                    }
                 } else {
-                    self?.trailingIcon = self?.defaultTrailingIcon
+                    self.trailingIcon = self.defaultTrailingIcon
                 }
             }
             .store(in: &cancellables)
