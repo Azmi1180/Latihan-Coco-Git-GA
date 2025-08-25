@@ -38,7 +38,7 @@ extension ResultViewController: ResultViewModelAction {
     func constructCollectionView(viewModel: some HomeCollectionViewModelProtocol) {
         let collectionViewController = HomeCollectionViewController(viewModel: viewModel)
         addChild(collectionViewController)
-        thisView.addCollectionView(from: collectionViewController.view)
+        thisView.addSearchResultView(from: collectionViewController.view)
         collectionViewController.didMove(toParent: self)
     }
     
