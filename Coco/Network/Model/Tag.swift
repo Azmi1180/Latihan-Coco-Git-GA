@@ -8,7 +8,7 @@
 import Foundation
 
 // MARK: - FirebaseData
-struct FirebaseData: Codable {
+struct FirebaseData: JSONDecodable {
     let tag: [Tag]
     let tagActivities: [TagActivity]
     let tagCategory: [TagCategory]
@@ -22,7 +22,7 @@ struct FirebaseData: Codable {
 
 
 // MARK: - Tag
-struct Tag: Codable, Identifiable {
+struct Tag: JSONDecodable, Identifiable {
     let id: Int?
     let name: String
     let tagCategoryID: Int?
@@ -34,7 +34,7 @@ struct Tag: Codable, Identifiable {
 }
 
 // MARK: - TagActivity
-struct TagActivity: Codable, Identifiable {
+struct TagActivity: JSONDecodable, Identifiable {
     let id, activityID, tagID: Int
 
     enum CodingKeys: String, CodingKey {
@@ -45,7 +45,7 @@ struct TagActivity: Codable, Identifiable {
 }
 
 // MARK: - TagCategory
-struct TagCategory: Codable, Identifiable {
+struct TagCategory: JSONDecodable, Identifiable {
     let id: Int
     let name: String
 }

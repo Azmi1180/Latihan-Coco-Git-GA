@@ -26,6 +26,12 @@ final class ActivityDetailView: UIView {
     }
 
     func configureView(_ data: ActivityDetailDataModel) {
+        // Clear existing content to avoid duplication
+        contentStackView.arrangedSubviews.forEach { view in
+            contentStackView.removeArrangedSubview(view)
+            view.removeFromSuperview()
+        }
+        
         titleLabel.text = data.title
         locationLabel.text = data.location
 
@@ -52,7 +58,8 @@ final class ActivityDetailView: UIView {
                 view: createProviderDetail(
                     imageUrl: data.providerDetail.content.imageUrlString,
                     name: data.providerDetail.content.name,
-                    description: data.providerDetail.content.description
+                    description: data.providerDetail.content.description,
+                    isVerified: data.isVerified
                 )
             )
         )
@@ -150,6 +157,12 @@ final class ActivityDetailView: UIView {
                 }
             )
         }
+    }
+    
+    func updateVerificationAndWhatsIncluded(_ data: ActivityDetailDataModel) {
+        // Find and update only the provider section and what's included section
+        // This avoids rebuilding the entire view
+        configureView(data)
     }
 
     private lazy var imageSliderView: UIView = UIView()
@@ -392,8 +405,12 @@ private extension ActivityDetailView {
         return stackView
     }
 
-    func createProviderDetail(imageUrl: String, name: String, description: String) -> UIView {
-        let contentView: UIView = UIView()
+    func createProviderDetail(imageUrl: String, name: String, description: String, isVerified: Bool = false) -> UIView {
+        // Main horizontal stack view: Image + Text Block
+        let mainHorizontalStack = createStackView(spacing: 12, axis: .horizontal)
+        mainHorizontalStack.alignment = .top
+        
+        // Provider image
         let imageView: UIImageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.layout {
@@ -402,47 +419,101 @@ private extension ActivityDetailView {
         imageView.layer.cornerRadius = 14.0
         imageView.loadImage(from: URL(string: imageUrl))
         imageView.clipsToBounds = true
-
+        
+        // Provider text block (vertical stack)
+        let textBlockStack = createStackView(spacing: 8, axis: .vertical)
+        textBlockStack.alignment = .leading
+        
+        // Top line: Provider name + verification badge
+        let nameAndBadgeStack = createStackView(spacing: 6, axis: .horizontal)
+        nameAndBadgeStack.alignment = .center
+        
         let nameLabel: UILabel = UILabel(
             font: .jakartaSans(forTextStyle: .subheadline, weight: .bold),
             textColor: Token.additionalColorsBlack,
             numberOfLines: 2
         )
         nameLabel.text = name
-
+        nameLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        nameLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        
+        nameAndBadgeStack.addArrangedSubview(nameLabel)
+        
+        // Add verification badge if verified
+        if isVerified {
+            let verificationBadge = createVerificationBadge()
+            nameAndBadgeStack.addArrangedSubview(verificationBadge)
+        }
+        
+        // Bottom line: "Verified Provider" + info icon (only if verified)
+        let verifiedProviderStack: UIStackView?
+        if isVerified {
+            verifiedProviderStack = createStackView(spacing: 4, axis: .horizontal)
+            verifiedProviderStack!.alignment = .center
+            
+            let verifiedLabel = UILabel(
+                font: .jakartaSans(forTextStyle: .caption1, weight: .medium),
+                textColor: Token.grayscale70,
+                numberOfLines: 1
+            )
+            verifiedLabel.text = "Verified Provider"
+            
+            let infoImageView = UIImageView()
+            infoImageView.image = UIImage(systemName: "info.circle")
+            infoImageView.tintColor = Token.grayscale70
+            infoImageView.contentMode = .scaleAspectFit
+            infoImageView.layout {
+                $0.size(16)
+            }
+            
+            verifiedProviderStack!.addArrangedSubview(verifiedLabel)
+            verifiedProviderStack!.addArrangedSubview(infoImageView)
+        } else {
+            verifiedProviderStack = nil
+        }
+        
+        // Description label
         let descriptionLabel: UILabel = UILabel(
             font: .jakartaSans(forTextStyle: .footnote, weight: .medium),
             textColor: Token.grayscale90,
             numberOfLines: 0
         )
         descriptionLabel.text = description
-
-        contentView.addSubviews([
-            imageView,
-            nameLabel,
-            descriptionLabel,
-        ])
-
-        imageView.layout {
-            $0.leading(to: contentView.leadingAnchor)
-                .top(to: contentView.topAnchor)
-                .bottom(to: contentView.bottomAnchor, relation: .lessThanOrEqual)
+        
+        // Add elements to text block stack
+        textBlockStack.addArrangedSubview(nameAndBadgeStack)
+        
+        if let verifiedStack = verifiedProviderStack {
+            textBlockStack.addArrangedSubview(verifiedStack)
         }
-
-        nameLabel.layout {
-            $0.leading(to: imageView.trailingAnchor, constant: 10.0)
-                .top(to: contentView.topAnchor)
-                .trailing(to: contentView.trailingAnchor)
+        
+        textBlockStack.addArrangedSubview(descriptionLabel)
+        
+        // Add image and text block to main horizontal stack
+        mainHorizontalStack.addArrangedSubview(imageView)
+        mainHorizontalStack.addArrangedSubview(textBlockStack)
+        
+        return mainHorizontalStack
+    }
+    
+    func createVerificationBadge() -> UIView {
+        let containerView = UIView()
+        
+        // Use the shield checkmark SF Symbol
+        let shieldImageView = UIImageView()
+        shieldImageView.image = UIImage(systemName: "checkmark.shield.fill")
+        shieldImageView.tintColor = UIColor.systemBlue
+        shieldImageView.contentMode = .scaleAspectFit
+        shieldImageView.layout {
+            $0.size(20)
         }
-
-        descriptionLabel.layout {
-            $0.leading(to: nameLabel.leadingAnchor)
-                .top(to: nameLabel.bottomAnchor, constant: 8.0)
-                .trailing(to: contentView.trailingAnchor)
-                .bottom(to: contentView.bottomAnchor, relation: .lessThanOrEqual)
+        
+        containerView.addSubview(shieldImageView)
+        shieldImageView.layout {
+            $0.edges(to: containerView)
         }
-
-        return contentView
+        
+        return containerView
     }
 
     func createPackageView(data: ActivityDetailDataModel.Package) -> UIView {
@@ -722,7 +793,7 @@ private extension ActivityDetailView {
     
     func createProviderContactView(from content: String) -> UIView {
         let items = content.split(separator: "\n").map { String($0) }
-        let stackView = createStackView(spacing: 12)
+        let stackView = createStackView(spacing: 16)
         
         if items.count > 0 {
             stackView.addArrangedSubview(createIconTextView(image: CocoIcon.icPinPointBlue.image, text: items[0]))
