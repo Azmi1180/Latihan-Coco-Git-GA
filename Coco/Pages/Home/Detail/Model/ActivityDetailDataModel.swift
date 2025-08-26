@@ -14,11 +14,18 @@ struct ActivityDetailDataModel: Equatable {
 
     let detailInfomation: ActivitySectionLayout<String>
     let providerDetail: ActivitySectionLayout<ProviderDetail>
-    let tripFacilities: ActivitySectionLayout<[String]>
-    let tnc: String
+    let whatsIncluded: ActivitySectionLayout<WhatsIncluded>
+    let moreInfo: [ActivitySectionLayout<String>]
 
     let availablePackages: ActivitySectionLayout<[Package]>
     let hiddenPackages: [Package]
+
+    struct WhatsIncluded: Equatable {
+        let providerAndSafety: [String]
+        let equipment: [String]
+        let services: [String]
+        let guideLanguage: [String]
+    }
 
     struct ProviderDetail: Equatable {
         let name: String
@@ -29,7 +36,8 @@ struct ActivityDetailDataModel: Equatable {
     struct Package: Equatable {
         let imageUrlString: String
         let name: String
-        let description: String
+        let pax: String
+        let ageRange: String
         let price: String
 
         let id: Int
@@ -43,7 +51,7 @@ struct ActivityDetailDataModel: Equatable {
             .map { $0.imageUrl }
 
         detailInfomation = ActivitySectionLayout(
-            title: "Details",
+            title: "Trip Overview",
             content: response.description
         )
         providerDetail = ActivitySectionLayout(
@@ -54,11 +62,20 @@ struct ActivityDetailDataModel: Equatable {
                 imageUrlString: response.packages[0].host.profileImageUrl
             )
         )
-        tripFacilities = ActivitySectionLayout(
-            title: "This Trip Includes",
-            content: response.accessories.map { $0.name }
+        whatsIncluded = ActivitySectionLayout(
+            title: "What's Included",
+            content: WhatsIncluded(
+                providerAndSafety: ["Verified Provider", "Certified Guide", "First Aid Ready"],
+                equipment: ["All Size Available"],
+                services: ["Free food and Drinks", "Island Leisure"],
+                guideLanguage: ["Bahasa Indonesia"]
+            )
         )
-        tnc = response.cancelable
+        moreInfo = [
+            ActivitySectionLayout(title: "Things to Prepare", content: "Swimwear, change of clothes, and towel\nPersonal medicine (if needed)\nSunscreen & hat\nWaterproof phone case or camera\nExtra snacks for kids (optional)"),
+            ActivitySectionLayout(title: "Provider Contact", content: "West Bali National Park, Bali\n+62-829-8888-333\nwww.nusapenidaecotour.com"),
+            ActivitySectionLayout(title: "Term and Conditions", content: response.cancelable)
+        ]
 
         availablePackages = ActivitySectionLayout(
             title: "Available Packages",
@@ -66,8 +83,9 @@ struct ActivityDetailDataModel: Equatable {
                 Package(
                     imageUrlString: $0.imageUrl,
                     name: $0.name,
-                    description: "Min.\($0.minParticipants) - Max.\($0.maxParticipants)",
-                    price: "Rp\($0.pricePerPerson)",
+                    pax: "\($0.minParticipants)-\($0.maxParticipants)",
+                    ageRange: "Ages 5-65", // This is a placeholder
+                    price: "Rp \($0.pricePerPerson)",
                     id: $0.id
                 )
             }
