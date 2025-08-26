@@ -50,6 +50,7 @@ class ResultViewController: UIViewController {
 
 extension ResultViewController: ResultViewModelAction {
     func constructCollectionView(viewModel: some HomeCollectionViewModelProtocol) {
+        thisView.hideEmptyStateView()
         let collectionViewController = HomeCollectionViewController(viewModel: viewModel)
         addChild(collectionViewController)
         thisView.addSearchResultView(from: collectionViewController.view)
@@ -81,6 +82,10 @@ extension ResultViewController: ResultViewModelAction {
         filterPillView.delegate = delegate
         
         thisView.addFilterPillsView(from: filterPillView)
+    }
+    
+    func showEmptyState() {
+        thisView.showEmptyStateView()
     }
 }
 
