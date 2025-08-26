@@ -31,6 +31,10 @@ final class ActivityDetailView: UIView {
             contentStackView.removeArrangedSubview(view)
             view.removeFromSuperview()
         }
+        packageContainer.arrangedSubviews.forEach { view in
+            packageContainer.removeArrangedSubview(view)
+            view.removeFromSuperview()
+        }
         
         titleLabel.text = data.title
         locationLabel.text = data.location
@@ -68,25 +72,18 @@ final class ActivityDetailView: UIView {
 
         if !data.availablePackages.content.isEmpty {
             contentStackView.addArrangedSubview(packageSection)
-            
-            // Store total package count for the button
-            totalPackageCount = data.availablePackages.content.count
 
-            if data.availablePackages.content.count == data.hiddenPackages.count {
+            totalPackageCount = data.availablePackages.content.count
+            
+            if data.availablePackages.content.count <= 2 {
                 packageButton.isHidden = true
-                data.availablePackages.content.forEach { data in
-                    packageContainer.addArrangedSubview(createPackageView(data: data))
-                }
-            }
-            else {
-                data.hiddenPackages.forEach { data in
-                    packageContainer.addArrangedSubview(createPackageView(data: data))
-                }
-                // Update button text with remaining count
+            } else {
+                packageButton.isHidden = false
                 updatePackageButtonText()
             }
 
             packageLabel.text = data.availablePackages.title
+            updatePackageData(data.availablePackages.content)
         }
 
         packageLabel.isHidden = data.availablePackages.content.isEmpty
@@ -137,9 +134,23 @@ final class ActivityDetailView: UIView {
     }
 
     func updatePackageData(_ data: [ActivityDetailDataModel.Package]) {
-        packageContainer.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        // Clear existing packages
+        packageContainer.arrangedSubviews.forEach { 
+            packageContainer.removeArrangedSubview($0)
+            $0.removeFromSuperview() 
+        }
 
-        for (index, item) in data.enumerated() {
+        // Determine how many packages to show based on button state
+        let packagesToShow: [ActivityDetailDataModel.Package]
+        if isPackageButtonStateHidden {
+            // Show only first 2 packages
+            packagesToShow = Array(data.prefix(2))
+        } else {
+            // Show all packages
+            packagesToShow = data
+        }
+
+        for (index, item) in packagesToShow.enumerated() {
             let view: UIView = createPackageView(data: item)
             view.alpha = 0
             view.transform = CGAffineTransform(translationX: 0, y: 8)
@@ -549,8 +560,10 @@ private extension ActivityDetailView {
         if let priceNumber = extractNumberFromPrice(data.price) {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
+            formatter.locale = Locale(identifier: "id_ID") 
             formatter.groupingSeparator = "."
             formatter.usesGroupingSeparator = true
+            formatter.maximumFractionDigits = 0
             
             if let formattedNumber = formatter.string(from: NSNumber(value: priceNumber)) {
                 formattedPrice = "Rp \(formattedNumber)"
@@ -588,8 +601,7 @@ private extension ActivityDetailView {
         config.baseForegroundColor = .white
         config.cornerStyle = .capsule
         config.contentInsets = .init(top: 12, leading: 24, bottom: 12, trailing: 24)
-        
-        // Set custom font for the button title
+                
         config.attributedTitle = AttributedString(
             "Choose",
             attributes: AttributeContainer([
@@ -599,10 +611,9 @@ private extension ActivityDetailView {
         )
         
         let chooseButton = UIButton(configuration: config, primaryAction: action)
-        
-        // Set a specific width for the button
+                
         chooseButton.layout {
-            $0.width(120) // Adjust this value to your desired width
+            $0.width(120)
         }
         
         footerStackView.addArrangedSubview(priceStackView)
@@ -656,7 +667,7 @@ private extension ActivityDetailView {
             let shapeLayer = CAShapeLayer()
             shapeLayer.strokeColor = Token.grayscale40.cgColor
             shapeLayer.lineWidth = 1
-            shapeLayer.lineDashPattern = [4, 4] // Adjust dash pattern
+            shapeLayer.lineDashPattern = [4, 4] 
             
             let path = CGMutablePath()
             path.addLines(between: [CGPoint(x: 0, y: 0), CGPoint(x: view.frame.width, y: 0)])
@@ -820,16 +831,26 @@ private extension ActivityDetailView {
         let cleanedString = priceString
             .replacingOccurrences(of: "Rp", with: "")
             .replacingOccurrences(of: " ", with: "")
-            .replacingOccurrences(of: ".", with: "") // Remove existing thousand separators
-            .replacingOccurrences(of: ",", with: ".") // Convert decimal comma to dot if needed
+            .replacingOccurrences(of: ",", with: "") // Remove commas if any
         
-        // Extract number using regex
-        let pattern = "[0-9]+\\.?[0-9]*"
-        if let range = cleanedString.range(of: pattern, options: .regularExpression) {
-            let numberString = String(cleanedString[range])
-            return Double(numberString)
-        }
-        
-        return nil
+        return Double(cleanedString)
     }
+    
+    // func extractNumberFromPrice(_ priceString: String) -> Double? {
+    //     // Remove common currency symbols and letters, keep only numbers and dots/commas
+    //     let cleanedString = priceString
+    //         .replacingOccurrences(of: "Rp", with: "")
+    //         .replacingOccurrences(of: " ", with: "")
+    //         .replacingOccurrences(of: ".", with: "") // Remove existing thousand separators
+    //         .replacingOccurrences(of: ",", with: ".") // Convert decimal comma to dot if needed
+        
+    //     // Extract number using regex
+    //     let pattern = "[0-9]+\\.?[0-9]*"
+    //     if let range = cleanedString.range(of: pattern, options: .regularExpression) {
+    //         let numberString = String(cleanedString[range])
+    //         return Double(numberString)
+    //     }
+        
+    //     return nil
+    // }
 }
