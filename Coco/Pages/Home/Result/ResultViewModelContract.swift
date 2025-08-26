@@ -20,5 +20,7 @@ protocol ResultViewModelAction: AnyObject {
     func openFilterTray(_ viewModel: HomeSearchFilterTrayViewModel)
     func dismissTray()
     func constructFilterPills(pills: [FilterPillDataModel], selectedPillId: String?, delegate: FilterPillViewDelegate)
-    func showEmptyState(topText: String, bottomText: String)
+//    func showEmptyState(topText: String, bottomText: String)
+    func showEmptyState()
+
 }

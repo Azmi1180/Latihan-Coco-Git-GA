@@ -43,8 +43,8 @@ final class ResultView: UIView {
         searchResultView.addSubviewAndLayout(view)
     }
     
-    func showEmptyStateView(topText: String, bottomText: String) {
-        emptyStateView.configure(topText: topText, bottomText: bottomText)
+    func showEmptyStateView() {
+//        emptyStateView.configure(topText: topText, bottomText: bottomText)
         emptyStateView.isHidden = false
         searchResultView.isHidden = true
 //        filterPillsView.isHidden = true

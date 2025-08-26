@@ -84,8 +84,8 @@ extension ResultViewController: ResultViewModelAction {
         thisView.addFilterPillsView(from: filterPillView)
     }
     
-    func showEmptyState(topText: String, bottomText: String) {
-        thisView.showEmptyStateView(topText: topText, bottomText: bottomText)
+    func showEmptyState() {
+        thisView.showEmptyStateView()
     }
 }
 

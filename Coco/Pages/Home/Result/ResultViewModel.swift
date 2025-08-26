@@ -31,7 +31,7 @@ class ResultViewModel: ResultViewModelProtocol {
     
     func onViewDidLoad() {
         if searchResults.isEmpty {
-            actionDelegate?.showEmptyState(topText: "No results found", bottomText: "Try searching for something else.")
+            actionDelegate?.showEmptyState()
         } else {
             let collectionViewModel = HomeCollectionViewModel()
             collectionViewModel.updateActivity(sections: [
@@ -131,7 +131,7 @@ class ResultViewModel: ResultViewModelProtocol {
         let filteredResults = filteredActivities.map { HomeActivityCellDataModel(activity: $0) }
         
         if filteredResults.isEmpty {
-            actionDelegate?.showEmptyState(topText: "No results match the filter", bottomText: "Try adjusting your filter.")
+            actionDelegate?.showEmptyState()
         } else {
             let collectionViewModel = HomeCollectionViewModel()
             collectionViewModel.updateActivity(sections: [
@@ -168,7 +168,7 @@ extension ResultViewModel: FilterPillViewDelegate {
         }
         
         if filteredResults.isEmpty {
-            actionDelegate?.showEmptyState(topText: "No results match the filter", bottomText: "Try adjusting your filter.")
+            actionDelegate?.showEmptyState()
         } else {
             let collectionViewModel = HomeCollectionViewModel()
             collectionViewModel.updateActivity(sections: [
