@@ -9,13 +9,13 @@ import UIKit
 
 class AccordionView: UIView {
     private var title: String
-    private var content: String
+    private var contentView: UIView
     private var isExpanded: Bool = false
 
     private lazy var titleButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle(title, for: .normal)
-        button.titleLabel?.font = .jakartaSans(forTextStyle: .subheadline, weight: .bold)
+        button.titleLabel?.font = .jakartaSans(forTextStyle: .subheadline, weight: .medium)
         button.setTitleColor(Token.additionalColorsBlack, for: .normal)
         button.contentHorizontalAlignment = .left
         button.addTarget(self, action: #selector(toggle), for: .touchUpInside)
@@ -23,25 +23,15 @@ class AccordionView: UIView {
     }()
 
     private lazy var arrowImageView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(systemName: "chevron.down"))
+        let imageView = UIImageView(image: UIImage(systemName: "chevron.down", withConfiguration: UIImage.SymbolConfiguration(weight: .semibold)))
         imageView.tintColor = Token.additionalColorsBlack
         return imageView
     }()
 
-    private lazy var contentLabel: UILabel = {
-        let label = UILabel()
-        label.text = content
-        label.numberOfLines = 0
-        label.font = .jakartaSans(forTextStyle: .footnote, weight: .regular)
-        label.textColor = Token.grayscale70
-        label.isHidden = true
-        return label
-    }()
-
     private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [headerStackView, contentLabel])
+        let stackView = UIStackView(arrangedSubviews: [headerStackView, contentView])
         stackView.axis = .vertical
-        stackView.spacing = 8
+        stackView.spacing = 12
         return stackView
     }()
     
@@ -52,10 +42,11 @@ class AccordionView: UIView {
         return stackView
     }()
 
-    init(title: String, content: String) {
+    init(title: String, contentView: UIView) {
         self.title = title
-        self.content = content
+        self.contentView = contentView
         super.init(frame: .zero)
+        self.contentView.isHidden = true
         setupView()
     }
 
@@ -76,10 +67,10 @@ class AccordionView: UIView {
 
     @objc private func toggle() {
         isExpanded.toggle()
-        contentLabel.isHidden = !isExpanded
+        contentView.isHidden = !isExpanded
         
         UIView.animate(withDuration: 0.3) {
-            self.arrowImageView.transform = self.isExpanded ? CGAffineTransform(rotationAngle: .pi) : .identity
+            self.arrowImageView.transform = self.isExpanded ? .identity : CGAffineTransform(rotationAngle: .pi)
         }
     }
 }

@@ -36,7 +36,8 @@ struct ActivityDetailDataModel: Equatable {
     struct Package: Equatable {
         let imageUrlString: String
         let name: String
-        let description: String
+        let pax: String
+        let ageRange: String
         let price: String
 
         let id: Int
@@ -71,8 +72,8 @@ struct ActivityDetailDataModel: Equatable {
             )
         )
         moreInfo = [
-            ActivitySectionLayout(title: "Things to Prepare", content: "Things to prepare content"),
-            ActivitySectionLayout(title: "Provider Contact", content: "Provider contact content"),
+            ActivitySectionLayout(title: "Things to Prepare", content: "Swimwear, change of clothes, and towel\nPersonal medicine (if needed)\nSunscreen & hat\nWaterproof phone case or camera\nExtra snacks for kids (optional)"),
+            ActivitySectionLayout(title: "Provider Contact", content: "West Bali National Park, Bali\n+62-829-8888-333\nwww.nusapenidaecotour.com"),
             ActivitySectionLayout(title: "Term and Conditions", content: response.cancelable)
         ]
 
@@ -82,8 +83,9 @@ struct ActivityDetailDataModel: Equatable {
                 Package(
                     imageUrlString: $0.imageUrl,
                     name: $0.name,
-                    description: "Min.\($0.minParticipants) - Max.\($0.maxParticipants)",
-                    price: "Rp\($0.pricePerPerson)",
+                    pax: "\($0.minParticipants)-\($0.maxParticipants)",
+                    ageRange: "Ages 5-65", // This is a placeholder
+                    price: "Rp \($0.pricePerPerson)",
                     id: $0.id
                 )
             }

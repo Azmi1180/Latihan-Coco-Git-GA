@@ -61,6 +61,9 @@ final class ActivityDetailView: UIView {
 
         if !data.availablePackages.content.isEmpty {
             contentStackView.addArrangedSubview(packageSection)
+            
+            // Store total package count for the button
+            totalPackageCount = data.availablePackages.content.count
 
             if data.availablePackages.content.count == data.hiddenPackages.count {
                 packageButton.isHidden = true
@@ -72,6 +75,8 @@ final class ActivityDetailView: UIView {
                 data.hiddenPackages.forEach { data in
                     packageContainer.addArrangedSubview(createPackageView(data: data))
                 }
+                // Update button text with remaining count
+                updatePackageButtonText()
             }
 
             packageLabel.text = data.availablePackages.title
@@ -92,16 +97,33 @@ final class ActivityDetailView: UIView {
         contentStackView.addArrangedSubview(createDividerView())
 
         // More Info
+        let moreInfoContentStackView = createStackView(spacing: 16.0)
         data.moreInfo.forEach { info in
-            let accordion = AccordionView(title: info.title, content: info.content)
-            contentStackView.addArrangedSubview(accordion)
+            let contentView: UIView
+            switch info.title {
+            case "Provider Contact":
+                contentView = createProviderContactView(from: info.content)
+            default:
+                let items = info.content.split(separator: "\n").map { String($0) }
+                contentView = createBenefitListView(titles: items)
+            }
+            
+            let accordion = AccordionView(title: info.title, contentView: contentView)
+            moreInfoContentStackView.addArrangedSubview(accordion)
         }
+        contentStackView.addArrangedSubview(
+            createSectionView(
+                title: "More Info",
+                view: moreInfoContentStackView
+            )
+        )
     }
 
     func addImageSliderView(with view: UIView) {
         imageSliderView.subviews.forEach { $0.removeFromSuperview() }
         imageSliderView.addSubviewAndLayout(view)
     }
+
 
     func toggleImageSliderView(isShown: Bool) {
         imageSliderView.isHidden = !isShown
@@ -424,235 +446,295 @@ private extension ActivityDetailView {
     }
 
     func createPackageView(data: ActivityDetailDataModel.Package) -> UIView {
-        let containerStackView: UIStackView = createStackView(spacing: 12.0, axis: .horizontal)
-        let contentStackView: UIStackView = createStackView(spacing: 10.0)
-
-        let headerStackView: UIStackView = createStackView(spacing: 12.0)
-        headerStackView.alignment = .leading
-
-        let footerContentView: UIView = UIView()
-
-        let imageView: UIImageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.layout {
-            $0.size(92.0)
+        let mainStackView = createStackView(spacing: 16)
+        
+        let titleLabel = UILabel(
+            font: .jakartaSans(forTextStyle: .headline, weight: .bold),
+            textColor: Token.additionalColorsBlack
+        )
+        titleLabel.text = data.name
+        
+        let tagsStackView = createStackView(spacing: 8, axis: .horizontal)
+        tagsStackView.addArrangedSubview(createTagView(text: data.pax, icon: UIImage(systemName: "person")))
+        tagsStackView.addArrangedSubview(createTagView(text: data.ageRange))
+        tagsStackView.addArrangedSubview(UIView()) // Spacer
+        
+        let divider = createDottedDivider()
+        
+        let footerStackView = createStackView(spacing: 16, axis: .horizontal)
+        footerStackView.alignment = .center
+        
+        let priceStackView = createStackView(spacing: 4)
+        let startFromLabel = UILabel(
+            font: .jakartaSans(forTextStyle: .caption1, weight: .regular),
+            textColor: Token.grayscale70
+        )
+        startFromLabel.text = "Start from"
+        
+        let priceLabel = UILabel()
+        
+        // Format the price with thousand separators
+        let formattedPrice: String
+        if let priceNumber = extractNumberFromPrice(data.price) {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.groupingSeparator = "."
+            formatter.usesGroupingSeparator = true
+            
+            if let formattedNumber = formatter.string(from: NSNumber(value: priceNumber)) {
+                formattedPrice = "Rp \(formattedNumber)"
+            } else {
+                formattedPrice = data.price
+            }
+        } else {
+            formattedPrice = data.price
         }
-        imageView.layer.cornerRadius = 14.0
-        imageView.loadImage(from: URL(string: data.imageUrlString))
-        imageView.clipsToBounds = true
-
-        let nameLabel: UILabel = UILabel(
-            font: .jakartaSans(forTextStyle: .subheadline, weight: .bold),
-            textColor: Token.additionalColorsBlack,
-            numberOfLines: 2
-        )
-        nameLabel.text = data.name
-
-        let ratingAreaStackView: UIStackView = createStackView(spacing: 4.0, axis: .horizontal)
-        ratingAreaStackView.alignment = .leading
-
-        ratingAreaStackView.addArrangedSubview(
-            createIconTextView(
-                image: CocoIcon.icActivityAreaIcon.getImageWithTintColor(Token.grayscale70),
-                text: data.description
-            )
-        )
-
-        let priceLabel: UILabel = UILabel(
-            font: .jakartaSans(forTextStyle: .subheadline, weight: .bold),
-            textColor: Token.additionalColorsBlack,
-            numberOfLines: 2
-        )
-
-        let attributedString: NSMutableAttributedString = NSMutableAttributedString(
-            string: data.price,
+        
+        let priceText = NSMutableAttributedString(
+            string: formattedPrice,
             attributes: [
-                .font : UIFont.jakartaSans(forTextStyle: .subheadline, weight: .bold),
-                .foregroundColor : Token.additionalColorsBlack
+                .font: UIFont.jakartaSans(forTextStyle: .headline, weight: .bold),
+                .foregroundColor: Token.additionalColorsBlack
             ]
         )
-
-        attributedString.append(
-            NSAttributedString(
-                string: "/Person",
-                attributes: [
-                    .font : UIFont.jakartaSans(forTextStyle: .subheadline, weight: .medium),
-                    .foregroundColor : Token.grayscale60
-                ]
-            )
-        )
-
-        priceLabel.setContentHuggingPriority(.defaultLow - 1, for: .horizontal)
-        priceLabel.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
-
-        priceLabel.attributedText = attributedString
-
-        containerStackView.addArrangedSubview(imageView)
-        containerStackView.addArrangedSubview(contentStackView)
-
-        contentStackView.addArrangedSubview(headerStackView)
-        contentStackView.addArrangedSubview(footerContentView)
-
-        headerStackView.addArrangedSubview(nameLabel)
-        headerStackView.addArrangedSubview(ratingAreaStackView)
-
+        priceText.append(NSAttributedString(
+            string: " /Pax",
+            attributes: [
+                .font: UIFont.jakartaSans(forTextStyle: .caption1, weight: .regular),
+                .foregroundColor: Token.grayscale70
+            ]
+        ))
+        priceLabel.attributedText = priceText
+        
+        priceStackView.addArrangedSubview(startFromLabel)
+        priceStackView.addArrangedSubview(priceLabel)
+        
         let action: UIAction = UIAction { [weak self] _ in
             self?.delegate?.notifyPackagesDetailDidTap(with: data.id)
         }
-
         var config = UIButton.Configuration.filled()
-        config.image = CocoIcon.icArrowTopRight.image
         config.baseBackgroundColor = Token.mainColorPrimary
         config.baseForegroundColor = .white
         config.cornerStyle = .capsule
-
-        let button: UIButton = UIButton(configuration: config, primaryAction: action)
-        button.layout {
-            $0.size(40.0)
+        config.contentInsets = .init(top: 12, leading: 24, bottom: 12, trailing: 24)
+        
+        // Set custom font for the button title
+        config.attributedTitle = AttributedString(
+            "Choose",
+            attributes: AttributeContainer([
+                .font: UIFont.jakartaSans(forTextStyle: .subheadline, weight: .semibold),
+                .foregroundColor: UIColor.white
+            ])
+        )
+        
+        let chooseButton = UIButton(configuration: config, primaryAction: action)
+        
+        // Set a specific width for the button
+        chooseButton.layout {
+            $0.width(120) // Adjust this value to your desired width
         }
+        
+        footerStackView.addArrangedSubview(priceStackView)
+        footerStackView.addArrangedSubview(chooseButton)
+        
+        mainStackView.addArrangedSubview(titleLabel)
+        mainStackView.addArrangedSubview(tagsStackView)
+        mainStackView.addArrangedSubview(divider)
+        mainStackView.addArrangedSubview(footerStackView)
+        
+        mainStackView.isLayoutMarginsRelativeArrangement = true
+        mainStackView.layoutMargins = .init(edges: 16.0)
+        mainStackView.layer.cornerRadius = 16.0
+        mainStackView.layer.borderWidth = 1.5
+        mainStackView.layer.borderColor = Token.grayscale40.cgColor
+        mainStackView.backgroundColor = .white
 
-        button.setContentHuggingPriority(.required + 1, for: .horizontal)
-        button.setContentHuggingPriority(.required + 1, for: .vertical)
+        return mainStackView
+    }
 
-        button.setContentCompressionResistancePriority(.required, for: .horizontal)
-        button.setContentCompressionResistancePriority(.required, for: .vertical)
-
-        footerContentView.addSubviews([
-            priceLabel,
-            button
-        ])
-
-        priceLabel.layout {
-            $0.leading(to: footerContentView.leadingAnchor)
-                .top(to: footerContentView.topAnchor)
-                .bottom(to: footerContentView.bottomAnchor)
+    func createTagView(text: String, icon: UIImage? = nil) -> UIView {
+        let stackView = createStackView(spacing: 4, axis: .horizontal)
+        stackView.alignment = .center
+        stackView.isLayoutMarginsRelativeArrangement = true
+        stackView.layoutMargins = .init(top: 6, left: 10, bottom: 6, right: 10)
+        stackView.backgroundColor = Token.grayscale20
+        stackView.layer.cornerRadius = 12
+        
+        if let icon = icon {
+            let imageView = UIImageView(image: icon)
+            imageView.tintColor = Token.grayscale70
+            imageView.layout{ $0.size(14) }
+            stackView.addArrangedSubview(imageView)
         }
-
-        button.layout {
-            $0.leading(to: priceLabel.trailingAnchor, relation: .lessThanOrEqual)
-                .centerY(to: footerContentView.centerYAnchor)
-                .trailing(to: footerContentView.trailingAnchor)
+        
+        let label = UILabel(
+            font: .jakartaSans(forTextStyle: .caption1, weight: .medium),
+            textColor: Token.grayscale70
+        )
+        label.text = text
+        stackView.addArrangedSubview(label)
+        
+        return stackView
+    }
+    
+    func createDottedDivider() -> UIView {
+        let view = UIView()
+        view.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        
+        DispatchQueue.main.async {
+            let shapeLayer = CAShapeLayer()
+            shapeLayer.strokeColor = Token.grayscale40.cgColor
+            shapeLayer.lineWidth = 1
+            shapeLayer.lineDashPattern = [4, 4] // Adjust dash pattern
+            
+            let path = CGMutablePath()
+            path.addLines(between: [CGPoint(x: 0, y: 0), CGPoint(x: view.frame.width, y: 0)])
+            shapeLayer.path = path
+            view.layer.addSublayer(shapeLayer)
         }
-
-        containerStackView.isLayoutMarginsRelativeArrangement = true
-        containerStackView.layoutMargins = .init(edges: 12.0)
-        containerStackView.layer.cornerRadius = 16.0
-        containerStackView.backgroundColor = Token.mainColorForth
-
-        return containerStackView
+        
+        return view
     }
 
     func createPackageSection() -> UIView {
-        let containerView: UIView = UIView()
-        containerView.addSubviews([
+        let contentView: UIView = UIView()
+        contentView.addSubviews([
             packageLabel,
+            packageContainer,
             packageButton
         ])
 
-        packageButton.setContentHuggingPriority(.required, for: .horizontal)
-        packageButton.setContentCompressionResistancePriority(.required, for: .horizontal)
-
         packageLabel.layout {
-            $0.leading(to: containerView.leadingAnchor)
-                .top(to: containerView.topAnchor)
-                .bottom(to: containerView.bottomAnchor)
-        }
-
-        packageButton.layout {
-            $0.leading(to: packageLabel.trailingAnchor, constant: 4.0)
-                .trailing(to: containerView.trailingAnchor)
-                .centerY(to: containerView.centerYAnchor)
-        }
-
-        let contentView: UIView = UIView()
-        contentView.addSubviews([
-            containerView,
-            packageContainer
-        ])
-
-        containerView.layout {
             $0.top(to: contentView.topAnchor)
                 .leading(to: contentView.leadingAnchor)
                 .trailing(to: contentView.trailingAnchor)
         }
 
         packageContainer.layout {
-            $0.top(to: containerView.bottomAnchor, constant: 16.0)
-                .bottom(to: contentView.bottomAnchor)
-                .leading(to: contentView.leadingAnchor)
-                .trailing(to: contentView.trailingAnchor)
+            $0.top(to: packageLabel.bottomAnchor, constant: 16.0)
+            $0.leading(to: contentView.leadingAnchor)
+            $0.trailing(to: contentView.trailingAnchor)
+        }
+        
+        packageButton.layout {
+            $0.top(to: packageContainer.bottomAnchor, constant: 16.0)
+            $0.leading(to: contentView.leadingAnchor)
+            $0.trailing(to: contentView.trailingAnchor)
+            $0.bottom(to: contentView.bottomAnchor)
         }
 
         return contentView
     }
 
     func createPackageTextButton() -> UIButton {
-        let textButton: UIButton = UIButton.textButton(title: "Show All")
-        textButton.addTarget(self, action: #selector(didTapTextButton), for: .touchUpInside)
+        var config = UIButton.Configuration.plain()
+        config.title = "See All"
+        config.baseForegroundColor = Token.mainColorPrimary
+        config.contentInsets = .init(top: 16, leading: 20, bottom: 16, trailing: 20)
+        
+        let button = UIButton(configuration: config)
+        button.layer.borderWidth = 1.5
+        button.layer.borderColor = Token.mainColorPrimary.cgColor
+        button.layer.cornerRadius = 25
+        button.titleLabel?.font = .jakartaSans(forTextStyle: .subheadline, weight: .medium)
+        button.addTarget(self, action: #selector(didTapTextButton), for: .touchUpInside)
+        
+        // Set minimum height for the button
+        button.layout {
+            $0.height(50)
+        }
 
-        return textButton
+        return button
     }
 
     @objc func didTapTextButton() {
         isPackageButtonStateHidden.toggle()
-        packageButton.setTitle(isPackageButtonStateHidden ? "Show All" : "Show Less", for: .normal)
+        updatePackageButtonText()
         delegate?.notifyPackagesButtonDidTap(shouldShowAll: !isPackageButtonStateHidden)
+    }
+    
+    func updatePackageButtonText() {
+        if isPackageButtonStateHidden {
+            let remainingCount = totalPackageCount - packageContainer.arrangedSubviews.count
+            packageButton.setTitle("See All (\(totalPackageCount))", for: .normal)
+        } else {
+            packageButton.setTitle("Show Less", for: .normal)
+        }
     }
 
     func createWhatsIncludedView(with data: ActivityDetailDataModel.WhatsIncluded) -> UIView {
-        let mainStackView = createStackView(spacing: 16, axis: .vertical)
+        let mainStackView = createStackView(spacing: 16, axis: .horizontal)
+        mainStackView.distribution = .fillEqually
+        mainStackView.alignment = .top
 
-        // Top Row
-        let topRowStackView = createStackView(spacing: 16, axis: .horizontal)
-        topRowStackView.distribution = .fillEqually
+        // Left Column
+        let leftColumnStackView = createStackView(spacing: 16, axis: .vertical)
 
         let providerSafetyStack = createStackView(spacing: 8)
         let providerSafetyLabel = UILabel()
         providerSafetyLabel.text = "Provider & Safety"
-        providerSafetyLabel.font = .jakartaSans(forTextStyle: .headline, weight: .bold)
+        providerSafetyLabel.font = .jakartaSans(forTextStyle: .subheadline, weight: .bold)
         providerSafetyStack.addArrangedSubview(providerSafetyLabel)
         data.providerAndSafety.forEach {
             providerSafetyStack.addArrangedSubview(createBenefitView(title: $0))
         }
-        topRowStackView.addArrangedSubview(providerSafetyStack)
-
-        let equipmentStack = createStackView(spacing: 8)
-        let equipmentLabel = UILabel()
-        equipmentLabel.text = "Equipment"
-        equipmentLabel.font = .jakartaSans(forTextStyle: .headline, weight: .bold)
-        equipmentStack.addArrangedSubview(equipmentLabel)
-        data.equipment.forEach {
-            equipmentStack.addArrangedSubview(createBenefitView(title: $0))
-        }
-        topRowStackView.addArrangedSubview(equipmentStack)
-
-        mainStackView.addArrangedSubview(topRowStackView)
-
-        // Bottom Row
-        let bottomRowStackView = createStackView(spacing: 16, axis: .horizontal)
-        bottomRowStackView.distribution = .fillEqually
+        leftColumnStackView.addArrangedSubview(providerSafetyStack)
 
         let servicesStack = createStackView(spacing: 8)
         let servicesLabel = UILabel()
         servicesLabel.text = "Services"
-        servicesLabel.font = .jakartaSans(forTextStyle: .headline, weight: .bold)
+        servicesLabel.font = .jakartaSans(forTextStyle: .subheadline, weight: .bold)
         servicesStack.addArrangedSubview(servicesLabel)
         data.services.forEach {
             servicesStack.addArrangedSubview(createBenefitView(title: $0))
         }
-        bottomRowStackView.addArrangedSubview(servicesStack)
+        leftColumnStackView.addArrangedSubview(servicesStack)
+
+        mainStackView.addArrangedSubview(leftColumnStackView)
+
+        // Right Column
+        let rightColumnStackView = createStackView(spacing: 16, axis: .vertical)
+
+        let equipmentStack = createStackView(spacing: 8)
+        let equipmentLabel = UILabel()
+        equipmentLabel.text = "Equipment"
+        equipmentLabel.font = .jakartaSans(forTextStyle: .subheadline, weight: .bold)
+        equipmentStack.addArrangedSubview(equipmentLabel)
+        data.equipment.forEach {
+            equipmentStack.addArrangedSubview(createBenefitView(title: $0))
+        }
+        rightColumnStackView.addArrangedSubview(equipmentStack)
 
         let guideLanguageStack = createStackView(spacing: 8)
         let guideLanguageLabel = UILabel()
         guideLanguageLabel.text = "Guide Language"
-        guideLanguageLabel.font = .jakartaSans(forTextStyle: .headline, weight: .bold)
+        guideLanguageLabel.font = .jakartaSans(forTextStyle: .subheadline, weight: .bold)
         guideLanguageStack.addArrangedSubview(guideLanguageLabel)
         data.guideLanguage.forEach {
             guideLanguageStack.addArrangedSubview(createBenefitView(title: $0))
         }
-        mainStackView.addArrangedSubview(bottomRowStackView)
+        rightColumnStackView.addArrangedSubview(guideLanguageStack)
+
+        mainStackView.addArrangedSubview(rightColumnStackView)
 
         return mainStackView
+    }
+    
+    func createProviderContactView(from content: String) -> UIView {
+        let items = content.split(separator: "\n").map { String($0) }
+        let stackView = createStackView(spacing: 12)
+        
+        if items.count > 0 {
+            stackView.addArrangedSubview(createIconTextView(image: CocoIcon.icPinPointBlue.image, text: items[0]))
+        }
+        if items.count > 1 {
+            stackView.addArrangedSubview(createIconTextView(image: UIImage(systemName: "phone.fill")!, text: items[1]))
+        }
+        if items.count > 2 {
+            stackView.addArrangedSubview(createIconTextView(image: UIImage(systemName: "globe")!, text: items[2]))
+        }
+        
+        return stackView
     }
     
     func createDividerView() -> UIView {
@@ -660,5 +742,23 @@ private extension ActivityDetailView {
         divider.backgroundColor = Token.grayscale40
         divider.heightAnchor.constraint(equalToConstant: 1.5).isActive = true
         return divider
+    }
+    
+    func extractNumberFromPrice(_ priceString: String) -> Double? {
+        // Remove common currency symbols and letters, keep only numbers and dots/commas
+        let cleanedString = priceString
+            .replacingOccurrences(of: "Rp", with: "")
+            .replacingOccurrences(of: " ", with: "")
+            .replacingOccurrences(of: ".", with: "") // Remove existing thousand separators
+            .replacingOccurrences(of: ",", with: ".") // Convert decimal comma to dot if needed
+        
+        // Extract number using regex
+        let pattern = "[0-9]+\\.?[0-9]*"
+        if let range = cleanedString.range(of: pattern, options: .regularExpression) {
+            let numberString = String(cleanedString[range])
+            return Double(numberString)
+        }
+        
+        return nil
     }
 }
