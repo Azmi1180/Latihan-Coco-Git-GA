@@ -37,6 +37,11 @@ final class EmptyStateView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
+    func configure(topText: String, bottomText: String) {
+        topLabel.text = topText
+        bottomLabel.text = bottomText
+    }
+
     private func setupViews() {
         addSubview(topLabel)
         addSubview(imageView)

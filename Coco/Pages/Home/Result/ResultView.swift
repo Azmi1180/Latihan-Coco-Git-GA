@@ -43,6 +43,19 @@ final class ResultView: UIView {
         searchResultView.addSubviewAndLayout(view)
     }
     
+    func showEmptyStateView(topText: String, bottomText: String) {
+        emptyStateView.configure(topText: topText, bottomText: bottomText)
+        emptyStateView.isHidden = false
+        searchResultView.isHidden = true
+//        filterPillsView.isHidden = true
+    }
+    
+    func hideEmptyStateView() {
+        emptyStateView.isHidden = true
+        searchResultView.isHidden = false
+//        filterPillsView.isHidden = false
+    }
+    
     // The following methods are added for full consistency with HomeView,
     // allowing you to easily add loading or error states in the future.
     func addErrorView(from view: UIView) {
@@ -70,6 +83,11 @@ final class ResultView: UIView {
     private lazy var searchBarView: UIView = UIView()
     private lazy var filterPillsView: UIView = UIView()
     private lazy var searchResultView: UIView = UIView()
+    private lazy var emptyStateView: EmptyStateView = {
+        let view = EmptyStateView()
+        view.isHidden = true
+        return view
+    }()
     private lazy var contentStackView: UIStackView = createContentStackView()
 }
 
@@ -83,6 +101,7 @@ private extension ResultView {
         // Add overlay views for error and loading states
         addSubviewAndLayout(errorView)
         addSubviewAndLayout(loadingView)
+        // addSubviewAndLayout(emptyStateView)
 
         // Hide overlays by default
         errorView.isHidden = true
@@ -94,13 +113,13 @@ private extension ResultView {
             searchBarView,
             filterPillsView,
             searchResultView,
+            emptyStateView
         ])
         stackView.axis = .vertical
-        stackView.spacing = 12.0 // This matches the spacing in HomeView
+        stackView.spacing = 12.0
         return stackView
     }
 }
-
 // Note: This implementation assumes you have the `addSubviewAndLayout` helper
 // extension on UIView, as it is used in your HomeView. If not, you'll need
 // to add it. Here's a likely implementation:

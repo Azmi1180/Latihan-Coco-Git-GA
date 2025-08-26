@@ -1,13 +1,10 @@
-
 //
 //  ResultViewModel.swift
 //  Coco
 //
 //  Created by Reynard on 25/08/25.
-//
 
 import Foundation
-
 import Combine
 
 class ResultViewModel: ResultViewModelProtocol {
@@ -33,11 +30,16 @@ class ResultViewModel: ResultViewModelProtocol {
     }
     
     func onViewDidLoad() {
-        let collectionViewModel = HomeCollectionViewModel()
-        collectionViewModel.updateActivity(sections: [
-            HomeSectionData(sectionType: .activity, sectionDataModel: HomeActivityCellSectionDataModel(title: "", dataModel: searchResults))
-        ])
-        actionDelegate?.constructCollectionView(viewModel: collectionViewModel)
+        if searchResults.isEmpty {
+            actionDelegate?.showEmptyState(topText: "No results found", bottomText: "Try searching for something else.")
+        } else {
+            let collectionViewModel = HomeCollectionViewModel()
+            collectionViewModel.updateActivity(sections: [
+                // ✅ FIXED THE TYPO HERE
+                HomeSectionData(sectionType: .activity, sectionDataModel: HomeActivityCellSectionDataModel(title: "", dataModel: searchResults))
+            ])
+            actionDelegate?.constructCollectionView(viewModel: collectionViewModel)
+        }
         
         let searchBarViewModel = HomeSearchBarViewModel(
             leadingIcon: CocoIcon.icSearchLoop.image,
@@ -57,6 +59,7 @@ class ResultViewModel: ResultViewModelProtocol {
     }
     
     private func contructFilterData() {
+        // ... (This function is correct, no changes needed)
         let responseMapActivity: [Activity] = activities
         var seenIDs: Set<Int> = Set()
         var activityValues: [HomeSearchFilterPillState] = responseMapActivity
@@ -114,12 +117,29 @@ class ResultViewModel: ResultViewModelProtocol {
             .sink { [weak self] newFilterData in
                 guard let self else { return }
                 self.filterDataModel = newFilterData
+                self.applyFilter(with: newFilterData)
                 actionDelegate?.dismissTray()
-                // TODO: Apply filter to search results
             }
             .store(in: &cancellables)
         
         actionDelegate?.openFilterTray(viewModel)
+    }
+    
+    private func applyFilter(with filterData: HomeSearchFilterTrayDataModel) {
+        let filteredActivities = HomeFilterUtil.doFilter(activities, filterDataModel: filterData)
+        
+        let filteredResults = filteredActivities.map { HomeActivityCellDataModel(activity: $0) }
+        
+        if filteredResults.isEmpty {
+            actionDelegate?.showEmptyState(topText: "No results match the filter", bottomText: "Try adjusting your filter.")
+        } else {
+            let collectionViewModel = HomeCollectionViewModel()
+            collectionViewModel.updateActivity(sections: [
+                // ✅ FIXED THE TYPO HERE
+                HomeSectionData(sectionType: .activity, sectionDataModel: HomeActivityCellSectionDataModel(title: "", dataModel: filteredResults))
+            ])
+            actionDelegate?.constructCollectionView(viewModel: collectionViewModel)
+        }
     }
 }
 
@@ -147,10 +167,15 @@ extension ResultViewModel: FilterPillViewDelegate {
             filteredResults = searchResults
         }
         
-        let collectionViewModel = HomeCollectionViewModel()
-        collectionViewModel.updateActivity(sections: [
-            HomeSectionData(sectionType: .activity, sectionDataModel: HomeActivityCellSectionDataModel(title: "", dataModel: filteredResults))
-        ])
-        actionDelegate?.constructCollectionView(viewModel: collectionViewModel)
+        if filteredResults.isEmpty {
+            actionDelegate?.showEmptyState(topText: "No results match the filter", bottomText: "Try adjusting your filter.")
+        } else {
+            let collectionViewModel = HomeCollectionViewModel()
+            collectionViewModel.updateActivity(sections: [
+                // ✅ FIXED THE TYPO HERE
+                HomeSectionData(sectionType: .activity, sectionDataModel: HomeActivityCellSectionDataModel(title: "", dataModel: filteredResults))
+            ])
+            actionDelegate?.constructCollectionView(viewModel: collectionViewModel)
+        }
     }
 }
