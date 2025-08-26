@@ -14,11 +14,18 @@ struct ActivityDetailDataModel: Equatable {
 
     let detailInfomation: ActivitySectionLayout<String>
     let providerDetail: ActivitySectionLayout<ProviderDetail>
-    let tripFacilities: ActivitySectionLayout<[String]>
-    let tnc: String
+    let whatsIncluded: ActivitySectionLayout<WhatsIncluded>
+    let moreInfo: [ActivitySectionLayout<String>]
 
     let availablePackages: ActivitySectionLayout<[Package]>
     let hiddenPackages: [Package]
+
+    struct WhatsIncluded: Equatable {
+        let providerAndSafety: [String]
+        let equipment: [String]
+        let services: [String]
+        let guideLanguage: [String]
+    }
 
     struct ProviderDetail: Equatable {
         let name: String
@@ -43,7 +50,7 @@ struct ActivityDetailDataModel: Equatable {
             .map { $0.imageUrl }
 
         detailInfomation = ActivitySectionLayout(
-            title: "Details",
+            title: "Trip Overview",
             content: response.description
         )
         providerDetail = ActivitySectionLayout(
@@ -54,11 +61,20 @@ struct ActivityDetailDataModel: Equatable {
                 imageUrlString: response.packages[0].host.profileImageUrl
             )
         )
-        tripFacilities = ActivitySectionLayout(
-            title: "This Trip Includes",
-            content: response.accessories.map { $0.name }
+        whatsIncluded = ActivitySectionLayout(
+            title: "What's Included",
+            content: WhatsIncluded(
+                providerAndSafety: ["Verified Provider", "Certified Guide", "First Aid Ready"],
+                equipment: ["All Size Available"],
+                services: ["Free food and Drinks", "Island Leisure"],
+                guideLanguage: ["Bahasa Indonesia"]
+            )
         )
-        tnc = response.cancelable
+        moreInfo = [
+            ActivitySectionLayout(title: "Things to Prepare", content: "Things to prepare content"),
+            ActivitySectionLayout(title: "Provider Contact", content: "Provider contact content"),
+            ActivitySectionLayout(title: "Term and Conditions", content: response.cancelable)
+        ]
 
         availablePackages = ActivitySectionLayout(
             title: "Available Packages",

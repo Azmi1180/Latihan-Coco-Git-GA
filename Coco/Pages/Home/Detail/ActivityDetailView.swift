@@ -43,6 +43,8 @@ final class ActivityDetailView: UIView {
             )
         )
 
+        contentStackView.addArrangedSubview(createDividerView())
+
         // Trip Provider
         contentStackView.addArrangedSubview(
             createSectionView(
@@ -55,29 +57,7 @@ final class ActivityDetailView: UIView {
             )
         )
 
-        // Facilities
-        if !data.tripFacilities.content.isEmpty {
-            contentStackView.addArrangedSubview(
-                createSectionView(
-                    title: data.tripFacilities.title,
-                    view: createBenefitListView(titles: data.tripFacilities.content)
-                )
-            )
-        }
-
-        // TnC
-        if !data.tnc.isEmpty {
-            let tncLabel: UILabel = UILabel(
-                font: .jakartaSans(forTextStyle: .footnote, weight: .regular),
-                textColor: Token.additionalColorsBlack,
-                numberOfLines: 0
-            )
-            tncLabel.text = data.tnc
-            contentStackView.addArrangedSubview(createSectionView(
-                title: "Terms and Conditon",
-                view: tncLabel
-            ))
-        }
+        contentStackView.addArrangedSubview(createDividerView())
 
         if !data.availablePackages.content.isEmpty {
             contentStackView.addArrangedSubview(packageSection)
@@ -98,6 +78,24 @@ final class ActivityDetailView: UIView {
         }
 
         packageLabel.isHidden = data.availablePackages.content.isEmpty
+
+        contentStackView.addArrangedSubview(createDividerView())
+
+        // What's Included
+        contentStackView.addArrangedSubview(
+            createSectionView(
+                title: data.whatsIncluded.title,
+                view: createWhatsIncludedView(with: data.whatsIncluded.content)
+            )
+        )
+
+        contentStackView.addArrangedSubview(createDividerView())
+
+        // More Info
+        data.moreInfo.forEach { info in
+            let accordion = AccordionView(title: info.title, content: info.content)
+            contentStackView.addArrangedSubview(accordion)
+        }
     }
 
     func addImageSliderView(with view: UIView) {
@@ -148,7 +146,7 @@ final class ActivityDetailView: UIView {
 
     private lazy var packageSection: UIView = createPackageSection()
     private lazy var packageLabel: UILabel = UILabel(
-        font: .jakartaSans(forTextStyle: .subheadline, weight: .bold),
+        font: .jakartaSans(forTextStyle: .headline, weight: .bold),
         textColor: Token.additionalColorsBlack,
         numberOfLines: 2
     )
@@ -159,6 +157,7 @@ final class ActivityDetailView: UIView {
     private lazy var headerStackView: UIStackView = createStackView(spacing: 0)
 
     private lazy var isPackageButtonStateHidden: Bool = true
+    private var totalPackageCount: Int = 0
 }
 
 extension ActivityDetailView {
@@ -221,7 +220,7 @@ private extension ActivityDetailView {
     func createSectionView(title: String, view: UIView) -> UIView {
         let contentView: UIView = UIView()
         let titleLabel: UILabel = UILabel(
-            font: .jakartaSans(forTextStyle: .subheadline, weight: .bold),
+            font: .jakartaSans(forTextStyle: .headline, weight: .bold),
             textColor: Token.additionalColorsBlack,
             numberOfLines: 2
         )
@@ -239,7 +238,7 @@ private extension ActivityDetailView {
         }
 
         view.layout {
-            $0.top(to: titleLabel.bottomAnchor, constant: 8.0)
+            $0.top(to: titleLabel.bottomAnchor, constant: 12.0)
                 .leading(to: contentView.leadingAnchor)
                 .trailing(to: contentView.trailingAnchor)
                 .bottom(to: contentView.bottomAnchor)
@@ -339,11 +338,13 @@ private extension ActivityDetailView {
     }
 
     func createBenefitView(title: String) -> UIView {
-        let contentView: UIView = UIView()
-        let benefitImageView: UIImageView = UIImageView(image: CocoIcon.icCheckMarkFill.image)
-        benefitImageView.layout {
-            $0.size(24.0)
-        }
+        let container = createStackView(spacing: 8, axis: .horizontal)
+
+        let bulletLabel = UILabel()
+        bulletLabel.text = "•"
+        bulletLabel.font = .jakartaSans(forTextStyle: .footnote, weight: .regular)
+        bulletLabel.textColor = Token.additionalColorsBlack
+
         let benefitLabel: UILabel = UILabel(
             font: .jakartaSans(forTextStyle: .footnote, weight: .regular),
             textColor: Token.additionalColorsBlack,
@@ -351,25 +352,12 @@ private extension ActivityDetailView {
         )
         benefitLabel.text = title
 
-        contentView.addSubviews([
-            benefitImageView,
-            benefitLabel
-        ])
+        container.addArrangedSubview(bulletLabel)
+        container.addArrangedSubview(benefitLabel)
 
-        benefitImageView.layout {
-            $0.top(to: contentView.topAnchor)
-                .leading(to: contentView.leadingAnchor)
-                .bottom(to: contentView.bottomAnchor, relation: .lessThanOrEqual)
-        }
+        bulletLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
 
-        benefitLabel.layout {
-            $0.leading(to: benefitImageView.trailingAnchor, constant: 4.0)
-                .top(to: contentView.topAnchor)
-                .bottom(to: contentView.bottomAnchor)
-                .trailing(to: contentView.trailingAnchor)
-        }
-
-        return contentView
+        return container
     }
 
     func createBenefitListView(titles: [String]) -> UIView {
@@ -609,5 +597,68 @@ private extension ActivityDetailView {
         isPackageButtonStateHidden.toggle()
         packageButton.setTitle(isPackageButtonStateHidden ? "Show All" : "Show Less", for: .normal)
         delegate?.notifyPackagesButtonDidTap(shouldShowAll: !isPackageButtonStateHidden)
+    }
+
+    func createWhatsIncludedView(with data: ActivityDetailDataModel.WhatsIncluded) -> UIView {
+        let mainStackView = createStackView(spacing: 16, axis: .vertical)
+
+        // Top Row
+        let topRowStackView = createStackView(spacing: 16, axis: .horizontal)
+        topRowStackView.distribution = .fillEqually
+
+        let providerSafetyStack = createStackView(spacing: 8)
+        let providerSafetyLabel = UILabel()
+        providerSafetyLabel.text = "Provider & Safety"
+        providerSafetyLabel.font = .jakartaSans(forTextStyle: .headline, weight: .bold)
+        providerSafetyStack.addArrangedSubview(providerSafetyLabel)
+        data.providerAndSafety.forEach {
+            providerSafetyStack.addArrangedSubview(createBenefitView(title: $0))
+        }
+        topRowStackView.addArrangedSubview(providerSafetyStack)
+
+        let equipmentStack = createStackView(spacing: 8)
+        let equipmentLabel = UILabel()
+        equipmentLabel.text = "Equipment"
+        equipmentLabel.font = .jakartaSans(forTextStyle: .headline, weight: .bold)
+        equipmentStack.addArrangedSubview(equipmentLabel)
+        data.equipment.forEach {
+            equipmentStack.addArrangedSubview(createBenefitView(title: $0))
+        }
+        topRowStackView.addArrangedSubview(equipmentStack)
+
+        mainStackView.addArrangedSubview(topRowStackView)
+
+        // Bottom Row
+        let bottomRowStackView = createStackView(spacing: 16, axis: .horizontal)
+        bottomRowStackView.distribution = .fillEqually
+
+        let servicesStack = createStackView(spacing: 8)
+        let servicesLabel = UILabel()
+        servicesLabel.text = "Services"
+        servicesLabel.font = .jakartaSans(forTextStyle: .headline, weight: .bold)
+        servicesStack.addArrangedSubview(servicesLabel)
+        data.services.forEach {
+            servicesStack.addArrangedSubview(createBenefitView(title: $0))
+        }
+        bottomRowStackView.addArrangedSubview(servicesStack)
+
+        let guideLanguageStack = createStackView(spacing: 8)
+        let guideLanguageLabel = UILabel()
+        guideLanguageLabel.text = "Guide Language"
+        guideLanguageLabel.font = .jakartaSans(forTextStyle: .headline, weight: .bold)
+        guideLanguageStack.addArrangedSubview(guideLanguageLabel)
+        data.guideLanguage.forEach {
+            guideLanguageStack.addArrangedSubview(createBenefitView(title: $0))
+        }
+        mainStackView.addArrangedSubview(bottomRowStackView)
+
+        return mainStackView
+    }
+    
+    func createDividerView() -> UIView {
+        let divider = UIView()
+        divider.backgroundColor = Token.grayscale40
+        divider.heightAnchor.constraint(equalToConstant: 1.5).isActive = true
+        return divider
     }
 }
