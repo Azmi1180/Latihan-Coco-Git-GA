@@ -12,7 +12,7 @@ class ResultViewModel: ResultViewModelProtocol {
     
     private let searchResults: [HomeActivityCellDataModel]
     private let query: String
-    private let activities: [Activity]
+    let activities: [Activity]
     
     private(set) var filterDataModel: HomeSearchFilterTrayDataModel?
     private var cancellables: Set<AnyCancellable> = Set()
