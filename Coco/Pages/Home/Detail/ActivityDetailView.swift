@@ -437,7 +437,7 @@ private extension ActivityDetailView {
         
         // Top line: Provider name + verification badge
         let nameAndBadgeStack = createStackView(spacing: 6, axis: .horizontal)
-        nameAndBadgeStack.alignment = .center
+        nameAndBadgeStack.alignment = .top
         
         let nameLabel: UILabel = UILabel(
             font: .jakartaSans(forTextStyle: .subheadline, weight: .bold),
@@ -827,30 +827,11 @@ private extension ActivityDetailView {
     }
     
     func extractNumberFromPrice(_ priceString: String) -> Double? {
-        // Remove common currency symbols and letters, keep only numbers and dots/commas
         let cleanedString = priceString
             .replacingOccurrences(of: "Rp", with: "")
             .replacingOccurrences(of: " ", with: "")
-            .replacingOccurrences(of: ",", with: "") // Remove commas if any
+            .replacingOccurrences(of: ",", with: "")
         
         return Double(cleanedString)
     }
-    
-    // func extractNumberFromPrice(_ priceString: String) -> Double? {
-    //     // Remove common currency symbols and letters, keep only numbers and dots/commas
-    //     let cleanedString = priceString
-    //         .replacingOccurrences(of: "Rp", with: "")
-    //         .replacingOccurrences(of: " ", with: "")
-    //         .replacingOccurrences(of: ".", with: "") // Remove existing thousand separators
-    //         .replacingOccurrences(of: ",", with: ".") // Convert decimal comma to dot if needed
-        
-    //     // Extract number using regex
-    //     let pattern = "[0-9]+\\.?[0-9]*"
-    //     if let range = cleanedString.range(of: pattern, options: .regularExpression) {
-    //         let numberString = String(cleanedString[range])
-    //         return Double(numberString)
-    //     }
-        
-    //     return nil
-    // }
 }
