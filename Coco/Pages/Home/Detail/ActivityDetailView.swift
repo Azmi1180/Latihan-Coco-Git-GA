@@ -560,8 +560,10 @@ private extension ActivityDetailView {
         if let priceNumber = extractNumberFromPrice(data.price) {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
+            formatter.locale = Locale(identifier: "id_ID") 
             formatter.groupingSeparator = "."
             formatter.usesGroupingSeparator = true
+            formatter.maximumFractionDigits = 0
             
             if let formattedNumber = formatter.string(from: NSNumber(value: priceNumber)) {
                 formattedPrice = "Rp \(formattedNumber)"
@@ -829,16 +831,26 @@ private extension ActivityDetailView {
         let cleanedString = priceString
             .replacingOccurrences(of: "Rp", with: "")
             .replacingOccurrences(of: " ", with: "")
-            .replacingOccurrences(of: ".", with: "") // Remove existing thousand separators
-            .replacingOccurrences(of: ",", with: ".") // Convert decimal comma to dot if needed
+            .replacingOccurrences(of: ",", with: "") // Remove commas if any
         
-        // Extract number using regex
-        let pattern = "[0-9]+\\.?[0-9]*"
-        if let range = cleanedString.range(of: pattern, options: .regularExpression) {
-            let numberString = String(cleanedString[range])
-            return Double(numberString)
-        }
-        
-        return nil
+        return Double(cleanedString)
     }
+    
+    // func extractNumberFromPrice(_ priceString: String) -> Double? {
+    //     // Remove common currency symbols and letters, keep only numbers and dots/commas
+    //     let cleanedString = priceString
+    //         .replacingOccurrences(of: "Rp", with: "")
+    //         .replacingOccurrences(of: " ", with: "")
+    //         .replacingOccurrences(of: ".", with: "") // Remove existing thousand separators
+    //         .replacingOccurrences(of: ",", with: ".") // Convert decimal comma to dot if needed
+        
+    //     // Extract number using regex
+    //     let pattern = "[0-9]+\\.?[0-9]*"
+    //     if let range = cleanedString.range(of: pattern, options: .regularExpression) {
+    //         let numberString = String(cleanedString[range])
+    //         return Double(numberString)
+    //     }
+        
+    //     return nil
+    // }
 }
