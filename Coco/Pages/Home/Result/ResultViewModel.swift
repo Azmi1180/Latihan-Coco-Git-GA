@@ -16,6 +16,7 @@ class ResultViewModel: ResultViewModelProtocol {
     
     private(set) var filterDataModel: HomeSearchFilterTrayDataModel?
     private var cancellables: Set<AnyCancellable> = Set()
+    private var isVerifiedProviderEnabled: Bool = false
     
     private var filterPills: [FilterPillDataModel] = [
         FilterPillDataModel(id: "all", title: "All"),
@@ -99,7 +100,8 @@ class ResultViewModel: ResultViewModelProtocol {
                 maxPrice: maxPrice,
                 range: minPrice...maxPrice,
                 step: 1
-            )
+            ),
+            isVerifiedProviderEnabled: isVerifiedProviderEnabled
         )
         
         self.filterDataModel = filterDataModel
@@ -117,6 +119,7 @@ class ResultViewModel: ResultViewModelProtocol {
             .sink { [weak self] newFilterData in
                 guard let self else { return }
                 self.filterDataModel = newFilterData
+                self.isVerifiedProviderEnabled = newFilterData.isVerifiedProviderEnabled
                 self.applyFilter(with: newFilterData)
                 actionDelegate?.dismissTray()
             }

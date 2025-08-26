@@ -15,11 +15,20 @@ struct HomeSearchFilterTray: View {
         VStack(alignment: .center) {
             Text("Filter Service")
                 .multilineTextAlignment(.center)
-                .font(.jakartaSans(forTextStyle: .body, weight: .semibold))
+                .font(.jakartaSans(forTextStyle: .footnote, weight: .semibold))
                 .foregroundStyle(Token.additionalColorsBlack.toColor())
+                .padding(.bottom)
 
             ScrollView {
-                VStack(alignment: .leading, spacing: 24.0) {
+                VStack(alignment: .leading, spacing: 28.0) {
+                    Toggle(isOn: $viewModel.dataModel.isVerifiedProviderEnabled) {
+                        Text("Verified Provider")
+                            .font(.jakartaSans(forTextStyle: .body, weight: .semibold))
+                            .foregroundStyle(Token.additionalColorsBlack.toColor())
+                    }
+                    .tint(Token.mainColorPrimary.toColor())
+
+                    
                     if !viewModel.dataModel.filterPillDataState.isEmpty {
                         VStack(alignment: .leading, spacing: 12.0) {
                             Text("Popular Filters")
