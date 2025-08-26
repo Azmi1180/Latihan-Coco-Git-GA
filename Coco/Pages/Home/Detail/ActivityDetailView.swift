@@ -406,7 +406,11 @@ private extension ActivityDetailView {
     }
 
     func createProviderDetail(imageUrl: String, name: String, description: String, isVerified: Bool = false) -> UIView {
-        let contentView: UIView = UIView()
+        // Main horizontal stack view: Image + Text Block
+        let mainHorizontalStack = createStackView(spacing: 12, axis: .horizontal)
+        mainHorizontalStack.alignment = .top
+        
+        // Provider image
         let imageView: UIImageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.layout {
@@ -415,10 +419,14 @@ private extension ActivityDetailView {
         imageView.layer.cornerRadius = 14.0
         imageView.loadImage(from: URL(string: imageUrl))
         imageView.clipsToBounds = true
-
-        // Create a horizontal stack for name and verification badge
-        let nameStackView = createStackView(spacing: 8, axis: .horizontal)
-        nameStackView.alignment = .center
+        
+        // Provider text block (vertical stack)
+        let textBlockStack = createStackView(spacing: 8, axis: .vertical)
+        textBlockStack.alignment = .leading
+        
+        // Top line: Provider name + verification badge
+        let nameAndBadgeStack = createStackView(spacing: 6, axis: .horizontal)
+        nameAndBadgeStack.alignment = .center
         
         let nameLabel: UILabel = UILabel(
             font: .jakartaSans(forTextStyle: .subheadline, weight: .bold),
@@ -426,78 +434,82 @@ private extension ActivityDetailView {
             numberOfLines: 2
         )
         nameLabel.text = name
-        nameStackView.addArrangedSubview(nameLabel)
+        nameLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        nameLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        
+        nameAndBadgeStack.addArrangedSubview(nameLabel)
         
         // Add verification badge if verified
         if isVerified {
             let verificationBadge = createVerificationBadge()
-            nameStackView.addArrangedSubview(verificationBadge)
+            nameAndBadgeStack.addArrangedSubview(verificationBadge)
         }
         
-        nameLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
-        nameLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-
+        // Bottom line: "Verified Provider" + info icon (only if verified)
+        let verifiedProviderStack: UIStackView?
+        if isVerified {
+            verifiedProviderStack = createStackView(spacing: 4, axis: .horizontal)
+            verifiedProviderStack!.alignment = .center
+            
+            let verifiedLabel = UILabel(
+                font: .jakartaSans(forTextStyle: .caption1, weight: .medium),
+                textColor: Token.grayscale70,
+                numberOfLines: 1
+            )
+            verifiedLabel.text = "Verified Provider"
+            
+            let infoImageView = UIImageView()
+            infoImageView.image = UIImage(systemName: "info.circle")
+            infoImageView.tintColor = Token.grayscale70
+            infoImageView.contentMode = .scaleAspectFit
+            infoImageView.layout {
+                $0.size(16)
+            }
+            
+            verifiedProviderStack!.addArrangedSubview(verifiedLabel)
+            verifiedProviderStack!.addArrangedSubview(infoImageView)
+        } else {
+            verifiedProviderStack = nil
+        }
+        
+        // Description label
         let descriptionLabel: UILabel = UILabel(
             font: .jakartaSans(forTextStyle: .footnote, weight: .medium),
             textColor: Token.grayscale90,
             numberOfLines: 0
         )
         descriptionLabel.text = description
-
-        contentView.addSubviews([
-            imageView,
-            nameStackView,
-            descriptionLabel,
-        ])
-
-        imageView.layout {
-            $0.leading(to: contentView.leadingAnchor)
-                .top(to: contentView.topAnchor)
-                .bottom(to: contentView.bottomAnchor, relation: .lessThanOrEqual)
+        
+        // Add elements to text block stack
+        textBlockStack.addArrangedSubview(nameAndBadgeStack)
+        
+        if let verifiedStack = verifiedProviderStack {
+            textBlockStack.addArrangedSubview(verifiedStack)
         }
-
-        nameStackView.layout {
-            $0.leading(to: imageView.trailingAnchor, constant: 10.0)
-                .top(to: contentView.topAnchor)
-                .trailing(to: contentView.trailingAnchor)
-        }
-
-        descriptionLabel.layout {
-            $0.leading(to: nameStackView.leadingAnchor)
-                .top(to: nameStackView.bottomAnchor, constant: 8.0)
-                .trailing(to: contentView.trailingAnchor)
-                .bottom(to: contentView.bottomAnchor, relation: .lessThanOrEqual)
-        }
-
-        return contentView
+        
+        textBlockStack.addArrangedSubview(descriptionLabel)
+        
+        // Add image and text block to main horizontal stack
+        mainHorizontalStack.addArrangedSubview(imageView)
+        mainHorizontalStack.addArrangedSubview(textBlockStack)
+        
+        return mainHorizontalStack
     }
     
     func createVerificationBadge() -> UIView {
         let containerView = UIView()
         
-        // Create a circular background
-        let backgroundView = UIView()
-        backgroundView.backgroundColor = UIColor.systemBlue
-        backgroundView.layer.cornerRadius = 12
-        backgroundView.layout {
-            $0.size(24)
+        // Use the shield checkmark SF Symbol
+        let shieldImageView = UIImageView()
+        shieldImageView.image = UIImage(systemName: "checkmark.shield.fill")
+        shieldImageView.tintColor = UIColor.systemBlue
+        shieldImageView.contentMode = .scaleAspectFit
+        shieldImageView.layout {
+            $0.size(20)
         }
         
-        // Add checkmark icon
-        let checkmarkImageView = UIImageView()
-        checkmarkImageView.image = UIImage(systemName: "checkmark")
-        checkmarkImageView.tintColor = .white
-        checkmarkImageView.contentMode = .scaleAspectFit
-        
-        backgroundView.addSubview(checkmarkImageView)
-        checkmarkImageView.layout {
-            $0.centerX(to: backgroundView.centerXAnchor)
-                .centerY(to: backgroundView.centerYAnchor)
-                .size(12)
-        }
-        
-        containerView.addSubview(backgroundView)
-        backgroundView.layout {
+        containerView.addSubview(shieldImageView)
+        shieldImageView.layout {
             $0.edges(to: containerView)
         }
         
@@ -781,7 +793,7 @@ private extension ActivityDetailView {
     
     func createProviderContactView(from content: String) -> UIView {
         let items = content.split(separator: "\n").map { String($0) }
-        let stackView = createStackView(spacing: 12)
+        let stackView = createStackView(spacing: 16)
         
         if items.count > 0 {
             stackView.addArrangedSubview(createIconTextView(image: CocoIcon.icPinPointBlue.image, text: items[0]))
