@@ -14,6 +14,7 @@ protocol ActivityDetailNavigationDelegate: AnyObject {
 protocol ActivityDetailViewModelAction: AnyObject {
     func configureView(data: ActivityDetailDataModel)
     func updatePackageData(data: [ActivityDetailDataModel.Package])
+    func updateVerificationAndWhatsIncluded(_ data: ActivityDetailDataModel)
 }
 
 protocol ActivityDetailViewModelProtocol: AnyObject {

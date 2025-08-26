@@ -26,6 +26,12 @@ final class ActivityDetailView: UIView {
     }
 
     func configureView(_ data: ActivityDetailDataModel) {
+        // Clear existing content to avoid duplication
+        contentStackView.arrangedSubviews.forEach { view in
+            contentStackView.removeArrangedSubview(view)
+            view.removeFromSuperview()
+        }
+        
         titleLabel.text = data.title
         locationLabel.text = data.location
 
@@ -52,7 +58,8 @@ final class ActivityDetailView: UIView {
                 view: createProviderDetail(
                     imageUrl: data.providerDetail.content.imageUrlString,
                     name: data.providerDetail.content.name,
-                    description: data.providerDetail.content.description
+                    description: data.providerDetail.content.description,
+                    isVerified: data.isVerified
                 )
             )
         )
@@ -150,6 +157,12 @@ final class ActivityDetailView: UIView {
                 }
             )
         }
+    }
+    
+    func updateVerificationAndWhatsIncluded(_ data: ActivityDetailDataModel) {
+        // Find and update only the provider section and what's included section
+        // This avoids rebuilding the entire view
+        configureView(data)
     }
 
     private lazy var imageSliderView: UIView = UIView()
@@ -392,7 +405,7 @@ private extension ActivityDetailView {
         return stackView
     }
 
-    func createProviderDetail(imageUrl: String, name: String, description: String) -> UIView {
+    func createProviderDetail(imageUrl: String, name: String, description: String, isVerified: Bool = false) -> UIView {
         let contentView: UIView = UIView()
         let imageView: UIImageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
@@ -403,12 +416,26 @@ private extension ActivityDetailView {
         imageView.loadImage(from: URL(string: imageUrl))
         imageView.clipsToBounds = true
 
+        // Create a horizontal stack for name and verification badge
+        let nameStackView = createStackView(spacing: 8, axis: .horizontal)
+        nameStackView.alignment = .center
+        
         let nameLabel: UILabel = UILabel(
             font: .jakartaSans(forTextStyle: .subheadline, weight: .bold),
             textColor: Token.additionalColorsBlack,
             numberOfLines: 2
         )
         nameLabel.text = name
+        nameStackView.addArrangedSubview(nameLabel)
+        
+        // Add verification badge if verified
+        if isVerified {
+            let verificationBadge = createVerificationBadge()
+            nameStackView.addArrangedSubview(verificationBadge)
+        }
+        
+        nameLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        nameLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
 
         let descriptionLabel: UILabel = UILabel(
             font: .jakartaSans(forTextStyle: .footnote, weight: .medium),
@@ -419,7 +446,7 @@ private extension ActivityDetailView {
 
         contentView.addSubviews([
             imageView,
-            nameLabel,
+            nameStackView,
             descriptionLabel,
         ])
 
@@ -429,20 +456,52 @@ private extension ActivityDetailView {
                 .bottom(to: contentView.bottomAnchor, relation: .lessThanOrEqual)
         }
 
-        nameLabel.layout {
+        nameStackView.layout {
             $0.leading(to: imageView.trailingAnchor, constant: 10.0)
                 .top(to: contentView.topAnchor)
                 .trailing(to: contentView.trailingAnchor)
         }
 
         descriptionLabel.layout {
-            $0.leading(to: nameLabel.leadingAnchor)
-                .top(to: nameLabel.bottomAnchor, constant: 8.0)
+            $0.leading(to: nameStackView.leadingAnchor)
+                .top(to: nameStackView.bottomAnchor, constant: 8.0)
                 .trailing(to: contentView.trailingAnchor)
                 .bottom(to: contentView.bottomAnchor, relation: .lessThanOrEqual)
         }
 
         return contentView
+    }
+    
+    func createVerificationBadge() -> UIView {
+        let containerView = UIView()
+        
+        // Create a circular background
+        let backgroundView = UIView()
+        backgroundView.backgroundColor = UIColor.systemBlue
+        backgroundView.layer.cornerRadius = 12
+        backgroundView.layout {
+            $0.size(24)
+        }
+        
+        // Add checkmark icon
+        let checkmarkImageView = UIImageView()
+        checkmarkImageView.image = UIImage(systemName: "checkmark")
+        checkmarkImageView.tintColor = .white
+        checkmarkImageView.contentMode = .scaleAspectFit
+        
+        backgroundView.addSubview(checkmarkImageView)
+        checkmarkImageView.layout {
+            $0.centerX(to: backgroundView.centerXAnchor)
+                .centerY(to: backgroundView.centerYAnchor)
+                .size(12)
+        }
+        
+        containerView.addSubview(backgroundView)
+        backgroundView.layout {
+            $0.edges(to: containerView)
+        }
+        
+        return containerView
     }
 
     func createPackageView(data: ActivityDetailDataModel.Package) -> UIView {

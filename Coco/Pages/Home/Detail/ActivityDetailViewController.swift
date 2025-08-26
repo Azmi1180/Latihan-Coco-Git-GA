@@ -52,6 +52,10 @@ extension ActivityDetailViewController: ActivityDetailViewModelAction {
     func updatePackageData(data: [ActivityDetailDataModel.Package]) {
         thisView.updatePackageData(data)
     }
+    
+    func updateVerificationAndWhatsIncluded(_ data: ActivityDetailDataModel) {
+        thisView.updateVerificationAndWhatsIncluded(data)
+    }
 }
 
 extension ActivityDetailViewController: ActivityDetailViewDelegate {

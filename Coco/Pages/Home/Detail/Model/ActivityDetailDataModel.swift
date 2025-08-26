@@ -8,9 +8,11 @@
 import Foundation
 
 struct ActivityDetailDataModel: Equatable {
+    let activityId: Int
     let title: String
     let location: String
     let imageUrlsString: [String]
+    let isVerified: Bool
 
     let detailInfomation: ActivitySectionLayout<String>
     let providerDetail: ActivitySectionLayout<ProviderDetail>
@@ -44,11 +46,13 @@ struct ActivityDetailDataModel: Equatable {
     }
 
     init(_ response: Activity) {
+        activityId = response.id
         title = response.title
         location = response.destination.name
         imageUrlsString = response.images
             .filter { $0.imageType != .banner }
             .map { $0.imageUrl }
+        isVerified = false // Will be updated after verification check
 
         detailInfomation = ActivitySectionLayout(
             title: "Trip Overview",
@@ -92,6 +96,64 @@ struct ActivityDetailDataModel: Equatable {
         )
 
         hiddenPackages = Array(availablePackages.content.prefix(2))
+    }
+    
+    func withVerificationStatus(_ isVerified: Bool) -> ActivityDetailDataModel {
+        return ActivityDetailDataModel(
+            activityId: self.activityId,
+            title: self.title,
+            location: self.location,
+            imageUrlsString: self.imageUrlsString,
+            isVerified: isVerified,
+            detailInfomation: self.detailInfomation,
+            providerDetail: self.providerDetail,
+            whatsIncluded: self.whatsIncluded,
+            moreInfo: self.moreInfo,
+            availablePackages: self.availablePackages,
+            hiddenPackages: self.hiddenPackages
+        )
+    }
+    
+    func withUpdatedWhatsIncluded(_ whatsIncluded: WhatsIncluded, isVerified: Bool) -> ActivityDetailDataModel {
+        return ActivityDetailDataModel(
+            activityId: self.activityId,
+            title: self.title,
+            location: self.location,
+            imageUrlsString: self.imageUrlsString,
+            isVerified: isVerified,
+            detailInfomation: self.detailInfomation,
+            providerDetail: self.providerDetail,
+            whatsIncluded: ActivitySectionLayout(title: "What's Included", content: whatsIncluded),
+            moreInfo: self.moreInfo,
+            availablePackages: self.availablePackages,
+            hiddenPackages: self.hiddenPackages
+        )
+    }
+    
+    private init(
+        activityId: Int,
+        title: String,
+        location: String,
+        imageUrlsString: [String],
+        isVerified: Bool,
+        detailInfomation: ActivitySectionLayout<String>,
+        providerDetail: ActivitySectionLayout<ProviderDetail>,
+        whatsIncluded: ActivitySectionLayout<WhatsIncluded>,
+        moreInfo: [ActivitySectionLayout<String>],
+        availablePackages: ActivitySectionLayout<[Package]>,
+        hiddenPackages: [Package]
+    ) {
+        self.activityId = activityId
+        self.title = title
+        self.location = location
+        self.imageUrlsString = imageUrlsString
+        self.isVerified = isVerified
+        self.detailInfomation = detailInfomation
+        self.providerDetail = providerDetail
+        self.whatsIncluded = whatsIncluded
+        self.moreInfo = moreInfo
+        self.availablePackages = availablePackages
+        self.hiddenPackages = hiddenPackages
     }
 }
 
