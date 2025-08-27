@@ -11,6 +11,7 @@ import UIKit
 protocol ActivityDetailViewDelegate: AnyObject {
     func notifyPackagesButtonDidTap(shouldShowAll: Bool)
     func notifyPackagesDetailDidTap(with packageId: Int)
+    func notifyVerifiedProviderDidTap()
 }
 
 final class ActivityDetailView: UIView {
@@ -341,13 +342,10 @@ private extension ActivityDetailView {
         pinPointImage.layout {
             $0.leading(to: locationView.leadingAnchor)
                 .bottom(to: locationView.bottomAnchor)
-                .top(to: locationView.topAnchor)
         }
 
         locationLabel.layout {
             $0.leading(to: pinPointImage.trailingAnchor, constant: 4.0)
-                .trailing(to: locationView.trailingAnchor)
-                .centerY(to: locationView.centerYAnchor)
         }
 
         let contentView: UIView = UIView()
@@ -358,25 +356,16 @@ private extension ActivityDetailView {
 
         titleLabel.layout {
             $0.leading(to: contentView.leadingAnchor)
-                .trailing(to: contentView.trailingAnchor)
-                .top(to: contentView.topAnchor)
         }
 
         locationView.layout {
             $0.top(to: titleLabel.bottomAnchor, constant: 8.0)
-                .leading(to: contentView.leadingAnchor)
-                .trailing(to: contentView.trailingAnchor)
-                .bottom(to: contentView.bottomAnchor)
         }
 
         let contentWrapperView: UIView = UIView()
         contentWrapperView.addSubviewAndLayout(
             contentView,
             insets: .init(
-                top: 16.0,
-                left: 24.0,
-                bottom: 16.0 + 8.0,
-                right: 16.0
             )
         )
 
@@ -463,9 +452,8 @@ private extension ActivityDetailView {
             verifiedProviderStack!.alignment = .center
             
             let verifiedLabel = UILabel(
-                font: .jakartaSans(forTextStyle: .caption1, weight: .medium),
-                textColor: Token.grayscale70,
-                numberOfLines: 1
+                font: .jakartaSans(forTextStyle: .footnote, weight: .medium),
+                textColor: Token.grayscale70
             )
             verifiedLabel.text = "Verified Provider"
             
@@ -479,6 +467,10 @@ private extension ActivityDetailView {
             
             verifiedProviderStack!.addArrangedSubview(verifiedLabel)
             verifiedProviderStack!.addArrangedSubview(infoImageView)
+            
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(verifiedProviderTapped))
+            verifiedProviderStack!.isUserInteractionEnabled = true
+            verifiedProviderStack!.addGestureRecognizer(tapGesture)
         } else {
             verifiedProviderStack = nil
         }
@@ -548,8 +540,6 @@ private extension ActivityDetailView {
         
         let priceStackView = createStackView(spacing: 4)
         let startFromLabel = UILabel(
-            font: .jakartaSans(forTextStyle: .caption1, weight: .regular),
-            textColor: Token.grayscale70
         )
         startFromLabel.text = "Start from"
         
@@ -558,18 +548,10 @@ private extension ActivityDetailView {
         // Format the price with thousand separators
         let formattedPrice: String
         if let priceNumber = extractNumberFromPrice(data.price) {
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            formatter.locale = Locale(identifier: "id_ID") 
-            formatter.groupingSeparator = "."
-            formatter.usesGroupingSeparator = true
-            formatter.maximumFractionDigits = 0
-            
-            if let formattedNumber = formatter.string(from: NSNumber(value: priceNumber)) {
-                formattedPrice = "Rp \(formattedNumber)"
-            } else {
-                formattedPrice = data.price
-            }
+            let numberFormatter = NumberFormatter()
+            numberFormatter.numberStyle = .decimal
+            numberFormatter.groupingSeparator = "."
+            formattedPrice = "Rp" + (numberFormatter.string(from: NSNumber(value: priceNumber)) ?? "")
         } else {
             formattedPrice = data.price
         }
@@ -582,9 +564,9 @@ private extension ActivityDetailView {
             ]
         )
         priceText.append(NSAttributedString(
-            string: " /Pax",
+            string: " / pax",
             attributes: [
-                .font: UIFont.jakartaSans(forTextStyle: .caption1, weight: .regular),
+                .font: UIFont.jakartaSans(forTextStyle: .footnote, weight: .regular),
                 .foregroundColor: Token.grayscale70
             ]
         ))
@@ -604,16 +586,15 @@ private extension ActivityDetailView {
                 
         config.attributedTitle = AttributedString(
             "Choose",
-            attributes: AttributeContainer([
-                .font: UIFont.jakartaSans(forTextStyle: .subheadline, weight: .semibold),
-                .foregroundColor: UIColor.white
+            attributes: .init([
+                .font: UIFont.jakartaSans(forTextStyle: .subheadline, weight: .bold)
             ])
         )
         
         let chooseButton = UIButton(configuration: config, primaryAction: action)
                 
         chooseButton.layout {
-            $0.width(120)
+            $0.height(48)
         }
         
         footerStackView.addArrangedSubview(priceStackView)
@@ -688,8 +669,6 @@ private extension ActivityDetailView {
 
         packageLabel.layout {
             $0.top(to: contentView.topAnchor)
-                .leading(to: contentView.leadingAnchor)
-                .trailing(to: contentView.trailingAnchor)
         }
 
         packageContainer.layout {
@@ -735,6 +714,10 @@ private extension ActivityDetailView {
         delegate?.notifyPackagesButtonDidTap(shouldShowAll: !isPackageButtonStateHidden)
     }
     
+    @objc private func verifiedProviderTapped() {
+        delegate?.notifyVerifiedProviderDidTap()
+    }
+
     func updatePackageButtonText() {
         if isPackageButtonStateHidden {
             let remainingCount = totalPackageCount - packageContainer.arrangedSubviews.count
