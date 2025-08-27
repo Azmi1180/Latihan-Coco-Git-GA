@@ -537,7 +537,7 @@ private extension ActivityDetailView {
         titleLabel.text = data.name
         
         let tagsStackView = createStackView(spacing: 8, axis: .horizontal)
-        tagsStackView.addArrangedSubview(createTagView(text: data.pax, icon: UIImage(systemName: "person")))
+       tagsStackView.addArrangedSubview(createTagView(text: data.pax, icon: UIImage(systemName: "Person")))
         tagsStackView.addArrangedSubview(createTagView(text: data.ageRange))
         tagsStackView.addArrangedSubview(UIView()) // Spacer
         

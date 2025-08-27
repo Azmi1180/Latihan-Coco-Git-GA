@@ -20,7 +20,7 @@ struct HomeSearchBarView: View {
             placeholder: viewModel.placeholderText,
             shouldInterceptFocus: !viewModel.isTypeAble,
             onFocusedAction: viewModel.onTextFieldFocusDidChange(to:),
-            outlineState: viewModel.outlineState
+            outlineState: viewModel.outlineState,
             isFocused: $isFocused
         )
         .onChange(of: isFocused) { newValue in

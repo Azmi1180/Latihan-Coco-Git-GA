@@ -94,7 +94,7 @@ extension HomeFormScheduleViewModel: HomeFormScheduleViewModelProtocol {
         let data: HomeFormScheduleViewData = HomeFormScheduleViewData(
             activityName: input.package.title,
             packageName: input.package.availablePackages.content.first { $0.id == input.selectedPackageId }?.name ?? "",
-            participantRange: input.package.availablePackages.content.first{ $0.id == input.selectedPackageId }?.description ?? "",
+            participantRange: input.package.availablePackages.content.first{ $0.id == input.selectedPackageId }?.pax ?? "",
             location: input.package.location,
             ageRange: "5-65",
             providerName: input.package.providerDetail.content.name,

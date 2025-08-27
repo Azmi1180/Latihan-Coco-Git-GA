@@ -32,8 +32,8 @@ struct CocoInputTextField: View {
         placeholder: String?,
         shouldInterceptFocus: Bool = false,
         onFocusedAction: ((Bool) -> Void)? = nil,
-        outlineState: OutlineState = .normal
-
+        outlineState: OutlineState = .normal,
+        isFocused: FocusState<Bool>.Binding
     ) {
         self.leadingIcon = leadingIcon
         _currentTypedText = currentTypedText
@@ -42,7 +42,7 @@ struct CocoInputTextField: View {
         self.shouldInterceptFocus = shouldInterceptFocus
         self.onFocusedAction = onFocusedAction
         self.outlineState = outlineState
-
+        self.isFocused = isFocused
     }
 
     var body: some View {

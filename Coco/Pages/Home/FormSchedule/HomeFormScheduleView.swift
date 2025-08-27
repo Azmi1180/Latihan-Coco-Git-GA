@@ -251,8 +251,8 @@ private extension HomeFormScheduleView {
         
         // horizontal Stack untuk label min-max participant dan age
         let horizontalStack = UIStackView(arrangedSubviews:
-                                            [createCapsuleLabel(image: CocoIcon.icPerson.image, label: participantRangeLabel),
-                                             createCapsuleLabel(image: nil, label: ageRangeLabel)
+                                            [createCapsuleLabel(icon: CocoIcon.icPerson.image, label: participantRangeLabel),
+                                             createCapsuleLabel(icon: nil, label: ageRangeLabel)
                                             ])
         horizontalStack.axis = .horizontal
         horizontalStack.spacing = 8
@@ -330,11 +330,11 @@ private extension HomeFormScheduleView {
         
         return cardView
     }
-    
-    private func createCapsuleLabel(image: UIImage?, label: UILabel) -> UIView {
+
+    private func createCapsuleLabel(icon: UIImage?, label: UILabel) -> UIView {
         let hstack: UIStackView
-        
-        if let iconImage = image {
+
+        if let iconImage = icon {
             let icon = UIImageView(image: iconImage)
             icon.layout { $0.size(16.0) }
             hstack = UIStackView(arrangedSubviews: [icon, label])
