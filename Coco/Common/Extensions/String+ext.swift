@@ -2,15 +2,19 @@ import Foundation
 
 public extension String {
     func formatToIndonesianCurrency() -> String {
-        var cleanedInput = self.replacingOccurrences(of: "Rp ", with: "")
+        // Hilangkan "Rp", spasi, dan karakter selain angka/titik/koma
+        var cleanedInput = self.replacingOccurrences(of: "Rp", with: "")
+            .replacingOccurrences(of: " ", with: "")
+            .components(separatedBy: CharacterSet(charactersIn: "0123456789.,").inverted)
+            .joined()
 
-        // Remove ".0" from the end if it exists
+        // Ubah koma jadi titik (biar konsisten untuk Double conversion)
+        cleanedInput = cleanedInput.replacingOccurrences(of: ",", with: ".")
+
+        // Hilangkan ".0" di akhir
         if cleanedInput.hasSuffix(".0") {
             cleanedInput = String(cleanedInput.dropLast(2))
         }
-
-        // Replace comma with dot for Double conversion if it's a decimal separator
-        cleanedInput = cleanedInput.replacingOccurrences(of: ",", with: ".")
 
         if let number = Double(cleanedInput) {
             let formatter = NumberFormatter()
@@ -25,7 +29,10 @@ public extension String {
                 return formattedString
             }
         }
-        // Fallback if conversion fails
+        // Fallback jika gagal konversi
         return "Rp \(self)"
+    }
+    static func formatToIndonesianCurrency(price: String) -> String {
+        return price.formatToIndonesianCurrency()
     }
 }

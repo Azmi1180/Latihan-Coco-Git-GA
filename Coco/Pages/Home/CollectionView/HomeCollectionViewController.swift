@@ -111,14 +111,14 @@ private extension HomeCollectionViewController {
                 // Item
                 let itemSize = NSCollectionLayoutSize(
                     widthDimension: .absolute(200),
-                    heightDimension: .absolute(217)
+                    heightDimension: .absolute(229)
                 )
                 let item = NSCollectionLayoutItem(layoutSize: itemSize)
 
                 // Group (horizontal container)
                 let groupSize = NSCollectionLayoutSize(
                     widthDimension: .absolute(200), // Ubah dari fractionalWidth(1.0) ke absolute(200)
-                    heightDimension: .absolute(217)
+                    heightDimension: .absolute(229)
                 )
                 let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
 
