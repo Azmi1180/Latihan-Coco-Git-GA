@@ -75,11 +75,13 @@ struct ActivityDetailDataModel: Equatable {
                 guideLanguage: ["Bahasa Indonesia"]
             )
         )
+        // swiftlint:disable line_length
         moreInfo = [
             ActivitySectionLayout(title: "Things to Prepare", content: "Swimwear, change of clothes, and towel\nPersonal medicine (if needed)\nSunscreen & hat\nWaterproof phone case or camera\nExtra snacks for kids (optional)"),
             ActivitySectionLayout(title: "Provider Contact", content: "West Bali National Park, Bali\n+62-829-8888-333\nwww.nusapenidaecotour.com"),
             ActivitySectionLayout(title: "Term and Conditions", content: response.cancelable)
         ]
+        // swiftlint:enable line_length
 
         availablePackages = ActivitySectionLayout(
             title: "Available Packages",

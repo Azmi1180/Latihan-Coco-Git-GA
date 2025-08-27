@@ -14,7 +14,7 @@ final class HomeActivityCell: UICollectionViewCell {
     private let nameLabel = UILabel(
         font: .jakartaSans(forTextStyle: .footnote, weight: .bold),
         textColor: Token.additionalColorsBlack,
-        numberOfLines: 2
+        numberOfLines: 1
     )
 
     private let areaLabel = UILabel(
@@ -22,6 +22,11 @@ final class HomeActivityCell: UICollectionViewCell {
         textColor: Token.additionalColorsBlack,
         numberOfLines: 2
 
+    )
+    private let startFromLabel = UILabel(
+        font: .jakartaSans(forTextStyle: .footnote, weight: .medium),
+        textColor: Token.grayscale60,
+        numberOfLines: 1
     )
 
     private let priceLabel = UILabel(
@@ -35,8 +40,9 @@ final class HomeActivityCell: UICollectionViewCell {
         let imageView = UIImageView(image: image)
         return imageView
     }()
+    
 
-    private let familyFriendlyBadgeView = FamilyFriendlyBadgeView() // New badge view
+    private lazy var familyFriendlyBadgeView = createBadge()// New badge view
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -84,7 +90,7 @@ final class HomeActivityCell: UICollectionViewCell {
         ]
         areaLabel.attributedText = NSAttributedString(string: areaLabelText, attributes: areaLabelAttributes)
 
-        let formattedPrice = formatToIndonesianCurrency(price: dataModel.priceText)
+        let formattedPrice = String.formatToIndonesianCurrency(price: dataModel.priceText)
         let attributedString = NSMutableAttributedString(
             string: formattedPrice,
             attributes: [
@@ -93,6 +99,8 @@ final class HomeActivityCell: UICollectionViewCell {
             ]
         )
         priceLabel.attributedText = attributedString
+        
+        startFromLabel.text = "Start From"
 
         familyFriendlyBadgeView.isHidden = !dataModel.isFamilyFriendly
     }
@@ -124,11 +132,24 @@ private extension HomeActivityCell {
         areaStack.translatesAutoresizingMaskIntoConstraints = false
 
         // Text stack (name, area, price)
-        let stack = UIStackView(arrangedSubviews: [nameLabel, areaStack, priceLabel])
-        stack.axis = .vertical
-        stack.spacing = 4
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        cardView.addSubview(stack)
+        let topStack = UIStackView(arrangedSubviews: [nameLabel, areaStack])
+        topStack.axis = .vertical
+        topStack.spacing = 0
+        topStack.alignment = .leading
+        topStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        let bottomStack = UIStackView(arrangedSubviews: [startFromLabel, priceLabel])
+        bottomStack.axis = .vertical
+        bottomStack.spacing = 3
+        bottomStack.alignment = .leading
+        bottomStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        let stackContainer = UIStackView(arrangedSubviews: [topStack, bottomStack])
+        stackContainer.axis = .vertical
+        stackContainer.spacing = 8
+        stackContainer.alignment = .leading
+        stackContainer.translatesAutoresizingMaskIntoConstraints = false
+        cardView.addSubview(stackContainer)
 
         // Add FamilyFriendlyBadgeView
         cardView.addSubview(familyFriendlyBadgeView)
@@ -148,11 +169,11 @@ private extension HomeActivityCell {
             imageView.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: 0),
             imageView.heightAnchor.constraint(equalToConstant: 136),
 
-            stack.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 0),
-            stack.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 8),
-            stack.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -8),
-            stack.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -8),
-
+            stackContainer.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 4),
+            stackContainer.leadingAnchor.constraint(equalTo: cardView.leadingAnchor, constant: 8),
+            stackContainer.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -8),
+            stackContainer.bottomAnchor.constraint(equalTo: cardView.bottomAnchor, constant: -4),
+            
             areaIcon.widthAnchor.constraint(equalToConstant: 18),
             areaIcon.heightAnchor.constraint(equalToConstant: 18),
 
@@ -177,23 +198,34 @@ private extension HomeActivityCell {
         )
         cardView.layer.shadowPath = shadowPath.cgPath
     }
+    
+    func createBadge() -> UIView {
+        let badgeView = UIView()
+        badgeView.backgroundColor = Token.additionalToColorsGreen
+        badgeView.layer.cornerRadius = 12
+        badgeView.layer.masksToBounds = true
+        badgeView.translatesAutoresizingMaskIntoConstraints = false
 
-    func formatToIndonesianCurrency(price: String) -> String {
-        let numericString = price.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+        NSLayoutConstraint.activate([
+            badgeView.widthAnchor.constraint(equalToConstant: 34),
+            badgeView.heightAnchor.constraint(equalToConstant: 26)
+        ])
 
-        if let number = Double(numericString) {
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .currency
-            formatter.currencySymbol = "Rp "
-            formatter.currencyGroupingSeparator = "."
-            formatter.currencyDecimalSeparator = ","
-            formatter.maximumFractionDigits = 0
-            formatter.minimumFractionDigits = 0
+        let imageView = UIImageView(image: UIImage(named: "familyIcon"))
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
+        badgeView.addSubview(imageView)
 
-            if let formattedString = formatter.string(from: NSNumber(value: number)) {
-                return formattedString
-            }
-        }
-        return "Rp \(price)"
+        NSLayoutConstraint.activate([
+            imageView.centerXAnchor.constraint(equalTo: badgeView.centerXAnchor),
+            imageView.centerYAnchor.constraint(equalTo: badgeView.centerYAnchor),
+            imageView.widthAnchor.constraint(equalToConstant: 18),
+            imageView.heightAnchor.constraint(equalToConstant: 18)
+        ])
+
+        badgeView.isHidden = true // pindahkan ke sini sebelum return
+        return badgeView
     }
+
+
 }

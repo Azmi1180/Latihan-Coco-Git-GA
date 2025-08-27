@@ -2,13 +2,20 @@ import UIKit
 
 final class FamilyFriendlyBadgeView: UIView {
 
-    private let label: UILabel = {
+    private let nameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = "Family-Friendly"
         label.font = .systemFont(ofSize: 9, weight: .bold) // Reduced font size
         label.textColor = .black // Or a suitable contrasting color
         return label
+    }()
+    
+    private let groupIcon: UIImageView = {
+        let config = UIImage.SymbolConfiguration(weight: .medium) // Or .semibold
+        let image = CocoIcon.icFamilyIcon.image.withConfiguration(config)
+        let imageView = UIImageView(image: image)
+        return imageView
     }()
 
     override init(frame: CGRect) {
@@ -30,19 +37,26 @@ final class FamilyFriendlyBadgeView: UIView {
         layer.shadowOpacity = 0.15
         layer.shadowRadius = 6
         layer.shadowOffset = CGSize(width: 0, height: 4)
-
-        addSubview(label)
-
+        
+        
+        let vStack: UIStackView = UIStackView(arrangedSubviews: [groupIcon, nameLabel])
+        vStack.axis = .horizontal
+        vStack.spacing = 4
+        vStack.alignment = .center
+        vStack.translatesAutoresizingMaskIntoConstraints = false
+        
+        addSubview(vStack)
         NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: topAnchor, constant: 6), // Internal padding
-            label.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 12), // Internal padding
-            label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -12), // Internal padding
-            label.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -6) // Internal padding
+            vStack.centerXAnchor.constraint(equalTo: centerXAnchor),
+            vStack.centerYAnchor.constraint(equalTo: centerYAnchor),
+            groupIcon.widthAnchor.constraint(equalToConstant: 15),
+            groupIcon.heightAnchor.constraint(equalToConstant: 15)
         ])
+
 
         // Set explicit size for the badge
         NSLayoutConstraint.activate([
-            widthAnchor.constraint(equalToConstant: 100),
+            widthAnchor.constraint(equalToConstant: 120),
             heightAnchor.constraint(equalToConstant: 27)
         ])
     }

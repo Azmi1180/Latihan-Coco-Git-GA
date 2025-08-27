@@ -76,7 +76,7 @@ final class HomeOtherDestinationCell: UICollectionViewCell {
         nameLabel.text = dataModel.name
         areaLabel.text = dataModel.area
 
-        let formattedPrice = formatToIndonesianCurrency(price: dataModel.priceText)
+        let formattedPrice = String.formatToIndonesianCurrency(price: dataModel.priceText)
         let startFromText = "start from "
 
         let startFromAttributedString = NSAttributedString(
@@ -160,8 +160,8 @@ private extension HomeOtherDestinationCell {
             areaIcon.widthAnchor.constraint(equalToConstant: 18),
             areaIcon.heightAnchor.constraint(equalToConstant: 18),
 
-            familyFriendlyBadgeView.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 4),
-            familyFriendlyBadgeView.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -4)
+            familyFriendlyBadgeView.topAnchor.constraint(equalTo: cardView.topAnchor, constant: 12),
+            familyFriendlyBadgeView.trailingAnchor.constraint(equalTo: cardView.trailingAnchor, constant: -12)
         ])
     }
 
@@ -181,22 +181,4 @@ private extension HomeOtherDestinationCell {
         cardView.layer.shadowPath = shadowPath.cgPath
     }
 
-    func formatToIndonesianCurrency(price: String) -> String {
-        let numericString = price.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
-
-        if let number = Double(numericString) {
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .currency
-            formatter.currencySymbol = "Rp "
-            formatter.currencyGroupingSeparator = "."
-            formatter.currencyDecimalSeparator = ","
-            formatter.maximumFractionDigits = 0
-            formatter.minimumFractionDigits = 0
-
-            if let formattedString = formatter.string(from: NSNumber(value: number)) {
-                return formattedString
-            }
-        }
-        return "Rp \(price)"
-    }
 }

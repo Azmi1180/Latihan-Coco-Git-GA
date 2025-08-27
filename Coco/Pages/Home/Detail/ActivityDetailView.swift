@@ -437,7 +437,7 @@ private extension ActivityDetailView {
         
         // Top line: Provider name + verification badge
         let nameAndBadgeStack = createStackView(spacing: 6, axis: .horizontal)
-        nameAndBadgeStack.alignment = .center
+        nameAndBadgeStack.alignment = .top
         
         let nameLabel: UILabel = UILabel(
             font: .jakartaSans(forTextStyle: .subheadline, weight: .bold),
