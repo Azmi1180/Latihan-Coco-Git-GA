@@ -70,4 +70,26 @@ extension ActivityDetailViewController: ActivityDetailViewDelegate {
     func notifyPackagesDetailDidTap(with packageId: Int) {
         viewModel.onPackagesDetailDidTap(with: packageId)
     }
+    
+    func notifyVerifiedProviderDidTap() {
+        let modalView = VerificationInfoModalView()
+        modalView.frame = view.bounds
+        modalView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        
+        // Add a fade-in animation
+        modalView.alpha = 0
+        view.addSubview(modalView)
+        UIView.animate(withDuration: 0.3) {
+            modalView.alpha = 1
+        }
+        
+        // Set the closure to remove the modal with a fade-out animation
+        modalView.onClose = { [weak modalView] in
+            UIView.animate(withDuration: 0.3, animations: {
+                modalView?.alpha = 0
+            }, completion: { _ in
+                modalView?.removeFromSuperview()
+            })
+        }
+    }
 }

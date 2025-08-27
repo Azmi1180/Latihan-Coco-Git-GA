@@ -142,8 +142,6 @@ extension HomeFormScheduleViewModel: HomeSearchBarViewModelDelegate {
     
     func homeSearchBarDidTapForNavigation() {
         // This method is called when isTypeAble is false, which is the case for calendarInputViewModel
-        // So, we should trigger the calendar option here.
-        actionDelegate?.showCalendarOption()
     }
 }
 
