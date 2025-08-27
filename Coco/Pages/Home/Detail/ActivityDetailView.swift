@@ -39,7 +39,7 @@ final class ActivityDetailView: UIView {
         
         titleLabel.text = data.title
         locationLabel.text = data.location
-
+        
         // Detail section
         let detailDescription: UILabel = UILabel(
             font: .jakartaSans(forTextStyle: .headline, weight: .regular),
@@ -184,6 +184,9 @@ final class ActivityDetailView: UIView {
         textColor: Token.additionalColorsBlack,
         numberOfLines: 2
     )
+    
+    private lazy var familyFriendlyBadge: UIView = createFamilyFriendlyBadge()
+    private lazy var isPackageButtonStateHidden: Bool = true
 
     private lazy var locationLabel: UILabel = UILabel(
         font: .jakartaSans(forTextStyle: .footnote, weight: .medium),
@@ -203,7 +206,6 @@ final class ActivityDetailView: UIView {
     private lazy var contentStackView: UIStackView = createStackView(spacing: 29.0)
     private lazy var headerStackView: UIStackView = createStackView(spacing: 0)
 
-    private lazy var isPackageButtonStateHidden: Bool = true
     private var totalPackageCount: Int = 0
 }
 
@@ -341,35 +343,90 @@ private extension ActivityDetailView {
 
         pinPointImage.layout {
             $0.leading(to: locationView.leadingAnchor)
-                .bottom(to: locationView.bottomAnchor)
+            $0.centerY(to: locationView.centerYAnchor)
         }
 
         locationLabel.layout {
             $0.leading(to: pinPointImage.trailingAnchor, constant: 4.0)
+            $0.top(to: locationView.topAnchor)
+            $0.trailing(to: locationView.trailingAnchor)
+            $0.bottom(to: locationView.bottomAnchor)
         }
 
         let contentView: UIView = UIView()
         contentView.addSubviews([
             titleLabel,
-            locationView
+            locationView,
+            familyFriendlyBadge
         ])
 
         titleLabel.layout {
+            $0.top(to: contentView.topAnchor)
             $0.leading(to: contentView.leadingAnchor)
+            $0.trailing(to: contentView.trailingAnchor)
         }
 
         locationView.layout {
             $0.top(to: titleLabel.bottomAnchor, constant: 8.0)
+            $0.leading(to: contentView.leadingAnchor)
+            $0.trailing(to: contentView.trailingAnchor)
+        }
+        
+        familyFriendlyBadge.layout {
+            $0.top(to: locationView.bottomAnchor, constant: 16.0)
+            $0.leading(to: contentView.leadingAnchor)
+            $0.trailing(to: contentView.trailingAnchor)
+            $0.bottom(to: contentView.bottomAnchor)
         }
 
         let contentWrapperView: UIView = UIView()
         contentWrapperView.addSubviewAndLayout(
             contentView,
             insets: .init(
+                vertical: 16.0,
+                horizontal: 16.08
             )
         )
 
         return contentWrapperView
+    }
+
+    
+
+    func createFamilyFriendlyBadge() -> UIView {
+        let hStack = createStackView(spacing: 8, axis: .horizontal)
+        hStack.alignment = .center
+
+        let infoIcon = UIImageView(image: UIImage(systemName: "info.circle"))
+        infoIcon.tintColor = Token.grayscale70
+        infoIcon.contentMode = .scaleAspectFit
+        infoIcon.layout {
+            $0.size(24)
+        }
+
+        let badgeContainer = createStackView(spacing: 6, axis: .horizontal)
+        badgeContainer.alignment = .center
+        badgeContainer.isLayoutMarginsRelativeArrangement = true
+        badgeContainer.layoutMargins = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
+        badgeContainer.layer.cornerRadius = 18
+        badgeContainer.backgroundColor = UIColor.from("#B9EC63")
+
+        let familyIconView = UIImageView(image: UIImage(named: "familyIcon"))
+        familyIconView.layout { $0.size(22) }
+
+        let label = UILabel()
+        label.text = "Family-Friendly"
+        label.font = .jakartaSans(forTextStyle: .callout, weight: .medium)
+        label.textColor = .black
+
+        badgeContainer.addArrangedSubview(familyIconView)
+        badgeContainer.addArrangedSubview(label)
+
+        hStack.addArrangedSubview(infoIcon)
+        hStack.addArrangedSubview(badgeContainer)
+        hStack.addArrangedSubview(UIView()) // Spacer to push to left
+
+        return hStack
     }
 
     func createBenefitView(title: String) -> UIView {
@@ -818,22 +875,4 @@ private extension ActivityDetailView {
         
         return Double(cleanedString)
     }
-    
-    // func extractNumberFromPrice(_ priceString: String) -> Double? {
-    //     // Remove common currency symbols and letters, keep only numbers and dots/commas
-    //     let cleanedString = priceString
-    //         .replacingOccurrences(of: "Rp", with: "")
-    //         .replacingOccurrences(of: " ", with: "")
-    //         .replacingOccurrences(of: ".", with: "") // Remove existing thousand separators
-    //         .replacingOccurrences(of: ",", with: ".") // Convert decimal comma to dot if needed
-        
-    //     // Extract number using regex
-    //     let pattern = "[0-9]+\\.?[0-9]*"
-    //     if let range = cleanedString.range(of: pattern, options: .regularExpression) {
-    //         let numberString = String(cleanedString[range])
-    //         return Double(numberString)
-    //     }
-        
-    //     return nil
-    // }
 }
