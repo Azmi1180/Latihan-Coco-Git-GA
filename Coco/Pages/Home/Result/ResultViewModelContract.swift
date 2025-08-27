@@ -16,4 +16,11 @@ protocol ResultViewModelProtocol: AnyObject {
 protocol ResultViewModelAction: AnyObject {
     func constructCollectionView(viewModel: some HomeCollectionViewModelProtocol)
     func constructNavBar(viewModel: HomeSearchBarViewModel)
+    func notifySearchBarTappedForNavigation()
+    func openFilterTray(_ viewModel: HomeSearchFilterTrayViewModel)
+    func dismissTray()
+    func constructFilterPills(pills: [FilterPillDataModel], selectedPillId: String?, delegate: FilterPillViewDelegate)
+//    func showEmptyState(topText: String, bottomText: String)
+    func showEmptyState()
+
 }

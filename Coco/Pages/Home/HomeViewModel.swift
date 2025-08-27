@@ -37,10 +37,7 @@ final class HomeViewModel {
         leadingIcon: CocoIcon.icSearchLoop.image,
         placeholderText: "Search...",
         currentTypedText: "",
-        trailingIcon: (
-            image: CocoIcon.icFilterIcon.image,
-            didTap: openFilterTray
-        ),
+        trailingIcon: nil,
         isTypeAble: false,
         delegate: self,
         behavior: .hiddenWhenEmpty
@@ -50,8 +47,6 @@ final class HomeViewModel {
     private var responseData: [Activity] = []
     private var allActivities: [Activity] = []
     private var cancellables: Set<AnyCancellable> = Set()
-    
-    private(set) var filterDataModel: HomeSearchFilterTrayDataModel?
     
     var isSearching: Bool = false
     var filteredOtherDestinationData: [HomeActivityCellDataModel] = []
@@ -153,79 +148,10 @@ final class HomeViewModel {
                 
                 self.collectionViewModel.updateActivity(sections: sections)
                 
-                DispatchQueue.global(qos: .background).async { [weak self] in
-                    self?.contructFilterData()
-                }
             case .failure(let failure):
                 break
             }
         }
-    }
-    
-    private func contructFilterData() {
-        let responseMapActivity: [Activity] = Array(responseMap.values)
-        var seenIDs: Set<Int> = Set()
-        var activityValues: [HomeSearchFilterPillState] = responseMap.values
-            .flatMap { $0.accessories }
-            .filter { accessory in
-                if seenIDs.contains(accessory.id) {
-                    return false
-                } else {
-                    seenIDs.insert(accessory.id)
-                    return true
-                }
-            }
-            .map {
-                HomeSearchFilterPillState(
-                    id: $0.id,
-                    title: $0.name,
-                    isSelected: false
-                )
-            }
-        
-        if responseMapActivity.first(where: { !$0.cancelable.isEmpty }) != nil {
-            activityValues.append(
-                HomeSearchFilterPillState(
-                    id: -99999999,
-                    title: "Free Cancellation",
-                    isSelected: false
-                )
-            )
-        }
-        let sortedData = responseMapActivity.sorted { $0.pricing < $1.pricing }
-        let minPrice: Double = sortedData.first?.pricing ?? 0
-        let maxPrice: Double = sortedData.last?.pricing ?? 0
-        let filterDataModel: HomeSearchFilterTrayDataModel = HomeSearchFilterTrayDataModel(
-            filterPillDataState: activityValues,
-            priceRangeModel: HomeSearchFilterPriceRangeModel(
-                minPrice: minPrice,
-                maxPrice: maxPrice,
-                range: minPrice...maxPrice,
-                step: 1
-            )
-        )
-        
-        self.filterDataModel = filterDataModel
-    }
-    
-    private func openFilterTray() {
-        guard let filterDataModel: HomeSearchFilterTrayDataModel else { return }
-        
-        let viewModel: HomeSearchFilterTrayViewModel = HomeSearchFilterTrayViewModel(
-            dataModel: filterDataModel,
-            activities: Array(responseMap.values)
-        )
-        viewModel.filterDidApplyPublisher
-            .receive(on: RunLoop.main)
-            .sink { [weak self] newFilterData in
-                guard let self else { return }
-                self.filterDataModel = newFilterData
-                actionDelegate?.dismissTray()
-                self.onSearchDidApply(self.searchBarViewModel.currentTypedText)
-            }
-            .store(in: &cancellables)
-        
-        actionDelegate?.openFilterTray(viewModel)
     }
 }
 
@@ -259,12 +185,16 @@ extension HomeViewModel: HomeSearchBarViewModelDelegate {
     func notifyHomeSearchBarDidTap(isTypeAble: Bool, viewModel: HomeSearchBarViewModel) {
         guard !isTypeAble else { return }
         
-        // TODO: Change with real data
-        actionDelegate?.searchDidTap(
+        // This method is now deprecated. Use homeSearchBarDidTapForNavigation instead.
+        // The logic here is moved to homeSearchBarDidTapForNavigation.
+    }
+    
+    func homeSearchBarDidTapForNavigation() {
+        actionDelegate?.navigateToSearch(
             latestSearches: [
-                .init(id: 1, name: "Kepulauan Seribu"),
-                .init(id: 2, name: "Nusa Penida"),
-                .init(id: 3, name: "Gili Island, Indonesia"),
+                HomeSearchSearchLocationData(id: 1, name: "Kepulauan Seribu"),
+                HomeSearchSearchLocationData(id: 2, name: "Nusa Penida"),
+                HomeSearchSearchLocationData(id: 3, name: "Gili Island, Indonesia"),
             ],
             currentQuery: searchBarViewModel.currentTypedText
         )

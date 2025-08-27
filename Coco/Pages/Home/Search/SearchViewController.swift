@@ -52,6 +52,13 @@ class SearchViewController: UIViewController {
         ])
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let lastSearchQuery = viewModel.lastSearchQuery {
+            viewModel.searchBarViewModel.currentTypedText = lastSearchQuery
+        }
+    }
+
     @objc func backButtonTapped() {
         navigationController?.popViewController(animated: true)
     }

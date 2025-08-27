@@ -1,30 +1,39 @@
 import UIKit
 
 final class EmptyStateView: UIView {
-
+    private let stackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .center
+        // ✅ CHANGED: Increased spacing from 16 to 24 for a more spread-out look.
+        stackView.spacing = 24
+        return stackView
+    }()
+    
     private let topLabel: UILabel = {
         let label = UILabel()
-        label.text = "No trips showing up here today."
-        label.textColor = Token.grayscale80
+        label.text = "We couldn't find any trips"
+        label.textColor = .systemGray
         label.textAlignment = .center
-        label.font = UIFont.jakartaSans(size: 16, weight: .bold)
+        label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         return label
     }()
 
     private let imageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "islandIcon") // Assuming 'islandIcon' is in Assets.xcassets
-        imageView.tintColor = Token.grayscale80
+        imageView.image = UIImage(named: "islandIcon")
+        imageView.tintColor = .systemGray4
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
 
     private let bottomLabel: UILabel = {
         let label = UILabel()
-        label.text = "Why not explore other trips for now? 👀"
-        label.textColor = Token.additionalColorsBlack
+        label.text = "Change keywords or filters to discover more"
+        label.textColor = .label
         label.textAlignment = .center
-        label.font = UIFont.jakartaSans(size: 12, weight: .semibold)
+        label.font = UIFont.systemFont(ofSize: 12, weight: .regular)
+        label.numberOfLines = 0
         return label
     }()
 
@@ -38,29 +47,23 @@ final class EmptyStateView: UIView {
     }
 
     private func setupViews() {
-        addSubview(topLabel)
-        addSubview(imageView)
-        addSubview(bottomLabel)
-
-        topLabel.translatesAutoresizingMaskIntoConstraints = false
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        bottomLabel.translatesAutoresizingMaskIntoConstraints = false
+        stackView.addArrangedSubview(topLabel)
+        stackView.addArrangedSubview(imageView)
+        stackView.addArrangedSubview(bottomLabel)
+        
+        addSubview(stackView)
+        stackView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            topLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            topLabel.bottomAnchor.constraint(equalTo: imageView.topAnchor, constant: -16),
-            topLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            topLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
+            stackView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            // ✅ CHANGED: Added a negative constant to shift the content up,
+            // making it appear centered on the whole screen, not just the bottom area.
+            stackView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -60),
+            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 40),
+            stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -40),
 
-            imageView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            imageView.centerYAnchor.constraint(equalTo: centerYAnchor),
             imageView.widthAnchor.constraint(equalToConstant: 123),
             imageView.heightAnchor.constraint(equalToConstant: 123),
-
-            bottomLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            bottomLabel.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 16),
-            bottomLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            bottomLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20)
         ])
     }
 }

@@ -22,21 +22,28 @@ final class SearchViewModel: ObservableObject {
     @Published var searchBarViewModel: HomeSearchBarViewModel
     @Published var popularLocations: [HomeSearchSearchLocationData] = []
     @Published var latestSearches: [HomeSearchSearchLocationData]
+    @Published var lastSearchQuery: String?
     
     weak var delegate: SearchViewModelDelegate?
     
     init(
         searchBarViewModel: HomeSearchBarViewModel,
         latestSearches: [HomeSearchSearchLocationData] = [],
-        activityFetcher: ActivityFetcherProtocol = ActivityFetcher()
+        activityFetcher: ActivityFetcherProtocol = ActivityFetcher(),
+        lastSearchQuery: String? = nil
     ) {
         self.searchBarViewModel = searchBarViewModel
         self.activityFetcher = activityFetcher
         self.latestSearches = latestSearches
+        self.lastSearchQuery = lastSearchQuery
+        if let lastSearchQuery = lastSearchQuery {
+            self.searchBarViewModel.currentTypedText = lastSearchQuery
+        }
     }
     
     @MainActor
     func onAppear() {
+        searchBarViewModel.isSearchBarFocused = true
         activityFetcher.fetchTopDestination() { [weak self] result in
             guard let self else { return }
             switch result {
@@ -53,6 +60,7 @@ final class SearchViewModel: ObservableObject {
     private let activityFetcher: ActivityFetcherProtocol
 
     func applySearch(query: String) {
+        self.lastSearchQuery = query
         delegate?.searchViewModel(didApplySearch: query)
     }
 
