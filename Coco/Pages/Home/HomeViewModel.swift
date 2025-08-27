@@ -39,7 +39,8 @@ final class HomeViewModel {
         currentTypedText: "",
         trailingIcon: nil,
         isTypeAble: false,
-        delegate: self
+        delegate: self,
+        behavior: .hiddenWhenEmpty
     )
     
     private var responseMap: [Int: Activity] = [:]

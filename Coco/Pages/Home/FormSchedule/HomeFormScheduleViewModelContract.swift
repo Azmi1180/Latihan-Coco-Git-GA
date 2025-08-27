@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 protocol HomeFormScheduleViewModelDelegate: AnyObject {
     func notifyFormScheduleDidNavigateToCheckout(with response: CreateBookingResponse)
@@ -14,7 +15,8 @@ protocol HomeFormScheduleViewModelDelegate: AnyObject {
 protocol HomeFormScheduleViewModelAction: AnyObject {
     func setupView(
         calendarViewModel: HomeSearchBarViewModel,
-        paxInputViewModel: HomeSearchBarViewModel
+        paxInputViewModel: HomeSearchBarViewModel,
+        departureTimeViewModel: HomeSearchBarViewModel
     )
     func configureView(data: HomeFormScheduleViewData)
     func showCalendarOption()
@@ -26,5 +28,6 @@ protocol HomeFormScheduleViewModelProtocol: AnyObject {
 
     func onViewDidLoad()
     func onCalendarDidChoose(date: Date)
+    func onDepartureTimeDidChoose(time: String)
     func onCheckout()
 }

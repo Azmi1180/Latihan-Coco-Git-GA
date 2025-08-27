@@ -80,7 +80,7 @@ final class TripDetailView: UIView {
         paxNumberLabel.text = "\(data.paxNumber)"
 
         priceDetailTitle.text = "Pay During Trip"
-        priceDetailPrice.text = "Rp\(data.price)"
+        priceDetailPrice.text = String(data.price)
 
         addressLabel.text = data.address
     }
