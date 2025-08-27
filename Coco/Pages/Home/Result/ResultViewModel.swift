@@ -32,7 +32,8 @@ class ResultViewModel: ResultViewModelProtocol {
             currentTypedText: query,
             trailingIcon: (image: CocoIcon.icFilterIcon.image, didTap: {}),
             isTypeAble: false,
-            delegate: nil
+            delegate: nil,
+            behavior: .fixed
         )
         actionDelegate?.constructNavBar(viewModel: searchBarViewModel)
     }

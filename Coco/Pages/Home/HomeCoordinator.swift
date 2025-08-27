@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import SwiftUI
 
 final class HomeCoordinator: BaseCoordinator {
     struct Input {
@@ -72,26 +73,38 @@ extension HomeCoordinator: HomeViewModelNavigationDelegate {
 
 extension HomeCoordinator: HomeFormScheduleViewModelDelegate {
     func notifyFormScheduleDidNavigateToCheckout(with response: CreateBookingResponse) {
-        let viewModel: CheckoutViewModel = CheckoutViewModel(
-            bookingResponse: response.bookingDetails
-        )
-        viewModel.delegate = self
-        let viewController = CheckoutViewController(viewModel: viewModel)
-
+        // Ensure this is on main thread
         DispatchQueue.main.async { [weak self] in
-            self?.start(viewController: viewController)
+            // Do NOT dismiss HomeFormScheduleVC here. Just show the popup.
+            self?.showCheckoutSuccessPopup()
         }
     }
-}
 
-extension HomeCoordinator: CheckoutViewModelDelegate {
-    func notifyUserDidCheckout() {
-        guard let tabBarController: BaseTabBarViewController = parentCoordinator?.navigationController?.tabBarController as? BaseTabBarViewController
-        else {
-            return
+    private func showCheckoutSuccessPopup() {
+        let popupView = CheckoutCompletedPopUpView { [weak self] in
+            guard let strongSelf = self else { return }
+
+            // Get a reference to the HomeFormScheduleVC's navigation controller
+            // This is the one we ultimately want to dismiss after the popup is gone.
+            guard let homeFormScheduleNavController = strongSelf.navigationController?.presentedViewController else { return }
+
+            // Dismiss the popup view controller first.
+            // The popup is presented by homeFormScheduleNavController.
+            // So, we call dismiss on homeFormScheduleNavController.
+            // The completion block will be executed *after* the popup is fully dismissed.
+            homeFormScheduleNavController.dismiss(animated: true) { [weak homeFormScheduleNavController] in
+                // Now that the popup is dismissed, we can dismiss the homeFormScheduleNavController itself.
+                // homeFormScheduleNavController is presented by strongSelf.navigationController.
+                homeFormScheduleNavController?.presentingViewController?.dismiss(animated: true)
+            }
         }
-        tabBarController.selectedIndex = 1
-        navigationController?.popToRootViewController(animated: true)
+        let hostingController = UIHostingController(rootView: popupView)
+        let popupViewController = CocoPopupViewController(child: hostingController)
+
+        // Present the popup on top of the HomeFormScheduleVC's navigation controller.
+        DispatchQueue.main.async { [weak self] in
+            self?.navigationController?.presentedViewController?.present(popupViewController, animated: true)
+        }
     }
 }
 
@@ -105,7 +118,14 @@ extension HomeCoordinator: ActivityDetailNavigationDelegate {
         )
         viewModel.delegate = self
         let viewController: HomeFormScheduleViewController = HomeFormScheduleViewController(viewModel: viewModel)
-        start(viewController: viewController)
+        let navigationController = UINavigationController(rootViewController: viewController)        
+        if let sheet = navigationController.sheetPresentationController {
+            sheet.detents = [.custom(resolver: { context in
+                0.95 * context.maximumDetentValue
+            })]
+        }
+        
+        self.navigationController?.present(navigationController, animated: true)
     }
 }
 

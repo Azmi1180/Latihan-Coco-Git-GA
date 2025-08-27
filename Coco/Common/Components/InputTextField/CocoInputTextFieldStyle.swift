@@ -16,71 +16,77 @@ struct CocoInputTextFieldStyle: TextFieldStyle {
     let trailingIcon: ImageHandler?
     let shouldInterceptFocus: Bool
     let onFocusedAction: ((Bool) -> Void)?
+    let outlineState: OutlineState
 
     init(
         leadingIcon: UIImage?,
         placeHolder: String?,
         trailingIcon: ImageHandler?,
         shouldInterceptFocus: Bool,
-        onFocusedAction: ((Bool) -> Void)?
+        onFocusedAction: ((Bool) -> Void)?,
+        outlineState: OutlineState = .normal
     ) {
         self.leadingIcon = leadingIcon
         self.placeHolder = placeHolder
         self.trailingIcon = trailingIcon
         self.shouldInterceptFocus = shouldInterceptFocus
         self.onFocusedAction = onFocusedAction
+        self.outlineState = outlineState
     }
 
     // swiftlint:disable identifier_name
     func _body(configuration: TextField<Self._Label>) -> some View {
-        HStack(alignment: .center, spacing: 8.0) {
-            if let leadingIcon: UIImage {
-                Image(uiImage: leadingIcon)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 18.0, height: 18.0)
-            }
+        VStack(alignment: .leading, spacing: 4) { // Change to VStack to stack content vertically
+            HStack(alignment: .center, spacing: 8.0) {
+                if let leadingIcon: UIImage {
+                    Image(uiImage: leadingIcon)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 18.0, height: 18.0)
+                }
 
-            ZStack {
-                GeometryReader { proxy in
-                    configuration
-                        .disabled(shouldInterceptFocus) // Disable interaction if intercepting
+                ZStack {
+                    GeometryReader { proxy in
+                        configuration
+                            .disabled(shouldInterceptFocus) // Disable interaction if intercepting
 
-                    // Transparent layer to intercept taps
-                    if shouldInterceptFocus {
-                        Color.clear
-                            .contentShape(Rectangle())
-                            .frame(width: proxy.size.width - (trailingIcon != nil ? 20.0 : 0), height: 52.0)
-                            .onTapGesture {
-                                onFocusedAction?(true)
-                            }
+                        // Transparent layer to intercept taps
+                        if shouldInterceptFocus {
+                            Color.clear
+                                .contentShape(Rectangle())
+                                .frame(width: proxy.size.width - (trailingIcon != nil ? 20.0 : 0), height: 52.0)
+                                .onTapGesture {
+                                    onFocusedAction?(true)
+                                }
+                        }
                     }
                 }
+
+                Spacer()
+
+                if let trailingIcon: ImageHandler {
+                    Rectangle()
+                        .frame(width: 1.0, height: 18.0)
+                        .foregroundStyle(Token.additionalColorsLine.toColor())
+
+                    Image(uiImage: trailingIcon.image)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 18.0, height: 18.0)
+                        .onTapGesture {
+                            trailingIcon.didTap?()
+                        }
+                }
             }
+            .padding(.vertical, 14.0)
+            .padding(.horizontal, 16.0)
+            .clipShape(Capsule(style: .continuous))
+            .overlay(
+                Capsule(style: .circular)
+                    .inset(by: 0.5) // Inset the capsule slightly to prevent clipping
+                    .stroke(outlineState == .error ? Color.red : Token.mainColorPrimary.toColor(), lineWidth: 1) // ubah warna dan ketebalan sesuai kebutuhan
+            )
 
-            Spacer()
-
-            if let trailingIcon: ImageHandler {
-                Rectangle()
-                    .frame(width: 1.0, height: 18.0)
-                    .foregroundStyle(Token.additionalColorsLine.toColor())
-
-                Image(uiImage: trailingIcon.image)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 18.0, height: 18.0)
-                    .onTapGesture {
-                        trailingIcon.didTap?()
-                    }
-            }
         }
-        .padding(.vertical, 14.0)
-        .padding(.horizontal, 16.0)
-        .clipShape(Capsule(style: .continuous))
-        .overlay(
-            Capsule(style: .circular)
-                .inset(by: 0.5) // Inset the capsule slightly to prevent clipping
-                .stroke(Token.mainColorPrimary.toColor(), lineWidth: 1) // ubah warna dan ketebalan sesuai kebutuhan
-         )
     }
 }

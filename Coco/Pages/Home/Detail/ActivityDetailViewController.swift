@@ -35,6 +35,10 @@ final class ActivityDetailViewController: UIViewController {
 
 extension ActivityDetailViewController: ActivityDetailViewModelAction {
     func configureView(data: ActivityDetailDataModel) {
+        print("🕵️ DEBUG: Memeriksa isi ActivityDetailDataModel...")
+        dump(data)
+        print("-------------------------------------------------")
+        
         thisView.configureView(data)
 
         if data.imageUrlsString.isEmpty {

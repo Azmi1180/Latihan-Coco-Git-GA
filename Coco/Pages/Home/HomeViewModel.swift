@@ -42,7 +42,8 @@ final class HomeViewModel {
             didTap: openFilterTray
         ),
         isTypeAble: false,
-        delegate: self
+        delegate: self,
+        behavior: .hiddenWhenEmpty
     )
     
     private var responseMap: [Int: Activity] = [:]

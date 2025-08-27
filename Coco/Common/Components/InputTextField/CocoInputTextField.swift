@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+
 private let kInputHeight: CGFloat = 52.0
 
 struct CocoInputTextField: View {
@@ -17,6 +18,7 @@ struct CocoInputTextField: View {
     private let leadingIcon: UIImage?
     private let trailingIcon: ImageHandler?
     private let placeholder: String?
+    private let outlineState: OutlineState
 
     @FocusState private var isFocused: Bool
     private let onFocusedAction: ((Bool) -> Void)?
@@ -27,7 +29,8 @@ struct CocoInputTextField: View {
         trailingIcon: ImageHandler? = nil,
         placeholder: String?,
         shouldInterceptFocus: Bool = false,
-        onFocusedAction: ((Bool) -> Void)? = nil
+        onFocusedAction: ((Bool) -> Void)? = nil,
+        outlineState: OutlineState = .normal
     ) {
         self.leadingIcon = leadingIcon
         _currentTypedText = currentTypedText
@@ -35,6 +38,7 @@ struct CocoInputTextField: View {
         self.placeholder = placeholder
         self.shouldInterceptFocus = shouldInterceptFocus
         self.onFocusedAction = onFocusedAction
+        self.outlineState = outlineState
     }
 
     var body: some View {
@@ -49,7 +53,8 @@ struct CocoInputTextField: View {
                 placeHolder: placeholder,
                 trailingIcon: trailingIcon,
                 shouldInterceptFocus: shouldInterceptFocus,
-                onFocusedAction: onFocusedAction
+                onFocusedAction: onFocusedAction,
+                outlineState: outlineState
             )
         )
         .focused($isFocused)
