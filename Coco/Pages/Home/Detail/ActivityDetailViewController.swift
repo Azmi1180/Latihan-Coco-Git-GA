@@ -9,6 +9,8 @@ import Foundation
 import UIKit
 
 final class ActivityDetailViewController: UIViewController {
+    var activityDetailData: ActivityDetailDataModel?
+
     init(viewModel: ActivityDetailViewModelProtocol) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -63,8 +65,14 @@ extension ActivityDetailViewController: ActivityDetailViewModelAction {
 }
 
 extension ActivityDetailViewController: ActivityDetailViewDelegate {
-    func notifyPackagesButtonDidTap(shouldShowAll: Bool) {
-        viewModel.onPackageDetailStateDidChange(shouldShowAll: shouldShowAll)
+    func notifyPackagesButtonDidTap() {
+        guard let packages = activityDetailData?.availablePackages.content else { return }
+        let bottomSheetVC = PackageListBottomSheetViewController(packages: packages)
+        if let sheet = bottomSheetVC.sheetPresentationController {
+            sheet.detents = [.medium(), .large()]
+            sheet.prefersGrabberVisible = true
+        }
+        present(bottomSheetVC, animated: true, completion: nil)
     }
 
     func notifyPackagesDetailDidTap(with packageId: Int) {

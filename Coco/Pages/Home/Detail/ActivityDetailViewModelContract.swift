@@ -12,6 +12,7 @@ protocol ActivityDetailNavigationDelegate: AnyObject {
 }
 
 protocol ActivityDetailViewModelAction: AnyObject {
+    var activityDetailData: ActivityDetailDataModel? { get set }
     func configureView(data: ActivityDetailDataModel)
     func updatePackageData(data: [ActivityDetailDataModel.Package])
     func updateVerificationAndWhatsIncluded(_ data: ActivityDetailDataModel)
@@ -22,6 +23,6 @@ protocol ActivityDetailViewModelProtocol: AnyObject {
     var navigationDelegate: ActivityDetailNavigationDelegate? { get set }
 
     func onViewDidLoad()
-    func onPackageDetailStateDidChange(shouldShowAll: Bool)
     func onPackagesDetailDidTap(with packageId: Int)
+    func getPackages() -> [ActivityDetailDataModel.Package]
 }

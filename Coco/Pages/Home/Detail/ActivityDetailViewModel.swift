@@ -23,6 +23,7 @@ final class ActivityDetailViewModel {
 extension ActivityDetailViewModel: ActivityDetailViewModelProtocol {
     func onViewDidLoad() {
         // First, show the view with initial data immediately
+        actionDelegate?.activityDetailData = data
         actionDelegate?.configureView(data: data)
         
         // Then, fetch verification status and update only if different from default
@@ -50,11 +51,11 @@ extension ActivityDetailViewModel: ActivityDetailViewModelProtocol {
                new.guideLanguage == current.guideLanguage
     }
 
-    func onPackageDetailStateDidChange(shouldShowAll: Bool) {
-        actionDelegate?.updatePackageData(data: shouldShowAll ? data.availablePackages.content : data.hiddenPackages)
-    }
-
     func onPackagesDetailDidTap(with packageId: Int) {
         navigationDelegate?.notifyActivityDetailPackageDidSelect(package: data, selectedPackageId: packageId)
+    }
+
+    func getPackages() -> [ActivityDetailDataModel.Package] {
+        return data.availablePackages.content
     }
 }

@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 protocol ActivityDetailViewDelegate: AnyObject {
-    func notifyPackagesButtonDidTap(shouldShowAll: Bool)
+    func notifyPackagesButtonDidTap()
     func notifyPackagesDetailDidTap(with packageId: Int)
 }
 
@@ -140,15 +140,8 @@ final class ActivityDetailView: UIView {
             $0.removeFromSuperview() 
         }
 
-        // Determine how many packages to show based on button state
-        let packagesToShow: [ActivityDetailDataModel.Package]
-        if isPackageButtonStateHidden {
-            // Show only first 2 packages
-            packagesToShow = Array(data.prefix(2))
-        } else {
-            // Show all packages
-            packagesToShow = data
-        }
+        // Show only first 2 packages
+        let packagesToShow = Array(data.prefix(2))
 
         for (index, item) in packagesToShow.enumerated() {
             let view: UIView = createPackageView(data: item)
@@ -202,7 +195,6 @@ final class ActivityDetailView: UIView {
     private lazy var contentStackView: UIStackView = createStackView(spacing: 29.0)
     private lazy var headerStackView: UIStackView = createStackView(spacing: 0)
 
-    private lazy var isPackageButtonStateHidden: Bool = true
     private var totalPackageCount: Int = 0
 }
 
@@ -730,18 +722,11 @@ private extension ActivityDetailView {
     }
 
     @objc func didTapTextButton() {
-        isPackageButtonStateHidden.toggle()
-        updatePackageButtonText()
-        delegate?.notifyPackagesButtonDidTap(shouldShowAll: !isPackageButtonStateHidden)
+        delegate?.notifyPackagesButtonDidTap()
     }
     
     func updatePackageButtonText() {
-        if isPackageButtonStateHidden {
-            let remainingCount = totalPackageCount - packageContainer.arrangedSubviews.count
-            packageButton.setTitle("See All (\(totalPackageCount))", for: .normal)
-        } else {
-            packageButton.setTitle("Show Less", for: .normal)
-        }
+        packageButton.setTitle("See All (\(totalPackageCount))", for: .normal)
     }
 
     func createWhatsIncludedView(with data: ActivityDetailDataModel.WhatsIncluded) -> UIView {
