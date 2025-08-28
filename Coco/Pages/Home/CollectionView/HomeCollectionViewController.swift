@@ -221,16 +221,20 @@ private extension HomeCollectionViewController {
             let isHidden = (sectionTitle == HomeViewModel.searchResultSectionTitle)
 
             var iconName: String? = nil
+            var iconColor: UIColor? = nil
             switch section.type {
             case .popularDestination:
                 iconName = "star.fill"
+                iconColor = .systemYellow
             case .familyTopPick:
                 iconName = "heart.fill"
+                iconColor = .systemPink
             case .activity:
                 iconName = "mappin.circle.fill"
+                iconColor = .systemRed
             }
 
-            supplementaryView.configureView(title: sectionTitle, isHidden: isHidden, iconName: iconName)
+            supplementaryView.configureView(title: sectionTitle, isHidden: isHidden, iconName: iconName, iconColor: iconColor)
         }
     }
 }
