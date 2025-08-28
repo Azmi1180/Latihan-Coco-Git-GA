@@ -18,13 +18,14 @@ final class HomeReusableHeader: UICollectionReusableView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configureView(title: String, isHidden: Bool = false, iconName: String? = nil) {
+    func configureView(title: String, isHidden: Bool = false, iconName: String? = nil, iconColor: UIColor? = nil) {
         titleLabel.text = title
         titleLabel.isHidden = isHidden
 
         if let iconName = iconName, !isHidden {
             iconImageView.image = UIImage(systemName: iconName)
             iconImageView.isHidden = false
+            iconImageView.tintColor = iconColor ?? Token.additionalColorsBlack
         } else {
             iconImageView.image = nil
             iconImageView.isHidden = true
