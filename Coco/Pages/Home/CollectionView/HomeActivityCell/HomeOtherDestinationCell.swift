@@ -28,6 +28,11 @@ final class HomeOtherDestinationCell: UICollectionViewCell {
         textColor: Token.additionalColorsBlack,
         numberOfLines: 1
     )
+    private let startFromText = UILabel(
+        font: .jakartaSans(size: 14, weight: .medium),
+        textColor: Token.grayscale80,
+        numberOfLines: 1
+    )
     private let areaIcon: UIImageView = {
         let config = UIImage.SymbolConfiguration(weight: .medium) // Or .semibold
         let image = CocoIcon.icActivityAreaIcon.image.withConfiguration(config)
@@ -75,31 +80,10 @@ final class HomeOtherDestinationCell: UICollectionViewCell {
 
         nameLabel.text = dataModel.name
         areaLabel.text = dataModel.area
-
+        startFromText.text = "Start From"
         let formattedPrice = String.formatToIndonesianCurrency(price: dataModel.priceText)
-        let startFromText = "start from "
 
-        let startFromAttributedString = NSAttributedString(
-            string: startFromText,
-            attributes: [
-                .font: UIFont.jakartaSans(size: 12, weight: .medium),
-                .foregroundColor: Token.grayscale80
-            ]
-        )
-
-        let priceAttributedString = NSAttributedString(
-            string: formattedPrice,
-            attributes: [
-                .font: UIFont.jakartaSans(size: 14, weight: .bold),
-                .foregroundColor: Token.additionalColorsBlack
-            ]
-        )
-
-        let combinedAttributedString = NSMutableAttributedString()
-        combinedAttributedString.append(startFromAttributedString)
-        combinedAttributedString.append(priceAttributedString)
-
-        priceLabel.attributedText = combinedAttributedString
+        priceLabel.text = formattedPrice
         familyFriendlyBadgeView.isHidden = !isFamilyFriendly
     }
 }
@@ -130,7 +114,7 @@ private extension HomeOtherDestinationCell {
         areaStack.translatesAutoresizingMaskIntoConstraints = false
 
         // Text stack (name, area, price)
-        let stack = UIStackView(arrangedSubviews: [nameLabel, areaStack, priceLabel])
+        let stack = UIStackView(arrangedSubviews: [nameLabel, areaStack, startFromText, priceLabel])
         stack.axis = .vertical
         stack.spacing = 8
         stack.translatesAutoresizingMaskIntoConstraints = false

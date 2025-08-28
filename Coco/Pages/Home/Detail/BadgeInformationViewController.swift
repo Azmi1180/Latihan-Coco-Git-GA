@@ -42,12 +42,14 @@ class BadgeInformationViewController: UIViewController {
         let badge = createFamilyFriendlyBadge()
         
         // Description
+        // swiftlint:disable line_length
         let descriptionLabel = UILabel()
         descriptionLabel.text = "Trips safe for kids, with facilities and activities for all ages. The Family-Friendly badge appears only when the package includes all required features, ensuring a worry-free experience for parents and children."
         descriptionLabel.font = .jakartaSans(forTextStyle: .body, weight: .regular)
         descriptionLabel.textColor = Token.grayscale90
         descriptionLabel.numberOfLines = 0
-        
+        // swiftlint:enable line_length
+
         // Tags
         let tags = [
             "Certified guide", "Multi-size gear", "Safe access zone", "First aid kit",
