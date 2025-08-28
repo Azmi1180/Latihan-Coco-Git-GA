@@ -12,6 +12,7 @@ protocol ActivityDetailViewDelegate: AnyObject {
     func notifyPackagesButtonDidTap(shouldShowAll: Bool)
     func notifyPackagesDetailDidTap(with packageId: Int)
     func notifyVerifiedProviderDidTap()
+    func notifyFamilyFriendlyBadgeDidTap()
 }
 
 final class ActivityDetailView: UIView {
@@ -393,7 +394,7 @@ private extension ActivityDetailView {
 
     
 
-    func createFamilyFriendlyBadge() -> UIView {
+   func createFamilyFriendlyBadge() -> UIView {
         let hStack = createStackView(spacing: 8, axis: .horizontal)
         hStack.alignment = .center
 
@@ -401,22 +402,22 @@ private extension ActivityDetailView {
         infoIcon.tintColor = Token.grayscale70
         infoIcon.contentMode = .scaleAspectFit
         infoIcon.layout {
-            $0.size(24)
+            $0.size(20)
         }
 
         let badgeContainer = createStackView(spacing: 6, axis: .horizontal)
         badgeContainer.alignment = .center
         badgeContainer.isLayoutMarginsRelativeArrangement = true
-        badgeContainer.layoutMargins = UIEdgeInsets(top: 8, left: 12, bottom: 8, right: 12)
-        badgeContainer.layer.cornerRadius = 18
+        badgeContainer.layoutMargins = UIEdgeInsets(top: 6, left: 10, bottom: 6, right: 10)
+        badgeContainer.layer.cornerRadius = 16
         badgeContainer.backgroundColor = UIColor.from("#B9EC63")
 
         let familyIconView = UIImageView(image: UIImage(named: "familyIcon"))
-        familyIconView.layout { $0.size(22) }
+        familyIconView.layout { $0.size(20) }
 
         let label = UILabel()
         label.text = "Family-Friendly"
-        label.font = .jakartaSans(forTextStyle: .callout, weight: .medium)
+        label.font = .jakartaSans(forTextStyle: .footnote, weight: .bold)
         label.textColor = .black
 
         badgeContainer.addArrangedSubview(familyIconView)
@@ -426,7 +427,15 @@ private extension ActivityDetailView {
         hStack.addArrangedSubview(badgeContainer)
         hStack.addArrangedSubview(UIView()) // Spacer to push to left
 
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(familyFriendlyBadgeTapped))
+        hStack.isUserInteractionEnabled = true
+        hStack.addGestureRecognizer(tapGesture)
+
         return hStack
+    }
+
+    @objc private func familyFriendlyBadgeTapped() {
+        delegate?.notifyFamilyFriendlyBadgeDidTap()
     }
 
     func createBenefitView(title: String) -> UIView {
@@ -586,7 +595,7 @@ private extension ActivityDetailView {
         titleLabel.text = data.name
         
         let tagsStackView = createStackView(spacing: 8, axis: .horizontal)
-       tagsStackView.addArrangedSubview(createTagView(text: data.pax, icon: UIImage(systemName: "Person")))
+       tagsStackView.addArrangedSubview(createTagView(text: "\(data.pax) Pax", icon: UIImage(systemName: "person")))
         tagsStackView.addArrangedSubview(createTagView(text: data.ageRange))
         tagsStackView.addArrangedSubview(UIView()) // Spacer
         
@@ -778,7 +787,7 @@ private extension ActivityDetailView {
     func updatePackageButtonText() {
         if isPackageButtonStateHidden {
             let remainingCount = totalPackageCount - packageContainer.arrangedSubviews.count
-            packageButton.setTitle("See All (\(totalPackageCount))", for: .normal)
+            packageButton.setTitle("See More (\(totalPackageCount-2))", for: .normal)
         } else {
             packageButton.setTitle("Show Less", for: .normal)
         }
