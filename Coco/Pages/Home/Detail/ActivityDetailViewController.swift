@@ -92,4 +92,18 @@ extension ActivityDetailViewController: ActivityDetailViewDelegate {
             })
         }
     }
+    
+    func notifyFamilyFriendlyBadgeDidTap() {
+        let badgeInfoVC = BadgeInformationViewController()
+        if let sheet = badgeInfoVC.sheetPresentationController {
+            let height = self.view.bounds.height * 0.8
+            let customDetent = UISheetPresentationController.Detent.custom { _ in
+                return height
+            }
+            sheet.detents = [customDetent]
+            sheet.prefersGrabberVisible = true
+            sheet.preferredCornerRadius = 24
+        }
+        present(badgeInfoVC, animated: true, completion: nil)
+    }
 }
