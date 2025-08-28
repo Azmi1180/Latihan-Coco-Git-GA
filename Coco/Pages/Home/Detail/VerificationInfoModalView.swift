@@ -54,22 +54,24 @@ final class VerificationInfoModalView: UIView {
         separatorView.backgroundColor = .systemGray5
         
         // --- Body Content ---
+        // swiftlint:disable line_length
         let firstParagraphLabel = createParagraphLabel(
             fullText: "1. The Verified Provider badge is awarded to snorkeling operators holding an official CHSE (Cleanliness, Health, Safety, and Environmental Sustainability) certification. This certification is valid for 3 years and ensures the provider maintains trusted standards of hygiene, safety, and environmental care.",
             boldParts: ["official CHSE (Cleanliness, Health, Safety, and Environmental Sustainability) certification"]
         )
-        
+        // swiftlint:disable line_length
+
         // NOTE: Replace "chse_badge" with the actual name of your image asset.
         let badgeImageView = UIImageView(image: UIImage(named: "chse"))
         badgeImageView.contentMode = .scaleAspectFit
         badgeImageView.layer.cornerRadius = 12
         badgeImageView.clipsToBounds = true
-        
+        // swiftlint:disable line_length
         let secondParagraphLabel = createParagraphLabel(
             fullText: "2. Trips are led by certified guides with professional credentials from recognized organizations such as POSSI, PADI, SSI, NAUI, or ADS-I, ensuring a safe and expertly guided experience.",
             boldParts: ["led by certified guides"]
         )
-        
+        // swiftlint:enable line_length
         let finalParagraphLabel = UILabel()
         finalParagraphLabel.text = "The badge guarantees you are booking with a reliable operator that prioritizes your safety, comfort, and the environment."
         // Using system font as a fallback
