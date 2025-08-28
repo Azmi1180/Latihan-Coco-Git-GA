@@ -31,9 +31,11 @@ final class ActivityDetailView: UIView {
         // Clear existing content to avoid duplication
         contentStackView.arrangedSubviews.forEach { view in
             contentStackView.removeArrangedSubview(view)
+//            view.removeFromSuperview()
         }
         packageContainer.arrangedSubviews.forEach { view in
-            packageContainer.removeArrangedSubview(view)            
+            packageContainer.removeArrangedSubview(view)
+            view.removeFromSuperview()
         }
         
         titleLabel.text = data.title
